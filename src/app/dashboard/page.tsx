@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "@/lib/store/session";
+import { BADGES, calcularNivel } from "@/lib/gamification/badges";
+import { AppShell } from "@/components/AppShell";
 
 const HERRAMIENTAS = [
   { nombre: "Generador de Planeaciones", href: "#", disponible: false },
@@ -13,7 +15,7 @@ const HERRAMIENTAS = [
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { perfil, resultadoTmaid, reiniciar } = useSession();
+  const { perfil, resultadoTmaid, progresoRutas, badges, puntos } = useSession();
 
   useEffect(() => {
     if (!perfil) {
@@ -27,24 +29,15 @@ export default function DashboardPage() {
     return null;
   }
 
-  return (
-    <main className="min-h-screen bg-surface">
-      <header className="glass-nav fixed top-0 z-50 flex w-full items-center justify-between px-6 py-4">
-        <span className="font-headline text-xl font-black tracking-tighter text-primary">
-          Professor AI
-        </span>
-        <button
-          onClick={() => {
-            reiniciar();
-            router.push("/login");
-          }}
-          className="text-xs font-semibold text-on-surface-variant hover:text-primary"
-        >
-          Reiniciar sesión de prueba
-        </button>
-      </header>
+  const { nivel } = calcularNivel(puntos);
+  const totalFases = resultadoTmaid.rutaPersonalizada.length;
+  const completadas = resultadoTmaid.rutaPersonalizada.filter(
+    (f) => progresoRutas[f.fase] === "completado"
+  ).length;
 
-      <div className="mx-auto max-w-3xl px-6 pb-24 pt-32">
+  return (
+    <AppShell titulo="Inicio">
+      <div className="mx-auto max-w-3xl">
         <p className="font-label text-xs font-bold uppercase tracking-widest text-secondary">
           Hola, {perfil.nombre}
         </p>
@@ -52,39 +45,65 @@ export default function DashboardPage() {
           {perfil.materia} · {perfil.nivelEducativo}
         </h1>
 
-        <div className="card mt-6 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-bold text-on-surface-variant">
-              Tu nivel IA
-            </p>
-            <p className="text-2xl font-black text-primary">
-              {resultadoTmaid.nivelAsignado}
-            </p>
-          </div>
-          <Link
-            href="/tmaid/resultado"
-            className="text-sm font-semibold text-secondary hover:underline"
-          >
-            Ver mi perfil completo →
-          </Link>
+        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <MiniStat etiqueta="Nivel IA" valor={resultadoTmaid.nivelAsignado} />
+          <MiniStat etiqueta="Nivel de juego" valor={`Nv. ${nivel}`} />
+          <MiniStat etiqueta="Puntos" valor={`${puntos} pts`} />
+          <MiniStat etiqueta="Badges" valor={`${badges.length}/${Object.keys(BADGES).length}`} />
         </div>
 
         <div className="card mt-4">
-          <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-on-surface-variant">
-            Tu plan de ruta
-          </h2>
-          <div className="flex flex-col gap-3">
-            {resultadoTmaid.rutaPersonalizada.map((fase) => (
-              <div
-                key={fase.fase}
-                className="rounded-lg bg-surface-container-low p-4"
-              >
-                <p className="font-bold text-on-surface">{fase.fase}</p>
-                <p className="text-sm text-on-surface-variant">
-                  {fase.descripcion}
-                </p>
-              </div>
-            ))}
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold uppercase tracking-wide text-on-surface-variant">
+              Tu ruta personalizada
+            </h2>
+            <Link
+              href="/rutas"
+              className="text-sm font-semibold text-secondary hover:underline"
+            >
+              Ver completa →
+            </Link>
+          </div>
+          <p className="mt-1 text-2xl font-black text-primary">
+            {completadas} / {totalFases} fases
+          </p>
+          <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-surface-container-highest">
+            <div
+              className="h-full rounded-full bg-primary transition-all"
+              style={{ width: `${(completadas / totalFases) * 100}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="card mt-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold uppercase tracking-wide text-on-surface-variant">
+              Tus badges
+            </h2>
+            <Link
+              href="/tmaid/resultado"
+              className="text-sm font-semibold text-secondary hover:underline"
+            >
+              Ver mi perfil →
+            </Link>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {Object.values(BADGES).map((badge) => {
+              const desbloqueado = badges.includes(badge.id);
+              return (
+                <span
+                  key={badge.id}
+                  title={`${badge.nombre}: ${badge.descripcion}`}
+                  className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold ${
+                    desbloqueado
+                      ? "bg-secondary-fixed text-on-secondary-fixed"
+                      : "bg-surface-container-low text-on-surface-variant opacity-40"
+                  }`}
+                >
+                  {badge.emoji} {badge.nombre}
+                </span>
+              );
+            })}
           </div>
         </div>
 
@@ -118,6 +137,17 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    </main>
+    </AppShell>
+  );
+}
+
+function MiniStat({ etiqueta, valor }: { etiqueta: string; valor: string }) {
+  return (
+    <div className="rounded-xl bg-surface-container-lowest p-4 text-center shadow-ambient">
+      <p className="font-label text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+        {etiqueta}
+      </p>
+      <p className="mt-1 text-lg font-black text-on-surface">{valor}</p>
+    </div>
   );
 }

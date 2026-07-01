@@ -2,12 +2,15 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useSession } from "@/lib/store/session";
 import { ETIQUETA_DIMENSION } from "@/lib/tmaid/scoring";
+import { BADGES, calcularNivel } from "@/lib/gamification/badges";
+import { AppShell } from "@/components/AppShell";
 
 export default function ResultadoTmaidPage() {
   const router = useRouter();
-  const { perfil, resultadoTmaid } = useSession();
+  const { perfil, resultadoTmaid, badges, puntos } = useSession();
 
   useEffect(() => {
     if (!perfil) {
@@ -25,9 +28,10 @@ export default function ResultadoTmaidPage() {
     keyof typeof resultadoTmaid.dimensiones,
     number
   ][];
+  const { nivel, siguienteEn } = calcularNivel(puntos);
 
   return (
-    <main className="min-h-screen bg-surface px-6 pb-24 pt-16">
+    <AppShell titulo="Perfil">
       <div className="mx-auto max-w-2xl">
         <p className="font-label text-xs font-bold uppercase tracking-widest text-secondary">
           Tu perfil docente
@@ -37,6 +41,51 @@ export default function ResultadoTmaidPage() {
         </h1>
 
         <div className="card mt-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-wide text-on-surface-variant">
+                Nivel de juego {nivel}
+              </h2>
+              <p className="text-2xl font-black text-primary">{puntos} pts</p>
+            </div>
+            {siguienteEn && (
+              <p className="text-xs text-on-surface-variant">
+                {siguienteEn - puntos} pts para nivel {nivel + 1}
+              </p>
+            )}
+          </div>
+          <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-surface-container-highest">
+            <div
+              className="h-full rounded-full bg-secondary-container"
+              style={{
+                width: siguienteEn
+                  ? `${Math.min(100, (puntos / siguienteEn) * 100)}%`
+                  : "100%",
+              }}
+            />
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {Object.values(BADGES).map((badge) => {
+              const desbloqueado = badges.includes(badge.id);
+              return (
+                <span
+                  key={badge.id}
+                  title={`${badge.nombre}: ${badge.descripcion}`}
+                  className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold ${
+                    desbloqueado
+                      ? "bg-secondary-fixed text-on-secondary-fixed"
+                      : "bg-surface-container-low text-on-surface-variant opacity-40"
+                  }`}
+                >
+                  {badge.emoji} {badge.nombre}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="card mt-4">
           <h2 className="text-sm font-bold uppercase tracking-wide text-on-surface-variant">
             Perfil pedagógico-IA
           </h2>
@@ -82,39 +131,10 @@ export default function ResultadoTmaidPage() {
           </ul>
         </div>
 
-        <div className="card mt-4">
-          <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-on-surface-variant">
-            Tu ruta personalizada
-          </h2>
-          <div className="flex flex-col gap-4">
-            {resultadoTmaid.rutaPersonalizada.map((fase, i) => (
-              <div key={fase.fase} className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary-container text-sm font-bold text-on-secondary-container">
-                    {i + 1}
-                  </span>
-                  {i < resultadoTmaid.rutaPersonalizada.length - 1 && (
-                    <span className="mt-1 h-full w-px flex-1 bg-outline-variant/40" />
-                  )}
-                </div>
-                <div className="pb-4">
-                  <p className="font-bold text-on-surface">{fase.fase}</p>
-                  <p className="text-sm text-on-surface-variant">
-                    {fase.descripcion}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <button
-          onClick={() => router.push("/dashboard")}
-          className="btn-primary mt-6 w-full"
-        >
-          Ir a mi escritorio →
-        </button>
+        <Link href="/rutas" className="btn-primary mt-6 block text-center">
+          Ver mi ruta interactiva →
+        </Link>
       </div>
-    </main>
+    </AppShell>
   );
 }

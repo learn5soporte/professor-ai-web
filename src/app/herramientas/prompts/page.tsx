@@ -2,14 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useSession } from "@/lib/store/session";
 import { PROMPTS } from "@/lib/herramientas/prompts";
+import { AppShell } from "@/components/AppShell";
+import { BadgeUnlockToast } from "@/components/BadgeUnlockToast";
+import { BADGES } from "@/lib/gamification/badges";
 
 export default function BancoPromptsPage() {
   const router = useRouter();
-  const { perfil } = useSession();
+  const { perfil, otorgarBadge } = useSession();
   const [copiadoIdx, setCopiadoIdx] = useState<number | null>(null);
+  const [badgeGanado, setBadgeGanado] = useState<null | (typeof BADGES)[string]>(
+    null
+  );
 
   useEffect(() => {
     if (!perfil) router.replace("/login");
@@ -22,22 +27,19 @@ export default function BancoPromptsPage() {
       await navigator.clipboard.writeText(texto);
       setCopiadoIdx(idx);
       setTimeout(() => setCopiadoIdx((cur) => (cur === idx ? null : cur)), 1500);
+      if (otorgarBadge("primer-prompt")) {
+        setBadgeGanado(BADGES["primer-prompt"]);
+      }
     } catch {
       // Si el navegador bloquea el acceso al portapapeles, no rompemos la UI.
     }
   }
 
   return (
-    <main className="min-h-screen bg-surface px-6 pb-24 pt-16">
+    <AppShell titulo="Banco de Prompts">
+      <BadgeUnlockToast badge={badgeGanado} onClose={() => setBadgeGanado(null)} />
       <div className="mx-auto max-w-2xl">
-        <Link
-          href="/dashboard"
-          className="text-sm font-semibold text-secondary hover:underline"
-        >
-          ← Escritorio
-        </Link>
-
-        <p className="mt-4 font-label text-xs font-bold uppercase tracking-widest text-secondary">
+        <p className="font-label text-xs font-bold uppercase tracking-widest text-secondary">
           Herramienta 3 · Módulo de creación
         </p>
         <h1 className="mt-2 text-3xl font-black text-on-surface">
@@ -77,6 +79,6 @@ export default function BancoPromptsPage() {
           ))}
         </div>
       </div>
-    </main>
+    </AppShell>
   );
 }
