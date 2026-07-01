@@ -10,17 +10,18 @@ import { AppShell } from "@/components/AppShell";
 
 export default function ResultadoTmaidPage() {
   const router = useRouter();
-  const { perfil, resultadoTmaid, badges, puntos } = useSession();
+  const { perfil, resultadoTmaid, badges, puntos, cargando } = useSession();
 
   useEffect(() => {
+    if (cargando) return;
     if (!perfil) {
       router.replace("/login");
     } else if (!resultadoTmaid) {
       router.replace("/tmaid");
     }
-  }, [perfil, resultadoTmaid, router]);
+  }, [cargando, perfil, resultadoTmaid, router]);
 
-  if (!perfil || !resultadoTmaid) {
+  if (cargando || !perfil || !resultadoTmaid) {
     return null;
   }
 

@@ -10,17 +10,18 @@ import { BADGES } from "@/lib/gamification/badges";
 
 export default function BancoPromptsPage() {
   const router = useRouter();
-  const { perfil, otorgarBadge } = useSession();
+  const { perfil, otorgarBadge, cargando } = useSession();
   const [copiadoIdx, setCopiadoIdx] = useState<number | null>(null);
   const [badgeGanado, setBadgeGanado] = useState<null | (typeof BADGES)[string]>(
     null
   );
 
   useEffect(() => {
+    if (cargando) return;
     if (!perfil) router.replace("/login");
-  }, [perfil, router]);
+  }, [cargando, perfil, router]);
 
-  if (!perfil) return null;
+  if (cargando || !perfil) return null;
 
   async function copiar(texto: string, idx: number) {
     try {

@@ -30,7 +30,7 @@ const CONTEXTO_DIMENSION: Record<Dimension, string> = {
 
 export default function TmaidPage() {
   const router = useRouter();
-  const { perfil, guardarResultadoTmaid, otorgarBadge } = useSession();
+  const { perfil, guardarResultadoTmaid, otorgarBadge, cargando } = useSession();
   const [paso, setPaso] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<string, number>>({});
   const [miedos, setMiedos] = useState("");
@@ -39,8 +39,9 @@ export default function TmaidPage() {
   );
 
   useEffect(() => {
+    if (cargando) return;
     if (!perfil) router.replace("/login");
-  }, [perfil, router]);
+  }, [cargando, perfil, router]);
 
   const esPreguntaAbierta = paso === PREGUNTAS_LIKERT.length;
   const pregunta = !esPreguntaAbierta ? PREGUNTAS_LIKERT[paso] : null;
@@ -77,7 +78,7 @@ export default function TmaidPage() {
     if (paso > 0) setPaso((p) => p - 1);
   }
 
-  if (!perfil) return null;
+  if (cargando || !perfil) return null;
 
   return (
     <AppShell titulo="Diagnóstico TMAID">

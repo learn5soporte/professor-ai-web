@@ -34,7 +34,7 @@ const CONTEXTO: Record<(typeof STEPS)[number], string> = {
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { perfil, guardarPerfil, otorgarBadge } = useSession();
+  const { perfil, guardarPerfil, otorgarBadge, cargando } = useSession();
   const [step, setStep] = useState(0);
   const [badgeGanado, setBadgeGanado] = useState<null | (typeof BADGES)[string]>(
     null
@@ -48,8 +48,9 @@ export default function OnboardingPage() {
   });
 
   useEffect(() => {
+    if (cargando) return;
     if (!perfil) router.replace("/login");
-  }, [perfil, router]);
+  }, [cargando, perfil, router]);
 
   const key = STEPS[step];
   const isLast = step === STEPS.length - 1;
@@ -72,7 +73,7 @@ export default function OnboardingPage() {
     setStep((s) => s - 1);
   }
 
-  if (!perfil) return null;
+  if (cargando || !perfil) return null;
 
   return (
     <AppShell titulo="Onboarding">

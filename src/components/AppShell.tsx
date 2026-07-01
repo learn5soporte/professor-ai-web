@@ -30,14 +30,21 @@ export function AppShell({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { perfil, resultadoTmaid, reiniciar, puntos, racha, registrarActividadDiaria } =
-    useSession();
+  const {
+    perfil,
+    resultadoTmaid,
+    reiniciar,
+    puntos,
+    racha,
+    registrarActividadDiaria,
+    cargando,
+  } = useSession();
   const { nivel } = calcularNivel(puntos);
 
   useEffect(() => {
-    registrarActividadDiaria();
+    if (!cargando) registrarActividadDiaria();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [cargando]);
 
   return (
     <div className="min-h-screen bg-surface">

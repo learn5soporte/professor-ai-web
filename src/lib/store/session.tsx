@@ -58,6 +58,7 @@ type SessionState = {
 };
 
 type SessionContextValue = SessionState & {
+  cargando: boolean;
   iniciarSesionMock: (nombre: string) => void;
   guardarPerfil: (perfil: PerfilDocente) => void;
   guardarResultadoTmaid: (resultado: ResultadoTmaid) => void;
@@ -106,6 +107,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const value: SessionContextValue = {
     ...state,
+    cargando: !hydrated,
     iniciarSesionMock: (nombre: string) =>
       setState((prev) => ({
         ...prev,

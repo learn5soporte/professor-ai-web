@@ -28,18 +28,25 @@ const ETIQUETA_ESTADO: Record<EstadoFase, string> = {
 
 export default function RutasPage() {
   const router = useRouter();
-  const { perfil, resultadoTmaid, progresoRutas, actualizarProgresoFase, otorgarBadge } =
-    useSession();
+  const {
+    perfil,
+    resultadoTmaid,
+    progresoRutas,
+    actualizarProgresoFase,
+    otorgarBadge,
+    cargando,
+  } = useSession();
   const [badgeGanado, setBadgeGanado] = useState<null | (typeof BADGES)[string]>(
     null
   );
 
   useEffect(() => {
+    if (cargando) return;
     if (!perfil) router.replace("/login");
     else if (!resultadoTmaid) router.replace("/tmaid");
-  }, [perfil, resultadoTmaid, router]);
+  }, [cargando, perfil, resultadoTmaid, router]);
 
-  if (!perfil || !resultadoTmaid) return null;
+  if (cargando || !perfil || !resultadoTmaid) return null;
 
   const totalFases = resultadoTmaid.rutaPersonalizada.length;
   const completadas = resultadoTmaid.rutaPersonalizada.filter(
