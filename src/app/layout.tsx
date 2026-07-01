@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Manrope } from "next/font/google";
+import { SessionProvider } from "@/lib/store/session";
 import "./globals.css";
 
 // Tipografía Lumina Academic: Plus Jakarta Sans (headlines) + Manrope (body/labels)
@@ -28,7 +29,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className={`${plusJakartaSans.variable} ${manrope.variable}`}>
-      <body>{children}</body>
+      <body>
+        <SessionProvider>{children}</SessionProvider>
+      </body>
     </html>
   );
 }

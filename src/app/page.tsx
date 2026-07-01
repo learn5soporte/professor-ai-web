@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-surface">
@@ -6,7 +8,7 @@ export default function Home() {
           Professor AI
         </span>
         <span className="font-label text-xs uppercase tracking-widest text-on-surface-variant">
-          Fase 0 · Setup
+          Prototipo clickeable · sin backend real aún
         </span>
       </header>
 
@@ -19,23 +21,25 @@ export default function Home() {
             Tu asistente de IA para el aula.
           </h1>
           <p className="mt-4 max-w-xl text-lg text-on-surface-variant">
-            Diagnostica, crea y evoluciona contigo. Este layout base confirma
-            que los tokens de Lumina Academic (azul #0040a1, dorado #feb700,
-            Plus Jakarta Sans + Manrope) están aplicados correctamente sobre
-            Next.js + Tailwind.
+            Diagnostica, crea y evoluciona contigo. Recorre el flujo completo:
+            entra, cuéntanos tu contexto, haz el diagnóstico TMAID y llega a
+            tu escritorio con una ruta personalizada — todo con datos
+            simulados por ahora, listo para conectar a Supabase real.
           </p>
         </div>
 
         <div className="flex gap-4">
-          <button className="btn-primary">Comenzar diagnóstico</button>
-          <button className="btn-secondary">Ver mi ruta</button>
+          <Link href="/login" className="btn-primary">
+            Comenzar diagnóstico →
+          </Link>
         </div>
 
         <div className="card">
-          <h2 className="text-lg font-bold">Módulos (Fase 0 — estructura)</h2>
+          <h2 className="text-lg font-bold">Recorrido del prototipo</h2>
           <p className="mt-2 text-sm text-on-surface-variant">
-            auth · onboarding · tmaid · dashboard · herramientas · seguimiento
-            · institucional — ver <code>src/modules</code>.
+            /login → /onboarding → /tmaid → /tmaid/resultado → /dashboard →
+            /herramientas/prompts. Módulos de código en{" "}
+            <code>src/modules</code>.
           </p>
         </div>
       </section>
