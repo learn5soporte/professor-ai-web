@@ -16,39 +16,41 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-surface px-6">
-      <div className="card w-full max-w-md">
-        <p className="font-label text-xs font-bold uppercase tracking-widest text-secondary">
+    <main className="dark-screen flex items-center justify-center px-6">
+      <div className="dark-screen-glow-blue -right-10 -top-10 h-72 w-72" />
+
+      <div className="relative z-10 w-full max-w-md rounded-xl bg-white/5 p-8 backdrop-blur-md">
+        <p className="font-label text-xs font-bold uppercase tracking-widest text-tertiary-fixed">
           Professor AI · Learn5
         </p>
-        <h1 className="mt-2 text-3xl font-black text-on-surface">
-          Bienvenido, docente.
-        </h1>
-        <p className="mt-2 text-sm text-on-surface-variant">
-          Prototipo Fase 0 — sin cuenta real todavía. Escribe tu nombre para
+        <h2 className="mt-2 text-2xl font-black text-white">
+          Iniciar Sesion
+        </h2>
+        <p className="mt-2 text-sm text-white/50">
+          Prototipo Fase 0 — sin cuenta real todavia. Escribe tu nombre para
           simular tu entrada y recorrer el flujo completo.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <label className="flex flex-col gap-1">
-            <span className="font-label text-xs font-semibold text-on-surface-variant">
+            <span className="font-label text-xs font-semibold text-white/50">
               Nombre
             </span>
             <input
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               placeholder="Ej. Marcela Rojas"
-              className="rounded-lg bg-surface-container-low px-4 py-3 text-on-surface outline-none ring-1 ring-outline-variant/20 focus:ring-2 focus:ring-primary"
+              className="dark-input"
             />
           </label>
 
-          <button type="submit" className="btn-primary">
+          <button type="submit" className="btn-accent">
             Comenzar →
           </button>
         </form>
 
-        <p className="mt-6 text-xs text-on-surface-variant">
-          En Fase 1 esto se reemplaza por Supabase Auth (email/contraseña +
+        <p className="mt-6 text-xs text-white/40">
+          En Fase 1 esto se reemplaza por Supabase Auth (email/contrasena +
           Google OAuth) manteniendo esta misma pantalla.
         </p>
       </div>
