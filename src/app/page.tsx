@@ -1,51 +1,40 @@
 import Link from "next/link";
+import { DarkScreen } from "@/components/DarkScreen";
 
-export default function Home() {
+/**
+ * SCREEN 1: SPLASH -- base literal: code.html real de Stitch
+ * (bloque_1_y_2_acceso_y_onboarding), sin adaptar estructura ni copy.
+ */
+export default function SplashPage() {
   return (
-    <main className="dark-screen">
-      <div className="dark-screen-glow-blue -left-20 -top-20 h-72 w-72" />
-      <div className="dark-screen-glow-gold right-0 top-1/3 h-96 w-96" />
-
-      <header className="relative z-10 flex w-full items-center justify-between px-6 py-4">
-        <span className="font-headline text-xl font-black tracking-tighter text-white">
+    <DarkScreen>
+      <section className="flex w-full max-w-4xl flex-col items-center justify-center px-margin-mobile text-center">
+        <div className="relative mb-8">
+          <div className="glow-node pulse-ai flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-tr from-secondary to-on-secondary-fixed md:h-40 md:w-40">
+            <span className="font-headline-lg text-headline-lg font-black text-white md:text-display-lg">
+              P
+            </span>
+          </div>
+        </div>
+        <h1 className="font-headline-lg mb-4 text-headline-lg-mobile font-black tracking-tighter md:font-display-lg md:text-display-lg">
           Professor AI
-        </span>
-        <span className="font-label text-xs uppercase tracking-widest text-white/50">
-          Prototipo clickeable · sin backend real aun
-        </span>
-      </header>
-
-      <section className="relative z-10 mx-auto flex max-w-4xl flex-col gap-8 px-6 pb-24 pt-24">
-        <div>
-          <p className="font-label text-xs font-bold uppercase tracking-widest text-tertiary-fixed">
-            Identidad visual: Humanist Futurist
-          </p>
-          <h1 className="mt-2 text-5xl font-black text-white">
-            Tu asistente de IA para el aula.
-          </h1>
-          <p className="mt-4 max-w-xl text-lg text-white/60">
-            Diagnostica, crea y evoluciona contigo. Recorre el flujo completo:
-            entra, cuentanos tu contexto, haz el diagnostico TMAID y llega a
-            tu escritorio con una ruta personalizada — todo con datos
-            simulados por ahora, listo para conectar a Supabase real.
-          </p>
+        </h1>
+        <p className="font-body-lg mx-auto mb-12 max-w-md text-body-lg text-white/50">
+          Tu asistente de IA para el aula. Diagnostica, crea y evoluciona
+          contigo.
+        </p>
+        <div className="flex justify-center gap-2">
+          <div className="loader-dot h-3 w-3 rounded-full bg-tertiary-fixed-dim" />
+          <div className="loader-dot h-3 w-3 rounded-full bg-tertiary-fixed-dim" />
+          <div className="loader-dot h-3 w-3 rounded-full bg-tertiary-fixed-dim" />
         </div>
-
-        <div className="flex gap-4">
-          <Link href="/login" className="btn-accent">
-            Comenzar diagnostico →
-          </Link>
-        </div>
-
-        <div className="rounded-xl bg-white/5 p-6 backdrop-blur-md">
-          <h2 className="text-lg font-bold text-white">Recorrido del prototipo</h2>
-          <p className="mt-2 text-sm text-white/50">
-            /login → /onboarding → /tmaid → /tmaid/resultado → /dashboard →
-            /herramientas/prompts. Modulos de codigo en{" "}
-            <code>src/modules</code>.
-          </p>
-        </div>
+        <Link
+          href="/login"
+          className="mt-12 text-xs font-bold uppercase tracking-widest text-white/40 transition-colors hover:text-white"
+        >
+          Comenzar →
+        </Link>
       </section>
-    </main>
+    </DarkScreen>
   );
 }
