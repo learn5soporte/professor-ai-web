@@ -3,40 +3,41 @@
 @tailwind utilities;
 
 /*
-  Lumina Academic — reglas del sistema de diseño (DESIGN.md):
+  Humanismo Futurista - reglas del sistema de diseno (Stitch "Pedagogical OS"):
   1. "No-Line Rule": no usar bordes 1px para separar secciones.
-     La jerarquía se logra con cambios de superficie (surface -> surface-container-low -> surface-container-lowest).
+     La jerarquia se logra con cambios de superficie (surface -> surface-container-low -> surface-container-lowest),
+     ahora sobre una base navy profunda en vez de blanca.
   2. Glass & Gradient: navbars/FABs flotantes usan surface-container-lowest al 80% + blur.
-  3. Botones primarios: gradiente primary -> primary-container, radio "full" (pill).
+  3. Botones primarios: gradiente dorado primary -> primary-container, radio "full" (pill), texto oscuro.
 */
 
 @layer base {
-  body {
-    @apply bg-surface text-on-surface font-body antialiased;
-  }
+    body {
+          @apply bg-surface text-on-surface font-body antialiased;
+    }
 
   h1,
-  h2,
-  h3 {
-    @apply font-headline tracking-tight;
-  }
+    h2,
+    h3 {
+          @apply font-headline tracking-tight;
+    }
 }
 
 @layer components {
-  .btn-primary {
-    @apply rounded-full px-6 py-3 font-body font-semibold text-on-primary shadow-ambient transition-opacity active:scale-95;
-    background-image: linear-gradient(135deg, theme("colors.primary"), theme("colors.primary-container"));
-  }
+    .btn-primary {
+          @apply rounded-full px-6 py-3 font-body font-semibold text-on-primary shadow-ambient transition-opacity active:scale-95;
+          background-image: linear-gradient(135deg, theme("colors.primary"), theme("colors.primary-container"));
+    }
 
   .btn-secondary {
-    @apply rounded-full bg-secondary-fixed px-6 py-3 font-body font-semibold text-on-secondary-fixed transition-opacity active:scale-95;
+        @apply rounded-full bg-secondary-fixed px-6 py-3 font-body font-semibold text-on-secondary-fixed transition-opacity active:scale-95;
   }
 
   .card {
-    @apply rounded-xl bg-surface-container-lowest p-6;
+        @apply rounded-xl bg-surface-container-lowest p-6;
   }
 
   .glass-nav {
-    @apply bg-surface-container-lowest/80 backdrop-blur-glass;
+        @apply bg-surface-container-lowest/80 backdrop-blur-glass;
   }
 }
