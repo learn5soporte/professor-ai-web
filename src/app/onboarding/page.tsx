@@ -4,11 +4,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lightbulb } from "lucide-react";
 import { useSession, type PerfilDocente } from "@/lib/store/session";
-import { AppShell } from "@/components/AppShell";
 import { BadgeUnlockToast } from "@/components/BadgeUnlockToast";
 import { BADGES } from "@/lib/gamification/badges";
 
-const NIVELES = ["Primaria", "Secundaria", "Universidad", "Formación corporativa"];
+const NIVELES = ["Primaria", "Secundaria", "Universidad", "Formacion corporativa"];
 const USO_PREVIO = ["Nunca", "Algo", "Regularmente"];
 
 const STEPS = [
@@ -21,15 +20,15 @@ const STEPS = [
 
 const CONTEXTO: Record<(typeof STEPS)[number], string> = {
   nivelEducativo:
-    "Usamos esto para ajustar el lenguaje y la complejidad de todo lo que te mostremos después — no es lo mismo IA para primaria que para universidad.",
+    "Usamos esto para ajustar el lenguaje y la complejidad de todo lo que te mostremos despues — no es lo mismo IA para primaria que para universidad.",
   materia:
-    "Cada herramienta y ejemplo que generemos parte de tu disciplina, para que nunca tengas que \"traducir\" contenido genérico a tu materia.",
+    "Cada herramienta y ejemplo que generemos parte de tu disciplina, para que nunca tengas que \"traducir\" contenido generico a tu materia.",
   pais:
-    "Nos ayuda a considerar el contexto educativo local (currículo, idioma, recursos disponibles) al sugerirte actividades.",
+    "Nos ayuda a considerar el contexto educativo local (curriculo, idioma, recursos disponibles) al sugerirte actividades.",
   usoPrevioIA:
-    "Así calibramos tu diagnóstico TMAID: si ya tienes experiencia, no te haremos empezar de cero.",
+    "Asi calibramos tu diagnostico TMAID: si ya tienes experiencia, no te haremos empezar de cero.",
   mayorDesafio:
-    "Tu ruta personalizada se ancla a este desafío — cada reto que te propongamos apunta a resolverlo.",
+    "Tu ruta personalizada se ancla a este desafio — cada reto que te propongamos apunta a resolverlo.",
 };
 
 export default function OnboardingPage() {
@@ -76,28 +75,25 @@ export default function OnboardingPage() {
   if (cargando || !perfil) return null;
 
   return (
-    <AppShell titulo="Onboarding">
+    <main className="dark-screen px-6 py-10">
+      <div className="dark-screen-glow-blue -right-20 top-0 h-72 w-72" />
       <BadgeUnlockToast badge={badgeGanado} onClose={() => setBadgeGanado(null)} />
-      <div className="mx-auto flex max-w-3xl flex-col gap-6 lg:flex-row lg:items-start">
-        <div className="card w-full lg:max-w-lg">
-          <div className="mb-6 flex items-center justify-between">
-            <p className="font-label text-xs font-bold uppercase tracking-widest text-secondary">
-              Paso {step + 1} de {STEPS.length}
-            </p>
-            <div className="flex gap-1">
-              {STEPS.map((s, i) => (
-                <span
-                  key={s}
-                  className={`h-1.5 w-6 rounded-full ${
-                    i <= step ? "bg-primary" : "bg-surface-container-highest"
-                  }`}
-                />
-              ))}
-            </div>
+
+      <div className="relative z-10 mx-auto flex max-w-3xl flex-col gap-6 lg:flex-row lg:items-start">
+        <div className="w-full rounded-xl bg-white/5 p-8 backdrop-blur-md lg:max-w-lg">
+          <div className="mb-8 flex gap-2">
+            {STEPS.map((s, i) => (
+              <span
+                key={s}
+                className={`h-1 flex-1 rounded-full ${
+                  i <= step ? "bg-secondary" : "bg-white/10"
+                }`}
+              />
+            ))}
           </div>
 
           {key === "nivelEducativo" && (
-            <StepPregunta titulo="¿En qué nivel enseñas?">
+            <StepPregunta titulo="En que nivel ensenas?">
               <div className="grid grid-cols-2 gap-3">
                 {NIVELES.map((nivel) => (
                   <OpcionBoton
@@ -115,9 +111,9 @@ export default function OnboardingPage() {
           )}
 
           {key === "materia" && (
-            <StepPregunta titulo="¿Cuál es tu materia o área principal?">
+            <StepPregunta titulo="Cual es tu materia o area principal?">
               <CampoTexto
-                placeholder="Ej. Matemáticas, Historia, Biología..."
+                placeholder="Ej. Matematicas, Historia, Biologia..."
                 value={form.materia}
                 onChange={(v) => setForm((f) => ({ ...f, materia: v }))}
               />
@@ -125,9 +121,9 @@ export default function OnboardingPage() {
           )}
 
           {key === "pais" && (
-            <StepPregunta titulo="¿En qué país/región trabajas?">
+            <StepPregunta titulo="En que pais/region trabajas?">
               <CampoTexto
-                placeholder="Ej. Colombia, México, Florida (EE.UU.)..."
+                placeholder="Ej. Colombia, Mexico, Florida (EE.UU.)..."
                 value={form.pais}
                 onChange={(v) => setForm((f) => ({ ...f, pais: v }))}
               />
@@ -135,7 +131,7 @@ export default function OnboardingPage() {
           )}
 
           {key === "usoPrevioIA" && (
-            <StepPregunta titulo="¿Has usado IA antes en tu trabajo docente?">
+            <StepPregunta titulo="Has usado IA antes en tu trabajo docente?">
               <div className="flex flex-col gap-3">
                 {USO_PREVIO.map((uso) => (
                   <OpcionBoton
@@ -153,7 +149,7 @@ export default function OnboardingPage() {
           )}
 
           {key === "mayorDesafio" && (
-            <StepPregunta titulo="¿Cuál es tu mayor desafío hoy en el aula?">
+            <StepPregunta titulo="Cual es tu mayor desafio hoy en el aula?">
               <CampoTexto
                 placeholder="Ej. Motivar a estudiantes desconectados, falta de tiempo..."
                 value={form.mayorDesafio}
@@ -166,31 +162,31 @@ export default function OnboardingPage() {
             <button
               onClick={back}
               disabled={step === 0}
-              className="rounded-full px-5 py-2 text-sm font-semibold text-on-surface-variant disabled:opacity-0"
+              className="rounded-full px-5 py-2 text-sm font-semibold text-white/50 disabled:opacity-0"
             >
-              Atrás
+              Atras
             </button>
             <button
               onClick={next}
               disabled={!canContinue}
-              className="btn-primary disabled:opacity-40"
+              className="btn-accent disabled:opacity-40"
             >
-              {isLast ? "Ir al diagnóstico →" : "Continuar →"}
+              {isLast ? "Ir al diagnostico →" : "Continuar →"}
             </button>
           </div>
         </div>
 
-        <div className="w-full rounded-xl bg-secondary-fixed p-5 lg:max-w-xs">
-          <div className="flex items-center gap-2 text-on-secondary-fixed">
+        <div className="w-full rounded-xl bg-white/5 p-5 backdrop-blur-md lg:max-w-xs">
+          <div className="flex items-center gap-2 text-tertiary-fixed">
             <Lightbulb size={18} />
             <p className="font-label text-xs font-bold uppercase tracking-widest">
-              Por qué preguntamos esto
+              Por que preguntamos esto
             </p>
           </div>
-          <p className="mt-2 text-sm text-on-secondary-fixed">{CONTEXTO[key]}</p>
+          <p className="mt-2 text-sm text-white/60">{CONTEXTO[key]}</p>
         </div>
       </div>
-    </AppShell>
+    </main>
   );
 }
 
@@ -203,7 +199,7 @@ function StepPregunta({
 }) {
   return (
     <div>
-      <h1 className="mb-5 text-2xl font-black text-on-surface">{titulo}</h1>
+      <h1 className="mb-5 text-2xl font-black text-white">{titulo}</h1>
       {children}
     </div>
   );
@@ -222,10 +218,10 @@ function OpcionBoton({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-lg px-4 py-3 text-left text-sm font-semibold transition-colors ${
+      className={`rounded-md border px-4 py-3 text-left text-sm font-semibold transition-colors ${
         activo
-          ? "bg-primary text-on-primary"
-          : "bg-surface-container-low text-on-surface hover:bg-surface-container"
+          ? "border-transparent bg-secondary text-white"
+          : "border-white/5 bg-white/5 text-white/80 hover:bg-white/10"
       }`}
     >
       {children}
@@ -248,7 +244,7 @@ function CampoTexto({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full rounded-lg bg-surface-container-low px-4 py-3 text-on-surface outline-none ring-1 ring-outline-variant/20 focus:ring-2 focus:ring-primary"
+      className="dark-input"
     />
   );
 }
