@@ -25,6 +25,8 @@ export type PerfilDocente = {
   pais: string;
   usoPrevioIA: string;
   mayorDesafio: string;
+  /** Paso 4 del onboarding real de Stitch: "¿Qué quieres lograr?" */
+  objetivoPrincipal: string;
 };
 
 export type ResultadoTmaid = {
@@ -119,6 +121,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           pais: "",
           usoPrevioIA: "",
           mayorDesafio: "",
+          objetivoPrincipal: "",
         },
       })),
     guardarPerfil: (perfil: PerfilDocente) =>
