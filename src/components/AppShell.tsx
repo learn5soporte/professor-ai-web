@@ -16,7 +16,7 @@ type Tab = {
 
 const TABS: Tab[] = [
   { href: "/dashboard", label: "Inicio", icon: Home, requiereTmaid: false },
-  { href: "/tmaid", label: "Diagnóstico", icon: ClipboardList, requiereTmaid: false },
+  { href: "/tmaid", label: "Diagnostico", icon: ClipboardList, requiereTmaid: false },
   { href: "/rutas", label: "Rutas", icon: Map, requiereTmaid: true },
   { href: "/tmaid/resultado", label: "Perfil", icon: UserRound, requiereTmaid: true },
 ];
@@ -61,7 +61,7 @@ export function AppShell({
         <div className="flex items-center gap-3">
           {perfil && (
             <div className="hidden items-center gap-3 sm:flex">
-              <span className="flex items-center gap-1 rounded-full bg-secondary-fixed px-2.5 py-1 text-xs font-bold text-on-secondary-fixed">
+              <span className="gold-chip">
                 <Star size={12} fill="currentColor" /> Nv.{nivel} · {puntos} pts
               </span>
               {racha > 0 && (
@@ -79,7 +79,7 @@ export function AppShell({
               reiniciar();
               router.push("/login");
             }}
-            title="Reiniciar sesión de prueba"
+            title="Reiniciar sesion de prueba"
             className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-container-low text-on-surface-variant hover:text-primary"
           >
             <LogOut size={16} />
@@ -99,7 +99,7 @@ export function AppShell({
             return (
               <span
                 key={tab.href}
-                title="Completa el diagnóstico TMAID primero"
+                title="Completa el diagnostico TMAID primero"
                 className="flex flex-1 flex-col items-center gap-1 rounded-lg py-2 text-on-surface-variant opacity-40"
               >
                 <Lock size={18} />
@@ -114,9 +114,9 @@ export function AppShell({
             <Link
               key={tab.href}
               href={tab.href}
-              className={`flex flex-1 flex-col items-center gap-1 rounded-lg py-2 transition-colors ${
+              className={`mx-1 flex flex-1 flex-col items-center gap-1 rounded-full py-2 transition-colors ${
                 activo
-                  ? "text-primary"
+                  ? "bg-primary-container text-white"
                   : "text-on-surface-variant hover:text-primary"
               }`}
             >
