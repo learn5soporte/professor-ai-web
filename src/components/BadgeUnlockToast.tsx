@@ -20,11 +20,11 @@ export function BadgeUnlockToast({
 
   return (
     <div className="fixed inset-x-0 top-20 z-[60] flex justify-center px-6">
-      <div className="flex items-center gap-3 rounded-full bg-primary px-5 py-3 text-on-primary shadow-ambient">
+      <div className="flex items-center gap-3 rounded-full bg-primary-container px-5 py-3 text-white shadow-atmospheric">
         <span className="text-2xl">{badge.emoji}</span>
         <div>
           <p className="text-xs font-bold uppercase tracking-wide opacity-80">
-            ¡Badge desbloqueado!
+            Badge desbloqueado!
           </p>
           <p className="text-sm font-bold">
             {badge.nombre} · +{badge.puntos} pts
