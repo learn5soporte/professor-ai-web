@@ -7,6 +7,34 @@ import { useSession } from "@/lib/store/session";
 import { ETIQUETA_DIMENSION } from "@/lib/tmaid/scoring";
 import { BADGES, calcularNivel } from "@/lib/gamification/badges";
 import { AppShell } from "@/components/AppShell";
+import { Icon } from "@/components/Icon";
+
+/**
+ * SCREEN 13: RESULTADO -- base literal: code.html real de Stitch
+ * (bloque_3_diagn_stico_tmaid), incluido el radar SVG de competencias,
+ * la grilla de metricas, brechas y acciones prioritarias.
+ */
+
+const PERSONA_POR_NIVEL: Record<string, string> = {
+  Iniciante: "Docente Explorador",
+  "En desarrollo": "Docente Curioso",
+  Avanzado: "Docente Aplicador",
+  Experto: "Docente Referente",
+};
+
+const METRICA_ICONO: Record<string, string> = {
+  conocimientoIA: "psychology",
+  usoHerramientas: "handyman",
+  integracionAula: "account_tree",
+  actitudCambio: "rocket_launch",
+};
+
+const METRICA_LABEL: Record<string, string> = {
+  conocimientoIA: "Teoría",
+  usoHerramientas: "Uso",
+  integracionAula: "Aulas",
+  actitudCambio: "Mentalidad",
+};
 
 export default function ResultadoTmaidPage() {
   const router = useRouter();
@@ -25,113 +53,153 @@ export default function ResultadoTmaidPage() {
     return null;
   }
 
-  const dimensionesEntries = Object.entries(resultadoTmaid.dimensiones) as [
-    keyof typeof resultadoTmaid.dimensiones,
-    number
-  ][];
-  const { nivel, siguienteEn } = calcularNivel(puntos);
+  const { dimensiones } = resultadoTmaid;
+  const { nivel } = calcularNivel(puntos);
+
+  // Radar: N=conocimiento, E=herramientas, S=integracion, W=actitud.
+  // Centro (100,100), radio maximo 80, cada dimension en escala 1-5 -> 0..1.
+  const frac = {
+    n: dimensiones.conocimientoIA / 5,
+    e: dimensiones.usoHerramientas / 5,
+    s: dimensiones.integracionAula / 5,
+    w: dimensiones.actitudCambio / 5,
+  };
+  const puntosRadar = [
+    `100,${100 - 80 * frac.n}`,
+    `${100 + 80 * frac.e},100`,
+    `100,${100 + 80 * frac.s}`,
+    `${100 - 80 * frac.w},100`,
+  ].join(" ");
 
   return (
     <AppShell titulo="Perfil">
-      <div className="mx-auto max-w-2xl">
-        <span className="gold-chip">Diagnostico TMAID</span>
-        <h1 className="mt-3 text-4xl font-black text-on-surface">
-          Nivel: {resultadoTmaid.nivelAsignado}
-        </h1>
-
-        <div className="card mt-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-sm font-bold uppercase tracking-wide text-on-surface-variant">
-                Nivel de juego {nivel}
-              </h2>
-              <p className="text-2xl font-black text-primary">{puntos} pts</p>
-            </div>
-            {siguienteEn && (
-              <p className="text-xs text-on-surface-variant">
-                {siguienteEn - puntos} pts para nivel {nivel + 1}
-              </p>
-            )}
-          </div>
-          <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-surface-container-highest">
-            <div
-              className="h-full rounded-full bg-secondary-container"
-              style={{
-                width: siguienteEn
-                  ? `${Math.min(100, (puntos / siguienteEn) * 100)}%`
-                  : "100%",
-              }}
-            />
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            {Object.values(BADGES).map((badge) => {
-              const desbloqueado = badges.includes(badge.id);
-              return (
-                <span
-                  key={badge.id}
-                  title={`${badge.nombre}: ${badge.descripcion}`}
-                  className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold ${
-                    desbloqueado
-                      ? "bg-tertiary-container text-on-tertiary-container"
-                      : "bg-surface-container-low text-on-surface-variant opacity-40"
-                  }`}
-                >
-                  {badge.emoji} {badge.nombre}
-                </span>
-              );
-            })}
-          </div>
+      <div className="-mx-6 -mt-20 mb-8 overflow-hidden bg-white px-6 pb-8 pt-24 text-center md:px-margin-page">
+        <div className="pointer-events-none absolute inset-0 opacity-10">
+          <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-secondary-container blur-[80px]" />
         </div>
-
-        <div className="card mt-4">
-          <h2 className="text-sm font-bold uppercase tracking-wide text-on-surface-variant">
-            Perfil pedagogico-IA
-          </h2>
-          <p className="mt-2 text-lg text-on-surface">
+        <div className="relative z-10">
+          <span className="font-label-lg mb-4 inline-block rounded-full bg-secondary-fixed px-4 py-1 text-secondary">
+            TU PERFIL IA
+          </span>
+          <h1 className="font-display-lg text-headline-lg-mobile text-primary md:text-display-lg">
+            {PERSONA_POR_NIVEL[resultadoTmaid.nivelAsignado] ?? resultadoTmaid.nivelAsignado}
+          </h1>
+          <p className="text-body-lg mx-auto mt-2 max-w-xl text-on-surface-variant">
             {resultadoTmaid.perfilPedagogicoIA}
           </p>
         </div>
+      </div>
 
-        <div className="card mt-4">
-          <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-on-surface-variant">
-            Tus 4 dimensiones
-          </h2>
-          <div className="flex flex-col gap-3">
-            {dimensionesEntries.map(([dim, valor]) => (
-              <div key={dim}>
-                <div className="mb-1 flex justify-between text-sm">
-                  <span className="font-semibold text-on-surface">
-                    {ETIQUETA_DIMENSION[dim]}
-                  </span>
-                  <span className="text-on-surface-variant">
-                    {valor.toFixed(1)} / 5
-                  </span>
-                </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container-highest">
-                  <div
-                    className="h-full rounded-full bg-primary"
-                    style={{ width: `${(valor / 5) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+      <div className="mx-auto grid max-w-5xl grid-cols-1 items-start gap-xl lg:grid-cols-2">
+        <div className="atmospheric-shadow flex flex-col items-center rounded-3xl bg-white p-8">
+          <h3 className="font-headline-md mb-8 self-start">Mapa de Competencias</h3>
+          <div className="w-full max-w-[400px]">
+            <svg className="h-auto w-full drop-shadow-xl" viewBox="0 0 200 200">
+              <polygon fill="none" points="100,20 180,100 100,180 20,100" stroke="#e1e3e4" strokeWidth="1" />
+              <polygon fill="none" points="100,40 160,100 100,160 40,100" stroke="#e1e3e4" strokeWidth="1" />
+              <polygon fill="none" points="100,60 140,100 100,140 60,100" stroke="#e1e3e4" strokeWidth="1" />
+              <line x1="100" y1="20" x2="100" y2="180" stroke="#e1e3e4" strokeWidth="1" />
+              <line x1="20" y1="100" x2="180" y2="100" stroke="#e1e3e4" strokeWidth="1" />
+              <polygon fill="rgba(37, 82, 202, 0.4)" points={puntosRadar} stroke="#cba82f" strokeWidth="3" />
+              <text className="fill-on-surface-variant font-label-lg" style={{ fontSize: "8px" }} textAnchor="middle" x="100" y="15">
+                CONOCIMIENTO
+              </text>
+              <text className="fill-on-surface-variant font-label-lg" style={{ fontSize: "8px" }} textAnchor="start" x="185" y="103">
+                HERRAMIENTAS
+              </text>
+              <text className="fill-on-surface-variant font-label-lg" style={{ fontSize: "8px" }} textAnchor="middle" x="100" y="193">
+                INTEGRACIÓN
+              </text>
+              <text className="fill-on-surface-variant font-label-lg" style={{ fontSize: "8px" }} textAnchor="end" x="15" y="103">
+                ACTITUD
+              </text>
+            </svg>
           </div>
         </div>
 
-        <div className="card mt-4">
-          <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-on-surface-variant">
-            Mapa de brechas
-          </h2>
-          <ul className="list-inside list-disc text-on-surface">
-            {resultadoTmaid.mapaBrechas.map((brecha) => (
-              <li key={brecha}>{brecha}</li>
-            ))}
-          </ul>
-        </div>
+        <div className="grid grid-cols-2 gap-4">
+          {(Object.keys(dimensiones) as (keyof typeof dimensiones)[]).map((dim) => {
+            const pct = Math.round((dimensiones[dim] / 5) * 100);
+            return (
+              <div key={dim} className="atmospheric-shadow rounded-2xl bg-white p-6">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="font-label-lg text-tertiary-container">{pct}%</span>
+                  <Icon name={METRICA_ICONO[dim]} className="text-outline-variant" />
+                </div>
+                <p className="font-headline-md mb-2">{METRICA_LABEL[dim]}</p>
+                <div className="h-1 w-full rounded-full bg-surface-container-highest">
+                  <div className="h-full rounded-full bg-secondary-container" style={{ width: `${pct}%` }} />
+                </div>
+              </div>
+            );
+          })}
 
-        <Link href="/rutas" className="btn-primary mt-6 block text-center">
-          Ver mi ruta interactiva →
+          <div className="col-span-2 mt-4">
+            <div className="atmospheric-shadow rounded-3xl bg-white/50 p-8">
+              <h4 className="font-headline-md mb-6">Brechas Identificadas</h4>
+              <ul className="space-y-4">
+                {resultadoTmaid.mapaBrechas.map((brecha) => (
+                  <li key={brecha} className="flex items-center gap-4 text-on-surface-variant">
+                    <Icon name="warning" filled className="text-tertiary-container" />
+                    {brecha}
+                  </li>
+                ))}
+              </ul>
+
+              <h4 className="font-headline-md mb-6 mt-12">Acciones Prioritarias</h4>
+              <div className="space-y-4">
+                {resultadoTmaid.rutaPersonalizada.map((fase, i) => (
+                  <div key={fase.fase} className="group flex items-start gap-4">
+                    <span className="text-headline-md text-tertiary-container/30 transition-colors group-hover:text-tertiary-container">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <p className="font-body-md flex-grow border-b border-surface-container-highest py-1">
+                      {fase.descripcion}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="col-span-2">
+            <div className="atmospheric-shadow rounded-3xl bg-white p-8">
+              <div className="mb-4 flex items-center justify-between">
+                <h4 className="font-headline-md">Tus badges</h4>
+                <span className="text-sm text-on-surface-variant">
+                  Nv.{nivel} · {puntos} pts
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {Object.values(BADGES).map((badge) => {
+                  const desbloqueado = badges.includes(badge.id);
+                  return (
+                    <span
+                      key={badge.id}
+                      title={`${badge.nombre}: ${badge.descripcion}`}
+                      className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold ${
+                        desbloqueado
+                          ? "bg-tertiary-container text-on-tertiary-container"
+                          : "bg-surface-container-low text-on-surface-variant opacity-40"
+                      }`}
+                    >
+                      {badge.emoji} {badge.nombre}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto mt-8 max-w-5xl">
+        <Link
+          href="/rutas"
+          className="font-headline-md group flex w-full items-center justify-between rounded-full bg-on-secondary-fixed px-10 py-5 text-on-secondary shadow-xl transition-all hover:bg-secondary active:scale-95"
+        >
+          Ver Mi Plan de Ruta Personalizado
+          <Icon name="trending_flat" className="transition-transform group-hover:translate-x-2" />
         </Link>
       </div>
     </AppShell>
