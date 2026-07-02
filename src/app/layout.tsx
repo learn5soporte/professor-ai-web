@@ -3,7 +3,7 @@ import { Plus_Jakarta_Sans, Manrope } from "next/font/google";
 import { SessionProvider } from "@/lib/store/session";
 import "./globals.css";
 
-// Tipografía Lumina Academic: Plus Jakarta Sans (headlines) + Manrope (body/labels)
+// Tipografia Humanismo Futurista: Plus Jakarta Sans (headlines) + Manrope (body/labels)
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-plus-jakarta-sans",
