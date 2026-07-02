@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Manrope } from "next/font/google";
+import { Epilogue, Manrope } from "next/font/google";
 import { SessionProvider } from "@/lib/store/session";
 import "./globals.css";
 
-// Tipografia Humanismo Futurista: Plus Jakarta Sans (headlines) + Manrope (body/labels)
-const plusJakartaSans = Plus_Jakarta_Sans({
+// Tipografia Humanist Futurist (DESIGN.md real): Epilogue (headlines) + Manrope (body/labels)
+const epilogue = Epilogue({
   subsets: ["latin"],
-  variable: "--font-plus-jakarta-sans",
+  variable: "--font-epilogue",
+  weight: ["400", "700", "800"],
   display: "swap",
 });
 
@@ -28,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${plusJakartaSans.variable} ${manrope.variable}`}>
+    <html lang="es" className={`${epilogue.variable} ${manrope.variable}`}>
       <body>
         <SessionProvider>{children}</SessionProvider>
       </body>
