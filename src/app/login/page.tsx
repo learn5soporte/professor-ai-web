@@ -2,58 +2,98 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useSession } from "@/lib/store/session";
+import { DarkScreen } from "@/components/DarkScreen";
+import { Icon } from "@/components/Icon";
 
+/**
+ * SCREEN 2: LOGIN -- base literal: code.html real de Stitch
+ * (bloque_1_y_2_acceso_y_onboarding). Fase 0: no hay Supabase Auth todavia,
+ * el email ingresado simula la sesion (cualquier password es aceptada).
+ */
 export default function LoginPage() {
   const router = useRouter();
-  const { iniciarSesionMock } = useSession();
-  const [nombre, setNombre] = useState("");
+  const { perfil, iniciarSesionMock } = useSession();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  function entrar() {
+    const nombre = email.split("@")[0] || "Docente";
+    iniciarSesionMock(nombre);
+    router.push(perfil ? "/dashboard" : "/onboarding");
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    iniciarSesionMock(nombre.trim() || "Docente");
-    router.push("/onboarding");
+    entrar();
   }
 
   return (
-    <main className="dark-screen flex items-center justify-center px-6">
-      <div className="dark-screen-glow-blue -right-10 -top-10 h-72 w-72" />
+    <DarkScreen>
+      <section className="flex w-full max-w-md flex-col px-margin-mobile">
+        <div className="mb-12 flex flex-col items-center">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container">
+            <span className="font-headline-md font-bold text-white">P</span>
+          </div>
+          <h2 className="font-headline-md text-headline-md text-white">
+            Iniciar Sesión
+          </h2>
+          <p className="mt-2 text-center text-body-sm text-white/40">
+            Prototipo Fase 0 -- sin cuenta real todavía. Cualquier email /
+            contraseña te lleva al flujo completo.
+          </p>
+        </div>
 
-      <div className="relative z-10 w-full max-w-md rounded-xl bg-white/5 p-8 backdrop-blur-md">
-        <p className="font-label text-xs font-bold uppercase tracking-widest text-tertiary-fixed">
-          Professor AI · Learn5
-        </p>
-        <h2 className="mt-2 text-2xl font-black text-white">
-          Iniciar Sesion
-        </h2>
-        <p className="mt-2 text-sm text-white/50">
-          Prototipo Fase 0 — sin cuenta real todavia. Escribe tu nombre para
-          simular tu entrada y recorrer el flujo completo.
-        </p>
-
-        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
-          <label className="flex flex-col gap-1">
-            <span className="font-label text-xs font-semibold text-white/50">
-              Nombre
-            </span>
+        <form onSubmit={handleSubmit} className="glass-card space-y-6 rounded-xl p-8">
+          <div className="space-y-2">
+            <label className="text-label-lg font-label-lg text-white/60">
+              Email
+            </label>
             <input
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              placeholder="Ej. Marcela Rojas"
-              className="dark-input"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="profesor@academia.edu"
+              className="w-full rounded-xl border-none bg-white/5 px-4 py-4 text-white placeholder:text-white/20 focus:ring-2 focus:ring-secondary-container"
             />
-          </label>
-
-          <button type="submit" className="btn-accent">
-            Comenzar →
+          </div>
+          <div className="space-y-2">
+            <label className="text-label-lg font-label-lg text-white/60">
+              Contraseña
+            </label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full rounded-xl border-none bg-white/5 px-4 py-4 text-white placeholder:text-white/20 focus:ring-2 focus:ring-secondary-container"
+            />
+          </div>
+          <button type="submit" className="btn-accent flex w-full items-center justify-center gap-2">
+            Entrar <Icon name="arrow_forward" className="text-[18px]" />
           </button>
+          <div className="flex items-center gap-4 py-2">
+            <div className="h-px flex-1 bg-tertiary-fixed-dim/20" />
+            <span className="text-body-sm font-bold uppercase tracking-widest text-tertiary-fixed-dim">
+              o
+            </span>
+            <div className="h-px flex-1 bg-tertiary-fixed-dim/20" />
+          </div>
+          <button type="button" onClick={entrar} className="btn-outline-dark flex w-full items-center justify-center gap-2">
+            <Icon name="account_circle" />
+            Continuar con Google
+          </button>
+          <p className="text-center text-body-sm text-white/40">
+            ¿No tienes cuenta?{" "}
+            <Link href="/registro" className="font-bold text-tertiary-fixed-dim">
+              Registrarse
+            </Link>
+          </p>
         </form>
-
-        <p className="mt-6 text-xs text-white/40">
-          En Fase 1 esto se reemplaza por Supabase Auth (email/contrasena +
-          Google OAuth) manteniendo esta misma pantalla.
-        </p>
-      </div>
-    </main>
+      </section>
+    </DarkScreen>
   );
 }
