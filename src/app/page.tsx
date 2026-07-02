@@ -15,7 +15,7 @@ export default function Home() {
       <section className="mx-auto flex max-w-4xl flex-col gap-8 px-6 pb-24 pt-32">
         <div>
           <p className="font-label text-xs font-bold uppercase tracking-widest text-secondary">
-            Identidad visual: Lumina Academic
+                      Identidad visual: Humanismo Futurista
           </p>
           <h1 className="mt-2 text-5xl font-black text-on-surface">
             Tu asistente de IA para el aula.
