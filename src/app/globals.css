@@ -3,12 +3,16 @@
 @tailwind utilities;
 
 /*
-  Humanismo Futurista - reglas del sistema de diseno (Stitch "Pedagogical OS"):
-  1. "No-Line Rule": no usar bordes 1px para separar secciones.
-     La jerarquia se logra con cambios de superficie (surface -> surface-container-low -> surface-container-lowest),
-     ahora sobre una base navy profunda en vez de blanca.
-  2. Glass & Gradient: navbars/FABs flotantes usan surface-container-lowest al 80% + blur.
-  3. Botones primarios: gradiente dorado primary -> primary-container, radio "full" (pill), texto oscuro.
+  Humanist Futurist - reglas del sistema de diseno (export real de Stitch, DESIGN.md):
+  1. Base clara editorial: la app principal (dashboard, rutas, resultado, herramientas) vive
+     sobre `surface` (#f8f9fa). Profundidad = cambios de superficie + "atmospheric shadow"
+     muy difusa, NUNCA bordes 1px ("No-Line Rule").
+  2. Navy/Royal Blue/Gold son ACENTOS, no el fondo global: tarjetas destacadas ("hero") y
+     chips de logro usan `.dark-hero` / dorado. Ver `.dark-hero`.
+  3. Pantallas "especializadas" e inmersivas (splash, login, onboarding, intro TMAID) usan
+     `.dark-screen`: fondo navy profundo con "glow blobs" difusos, texto blanco.
+  4. Botones: `.btn-primary` (negro/navy, pill) para CTAs sobre fondo claro; `.btn-accent`
+     (azul rey, pill) para CTAs sobre fondo oscuro.
 */
 
 @layer base {
@@ -25,19 +29,51 @@
 
 @layer components {
     .btn-primary {
-          @apply rounded-full px-6 py-3 font-body font-semibold text-on-primary shadow-ambient transition-opacity active:scale-95;
-          background-image: linear-gradient(135deg, theme("colors.primary"), theme("colors.primary-container"));
+          @apply rounded-full px-6 py-3 font-body font-semibold text-on-primary shadow-atmospheric transition-opacity active:scale-95;
+          background-color: theme("colors.primary");
     }
 
+  .btn-accent {
+        @apply rounded-full bg-secondary px-6 py-3 font-body font-semibold text-on-secondary shadow-atmospheric transition-opacity active:scale-95;
+  }
+
   .btn-secondary {
-        @apply rounded-full bg-secondary-fixed px-6 py-3 font-body font-semibold text-on-secondary-fixed transition-opacity active:scale-95;
+        @apply rounded-full bg-tertiary-fixed px-6 py-3 font-body font-semibold text-on-tertiary-fixed transition-opacity active:scale-95;
   }
 
   .card {
-        @apply rounded-xl bg-surface-container-lowest p-6;
+        @apply rounded-xl bg-surface-container-lowest p-6 shadow-atmospheric;
   }
 
   .glass-nav {
-        @apply bg-surface-container-lowest/80 backdrop-blur-glass;
+        @apply bg-white/70 backdrop-blur-glass;
+  }
+
+  .dark-hero {
+        @apply rounded-xl p-6 text-white shadow-atmospheric;
+        background: linear-gradient(135deg, theme("colors.primary-container"), #0a2559);
+  }
+
+  .gold-chip {
+        @apply inline-flex items-center gap-1 rounded-full bg-tertiary-container px-3 py-1 font-label text-xs font-bold text-on-tertiary-container;
+  }
+
+  .dark-screen {
+        @apply relative min-h-screen overflow-hidden text-white;
+        background: radial-gradient(circle at 30% 20%, #142a63 0%, #050b24 55%, #030714 100%);
+  }
+
+  .dark-screen-glow-blue {
+        @apply pointer-events-none absolute rounded-full opacity-20 blur-3xl;
+        background: theme("colors.secondary");
+  }
+
+  .dark-screen-glow-gold {
+        @apply pointer-events-none absolute rounded-full opacity-10 blur-3xl;
+        background: theme("colors.tertiary-fixed");
+  }
+
+  .dark-input {
+        @apply w-full rounded-md border-none bg-white/5 px-4 py-4 text-white placeholder:text-white/30 outline-none focus:ring-2 focus:ring-secondary-container;
   }
 }
