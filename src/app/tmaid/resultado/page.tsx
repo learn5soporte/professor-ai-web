@@ -34,10 +34,8 @@ export default function ResultadoTmaidPage() {
   return (
     <AppShell titulo="Perfil">
       <div className="mx-auto max-w-2xl">
-        <p className="font-label text-xs font-bold uppercase tracking-widest text-secondary">
-          Tu perfil docente
-        </p>
-        <h1 className="mt-2 text-4xl font-black text-on-surface">
+        <span className="gold-chip">Diagnostico TMAID</span>
+        <h1 className="mt-3 text-4xl font-black text-on-surface">
           Nivel: {resultadoTmaid.nivelAsignado}
         </h1>
 
@@ -75,7 +73,7 @@ export default function ResultadoTmaidPage() {
                   title={`${badge.nombre}: ${badge.descripcion}`}
                   className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold ${
                     desbloqueado
-                      ? "bg-secondary-fixed text-on-secondary-fixed"
+                      ? "bg-tertiary-container text-on-tertiary-container"
                       : "bg-surface-container-low text-on-surface-variant opacity-40"
                   }`}
                 >
@@ -88,7 +86,7 @@ export default function ResultadoTmaidPage() {
 
         <div className="card mt-4">
           <h2 className="text-sm font-bold uppercase tracking-wide text-on-surface-variant">
-            Perfil pedagógico-IA
+            Perfil pedagogico-IA
           </h2>
           <p className="mt-2 text-lg text-on-surface">
             {resultadoTmaid.perfilPedagogicoIA}
