@@ -14,6 +14,10 @@ import { Icon } from "@/components/Icon";
  * La "actividad mensual" es ilustrativa -- Fase 0 no tiene tracking real de
  * uso diario todavía; el "re-diagnostico" de Stitch (countdown falso) se
  * reemplaza por un CTA real, ya que /tmaid ya soporta repetirse.
+ *
+ * Nota (verificacion final): mismo ajuste de viewBox que /tmaid/resultado
+ * ("-40 -10 280 220" en vez de "0 0 200 200") para que las etiquetas
+ * "HERRAMIENTAS"/"ACTITUD" no se recorten contra el borde del SVG.
  */
 
 const MESES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun"];
@@ -67,7 +71,7 @@ export default function ProgresoPage() {
               Perfil de Competencias
             </h3>
             <div className="w-full max-w-[300px]">
-              <svg className="h-auto w-full drop-shadow-lg" viewBox="0 0 200 200">
+              <svg className="h-auto w-full drop-shadow-lg" viewBox="-40 -10 280 220">
                 <polygon fill="none" points="100,20 180,100 100,180 20,100" stroke="#e1e3e4" strokeWidth="1" />
                 <polygon fill="none" points="100,40 160,100 100,160 40,100" stroke="#e1e3e4" strokeWidth="1" />
                 <polygon fill="none" points="100,60 140,100 100,140 60,100" stroke="#e1e3e4" strokeWidth="1" />
