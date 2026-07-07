@@ -11,9 +11,10 @@ import { Icon } from "@/components/Icon";
  * Caja de Herramientas -- base literal: code.html real de Stitch
  * (bloque_6_a_8_insignias_herramientas_y_progreso, Screen 23: ai-hub).
  * Estado de cada tarjeta refleja lo que REALMENTE existe hoy en la app
- * (no copiamos las etiquetas ficticias de Stitch tal cual): Planeacion Pro
- * y Banco de Prompts ya funcionan (aunque sea simulado en Fase 0); Rubricas
- * y Adaptador estan planificados para batches futuros.
+ * (no copiamos las etiquetas ficticias de Stitch tal cual): Planeacion Pro,
+ * Banco de Prompts y (desde el Batch 9) Creador de Rubricas ya funcionan
+ * (aunque sea simulado en Fase 0); el Adaptador de Contenido sigue
+ * planificado para un batch futuro.
  */
 
 type Herramienta = {
@@ -43,8 +44,8 @@ const HERRAMIENTAS: Herramienta[] = [
     nombre: "Creador de Rúbricas",
     descripcion: "Crea criterios de evaluación alineados a competencias.",
     icono: "table_chart",
-    href: "#",
-    estado: "proximamente",
+    href: "/herramientas/rubricas",
+    estado: "disponible",
   },
   {
     nombre: "Adaptador de Contenido",
