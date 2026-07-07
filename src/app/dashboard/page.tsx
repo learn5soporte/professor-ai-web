@@ -8,7 +8,7 @@ import { BADGES, calcularNivel } from "@/lib/gamification/badges";
 import { AppShell } from "@/components/AppShell";
 
 const HERRAMIENTAS = [
-  { nombre: "Generador de Planeaciones", href: "#", disponible: false },
+  { nombre: "Generador de Planeaciones", href: "/herramientas/planeacion", disponible: true },
   { nombre: "Creador de Rubricas", href: "#", disponible: false },
   { nombre: "Banco de Prompts Pedagogicos", href: "/herramientas/prompts", disponible: true },
 ];
@@ -122,12 +122,20 @@ export default function DashboardPage() {
             <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-on-surface-variant">
               Herramientas rapidas
             </h2>
-            <Link
-              href="/progreso"
-              className="mb-4 text-sm font-semibold text-secondary hover:underline"
-            >
-              Mi progreso →
-            </Link>
+            <div className="mb-4 flex items-center gap-3">
+              <Link
+                href="/herramientas"
+                className="text-sm font-semibold text-secondary hover:underline"
+              >
+                Ver todas →
+              </Link>
+              <Link
+                href="/progreso"
+                className="text-sm font-semibold text-secondary hover:underline"
+              >
+                Mi progreso →
+              </Link>
+            </div>
           </div>
           <div className="flex flex-col gap-2">
             {HERRAMIENTAS.map((h) =>
