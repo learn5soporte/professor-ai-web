@@ -82,12 +82,20 @@ export default function DashboardPage() {
             <h2 className="text-sm font-bold uppercase tracking-wide text-on-surface-variant">
               Tus badges
             </h2>
-            <Link
-              href="/tmaid/resultado"
-              className="text-sm font-semibold text-secondary hover:underline"
-            >
-              Ver mi perfil →
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/insignias"
+                className="text-sm font-semibold text-secondary hover:underline"
+              >
+                Ver todas →
+              </Link>
+              <Link
+                href="/tmaid/resultado"
+                className="text-sm font-semibold text-secondary hover:underline"
+              >
+                Ver mi perfil →
+              </Link>
+            </div>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {Object.values(BADGES).map((badge) => {
@@ -110,9 +118,17 @@ export default function DashboardPage() {
         </div>
 
         <div className="card mt-4">
-          <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-on-surface-variant">
-            Herramientas rapidas
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-on-surface-variant">
+              Herramientas rapidas
+            </h2>
+            <Link
+              href="/progreso"
+              className="mb-4 text-sm font-semibold text-secondary hover:underline"
+            >
+              Mi progreso →
+            </Link>
+          </div>
           <div className="flex flex-col gap-2">
             {HERRAMIENTAS.map((h) =>
               h.disponible ? (
