@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSession } from "@/lib/store/session";
 import { BADGES, calcularNivel } from "@/lib/gamification/badges";
 import { AppShell } from "@/components/AppShell";
+import { Icon } from "@/components/Icon";
 
 const HERRAMIENTAS = [
   { nombre: "Generador de Planeaciones", href: "/herramientas/planeacion", disponible: true },
@@ -22,13 +23,96 @@ export default function DashboardPage() {
     if (cargando) return;
     if (!perfil) {
       router.replace("/login");
-    } else if (!resultadoTmaid) {
-      router.replace("/tmaid");
     }
-  }, [cargando, perfil, resultadoTmaid, router]);
+  }, [cargando, perfil, router]);
 
-  if (cargando || !perfil || !resultadoTmaid) {
+  if (cargando || !perfil) {
     return null;
+  }
+
+  // Estado inicial -- base literal: code.html real de Stitch
+  // (estado_inicial_tu_primer_paso). Antes, un docente sin diagnóstico era
+  // redirigido instantáneamente a /tmaid sin ninguna explicación; ahora ve
+  // esta pantalla de bienvenida real con su propio CTA hacia el diagnóstico.
+  if (!resultadoTmaid) {
+    return (
+      <AppShell titulo="Inicio">
+        <div className="mx-auto flex max-w-4xl flex-col items-center px-margin-mobile text-center">
+          <div className="relative mb-gap-xl flex h-64 w-64 items-center justify-center md:h-80 md:w-80">
+            <div className="flex h-full w-full items-center justify-center rounded-full bg-surface-container-highest shadow-inner">
+              <Icon
+                name="rocket_launch"
+                className="text-secondary"
+                style={{ fontSize: "96px" }}
+              />
+            </div>
+            <div className="absolute -right-4 -top-4 flex h-12 w-12 rotate-12 items-center justify-center rounded-xl bg-tertiary-container shadow-lg">
+              <Icon name="star" filled className="text-on-tertiary-container" />
+            </div>
+            <div className="absolute -left-8 bottom-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container opacity-80 shadow-lg">
+              <Icon name="auto_awesome" className="text-on-secondary-container" />
+            </div>
+          </div>
+
+          <h1 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-4 max-w-2xl text-primary">
+            Todo empieza aquí
+          </h1>
+          <p className="text-body-lg mb-gap-xl max-w-lg text-on-surface-variant">
+            Para comenzar tu viaje de transformación académica con IA, necesitamos
+            entender tu punto de partida. Realiza tu primer diagnóstico y
+            desbloquea tu ruta personalizada.
+          </p>
+
+          <div className="flex flex-col items-center gap-4">
+            <Link
+              href="/tmaid"
+              className="text-label-lg flex items-center gap-3 rounded-full bg-primary-container px-10 py-5 font-bold text-on-primary transition-all hover:opacity-90 active:scale-95"
+            >
+              Hacer mi diagnóstico <Icon name="rocket_launch" />
+            </Link>
+            <span className="text-body-sm flex items-center gap-2 text-outline">
+              <Icon name="timer" className="text-[18px]" /> Toma menos de 3 minutos
+            </span>
+          </div>
+
+          <div className="mt-20 grid w-full max-w-3xl grid-cols-1 gap-gap-md md:grid-cols-3">
+            <div className="atmospheric-shadow flex items-start gap-4 rounded-xl bg-white p-6 text-left">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-container">
+                <Icon name="psychology" className="text-secondary" />
+              </div>
+              <div>
+                <h3 className="font-label-lg text-primary">Análisis IA</h3>
+                <p className="text-body-sm text-on-surface-variant">
+                  Evaluamos tus competencias actuales.
+                </p>
+              </div>
+            </div>
+            <div className="atmospheric-shadow flex items-start gap-4 rounded-xl bg-white p-6 text-left">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-container">
+                <Icon name="route" className="text-secondary" />
+              </div>
+              <div>
+                <h3 className="font-label-lg text-primary">Ruta Única</h3>
+                <p className="text-body-sm text-on-surface-variant">
+                  Contenido adaptado a tu especialidad.
+                </p>
+              </div>
+            </div>
+            <div className="atmospheric-shadow flex items-start gap-4 rounded-xl bg-white p-6 text-left">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-container">
+                <Icon name="verified" className="text-secondary" />
+              </div>
+              <div>
+                <h3 className="font-label-lg text-primary">Certificación</h3>
+                <p className="text-body-sm text-on-surface-variant">
+                  Valida tus avances ante la facultad.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </AppShell>
+    );
   }
 
   const { nivel } = calcularNivel(puntos);
@@ -143,7 +227,7 @@ export default function DashboardPage() {
                 <Link
                   key={h.nombre}
                   href={h.href}
-                  className="flex items-center justify-between rounded-lg bg-surface-container-low px-4 py-3 text-sm font-semibold text-on-surface hover:bg-surface-container"
+                  className="flex items-center justify-between rounded-lg bg-surface-container-low px-4 py-3 text-sm font-semibold text-on-surface hover:bz-surface-container"
                 >
                   {h.nombre}
                   <span className="text-primary">→</span>
