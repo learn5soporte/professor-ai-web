@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, ClipboardList, Map, BarChart3, UserRound, Lock, LogOut, Flame, Star } from "lucide-react";
+import { Home, ClipboardList, Map, BarChart3, UserRound, Lock, LogOut, Flame, Star, Sparkles } from "lucide-react";
 import { useSession } from "@/lib/store/session";
 import { calcularNivel } from "@/lib/gamification/badges";
+import { PremiumUpgradeModal } from "@/components/PremiumUpgradeModal";
 
 type Tab = {
   href: string;
@@ -41,6 +42,7 @@ export function AppShell({
     cargando,
   } = useSession();
   const { nivel } = calcularNivel(puntos);
+  const [mostrarPremium, setMostrarPremium] = useState(false);
 
   useEffect(() => {
     if (!cargando) registrarActividadDiaria();
@@ -62,6 +64,13 @@ export function AppShell({
         <div className="flex items-center gap-3">
           {perfil && (
             <div className="hidden items-center gap-3 sm:flex">
+              <button
+                onClick={() => setMostrarPremium(true)}
+                className="flex items-center gap-1 rounded-full bg-primary-container px-2.5 py-1 text-xs font-bold text-white transition-opacity hover:opacity-90"
+                title="Conoce Tutor IA Premium"
+              >
+                <Sparkles size={12} /> Premium
+              </button>
               <span className="gold-chip">
                 <Star size={12} fill="currentColor" /> Nv.{nivel} · {puntos} pts
               </span>
@@ -129,6 +138,8 @@ export function AppShell({
           );
         })}
       </nav>
+
+      <PremiumUpgradeModal open={mostrarPremium} onClose={() => setMostrarPremium(false)} />
     </div>
   );
 }
