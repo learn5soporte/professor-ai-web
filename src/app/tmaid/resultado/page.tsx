@@ -13,6 +13,12 @@ import { Icon } from "@/components/Icon";
  * SCREEN 13: RESULTADO -- base literal: code.html real de Stitch
  * (bloque_3_diagn_stico_tmaid), incluido el radar SVG de competencias,
  * la grilla de metricas, brechas y acciones prioritarias.
+ *
+ * Nota (verificacion final): el viewBox del radar se amplio de "0 0 200
+ * 200" a "-40 -10 280 220" -- las etiquetas laterales "HERRAMIENTAS" y
+ * "ACTITUD" (ancladas a los bordes, no centradas) se recortaban contra el
+ * borde del viewBox original. El mismo ajuste se aplico en /progreso, que
+ * reutiliza este radar.
  */
 
 const PERSONA_POR_NIVEL: Record<string, string> = {
@@ -94,7 +100,7 @@ export default function ResultadoTmaidPage() {
         <div className="atmospheric-shadow flex flex-col items-center rounded-3xl bg-white p-8">
           <h3 className="font-headline-md mb-8 self-start">Mapa de Competencias</h3>
           <div className="w-full max-w-[400px]">
-            <svg className="h-auto w-full drop-shadow-xl" viewBox="0 0 200 200">
+            <svg className="h-auto w-full drop-shadow-xl" viewBox="-40 -10 280 220">
               <polygon fill="none" points="100,20 180,100 100,180 20,100" stroke="#e1e3e4" strokeWidth="1" />
               <polygon fill="none" points="100,40 160,100 100,160 40,100" stroke="#e1e3e4" strokeWidth="1" />
               <polygon fill="none" points="100,60 140,100 100,140 60,100" stroke="#e1e3e4" strokeWidth="1" />
