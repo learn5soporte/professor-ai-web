@@ -10,7 +10,7 @@ import { Icon } from "@/components/Icon";
 
 const HERRAMIENTAS = [
   { nombre: "Generador de Planeaciones", href: "/herramientas/planeacion", disponible: true },
-  { nombre: "Creador de Rubricas", href: "#", disponible: false },
+  { nombre: "Creador de Rubricas", href: "/herramientas/rubricas", disponible: true },
   { nombre: "Banco de Prompts Pedagogicos", href: "/herramientas/prompts", disponible: true },
 ];
 
@@ -227,7 +227,7 @@ export default function DashboardPage() {
                 <Link
                   key={h.nombre}
                   href={h.href}
-                  className="flex items-center justify-between rounded-lg bg-surface-container-low px-4 py-3 text-sm font-semibold text-on-surface hover:bz-surface-container"
+                  className="flex items-center justify-between rounded-lg bg-surface-container-low px-4 py-3 text-sm font-semibold text-on-surface hover:bg-surface-container"
                 >
                   {h.nombre}
                   <span className="text-primary">→</span>
