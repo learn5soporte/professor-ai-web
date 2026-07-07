@@ -2,28 +2,26 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Circle, PlayCircle } from "lucide-react";
-import { useSession, type EstadoFase } from "@/lib/store/session";
+import { useSession } from "@/lib/store/session";
 import { AppShell } from "@/components/AppShell";
 import { BadgeUnlockToast } from "@/components/BadgeUnlockToast";
 import { BADGES } from "@/lib/gamification/badges";
+import { Icon } from "@/components/Icon";
 
-const BADGE_POR_FASE: Record<string, string> = {
-  Explorar: "fase-explorar",
-  Aplicar: "fase-aplicar",
-  Dominar: "fase-dominar",
-};
+/**
+ * Mi Ruta Formativa -- base literal: code.html real de Stitch
+ * (bloque_4_y_5_dashboard_y_ruta_formativa, Section 15: screen-roadmap).
+ * Selector de fase (Explorar/Aplicar/Dominar) + roadmap vertical con nodos
+ * completado / activo (glow) / proximo (lock_open) / bloqueado (lock).
+ */
 
-const SIGUIENTE_ESTADO: Record<EstadoFase, EstadoFase> = {
-  pendiente: "en_progreso",
-  en_progreso: "completado",
-  completado: "pendiente",
-};
+type EstadoNodo = "completado" | "activo" | "proximo" | "bloqueado";
 
-const ETIQUETA_ESTADO: Record<EstadoFase, string> = {
-  pendiente: "Pendiente",
-  en_progreso: "En progreso",
-  completado: "Completado",
+const ICONO_NODO: Record<EstadoNodo, string> = {
+  completado: "check",
+  activo: "lightbulb",
+  proximo: "lock_open",
+  bloqueado: "lock",
 };
 
 export default function RutasPage() {
@@ -32,13 +30,10 @@ export default function RutasPage() {
     perfil,
     resultadoTmaid,
     progresoRutas,
-    actualizarProgresoFase,
-    otorgarBadge,
     cargando,
   } = useSession();
-  const [badgeGanado, setBadgeGanado] = useState<null | (typeof BADGES)[string]>(
-    null
-  );
+  const [faseSeleccionada, setFaseSeleccionada] = useState<string | null>(null);
+  const [badgeGanado] = useState<null | (typeof BADGES)[string]>(null);
 
   useEffect(() => {
     if (cargando) return;
@@ -48,80 +43,121 @@ export default function RutasPage() {
 
   if (cargando || !perfil || !resultadoTmaid) return null;
 
-  const totalFases = resultadoTmaid.rutaPersonalizada.length;
-  const completadas = resultadoTmaid.rutaPersonalizada.filter(
-    (f) => progresoRutas[f.fase] === "completado"
-  ).length;
+  const fases = resultadoTmaid.rutaPersonalizada;
+  const indiceActivo = fases.findIndex((f) => progresoRutas[f.fase] !== "completado");
+  const rutaCompleta = indiceActivo === -1;
 
-  function avanzarFase(fase: string) {
-    const estadoActual = progresoRutas[fase] ?? "pendiente";
-    const siguiente = SIGUIENTE_ESTADO[estadoActual];
-    actualizarProgresoFase(fase, siguiente);
-
-    if (siguiente === "completado") {
-      const badgeId = BADGE_POR_FASE[fase];
-      if (badgeId && otorgarBadge(badgeId)) {
-        setBadgeGanado(BADGES[badgeId]);
-      }
-    }
+  function estadoDe(i: number): EstadoNodo {
+    if (progresoRutas[fases[i].fase] === "completado") return "completado";
+    if (i === indiceActivo) return "activo";
+    if (i === indiceActivo + 1) return "proximo";
+    return "bloqueado";
   }
 
   return (
     <AppShell titulo="Rutas">
-      <BadgeUnlockToast badge={badgeGanado} onClose={() => setBadgeGanado(null)} />
-      <div className="mx-auto max-w-2xl">
-        <p className="font-label text-xs font-bold uppercase tracking-widest text-secondary">
-          Tu ruta personalizada
-        </p>
-        <h1 className="mt-2 text-3xl font-black text-on-surface">
-          {completadas} de {totalFases} fases completadas
-        </h1>
-        <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-surface-container-highest">
-          <div
-            className="h-full rounded-full bg-primary transition-all"
-            style={{ width: `${(completadas / totalFases) * 100}%` }}
-          />
+      <BadgeUnlockToast badge={badgeGanado} onClose={() => {}} />
+      <div className="mx-auto max-w-2xl space-y-gap-xl">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <span className="text-label-lg font-label-lg rounded-full bg-tertiary-fixed px-4 py-1 uppercase tracking-widest text-on-tertiary-fixed">
+            Tu Viaje de Aprendizaje
+          </span>
+          <h2 className="font-headline-lg text-headline-lg text-on-primary-fixed">
+            Ruta Formativa
+          </h2>
         </div>
 
-        <div className="mt-6 flex flex-col gap-4">
-          {resultadoTmaid.rutaPersonalizada.map((fase) => {
-            const estado = progresoRutas[fase.fase] ?? "pendiente";
-            return (
-              <div key={fase.fase} className="card">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-lg font-bold text-on-surface">
-                      {fase.fase}
-                    </p>
-                    <p className="mt-1 text-sm text-on-surface-variant">
-                      {fase.descripcion}
-                    </p>
+        {/* Selector de fase */}
+        <div className="flex justify-center">
+          <div className="inline-flex gap-1 rounded-full bg-surface-container p-1">
+            {fases.map((f) => (
+              <button
+                key={f.fase}
+                onClick={() => setFaseSeleccionada(f.fase)}
+                className={`rounded-full px-8 py-2 font-bold uppercase transition-all ${
+                  (faseSeleccionada ?? fases[Math.max(indiceActivo, 0)]?.fase) === f.fase
+                    ? "bg-white text-secondary shadow-sm"
+                    : "text-on-surface-variant hover:text-on-surface"
+                }`}
+              >
+                {f.fase}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {rutaCompleta && (
+          <div className="atmospheric-shadow rounded-xl bg-tertiary-fixed p-6 text-center text-on-tertiary-fixed">
+            <Icon name="emoji_events" filled className="text-4xl" />
+            <p className="font-headline-md mt-2">¡Completaste toda tu ruta formativa!</p>
+          </div>
+        )}
+
+        {/* Roadmap vertical */}
+        <div className="relative mx-auto max-w-lg py-10">
+          <div className="absolute bottom-0 left-1/2 top-0 w-1 -translate-x-1/2 rounded-full bg-surface-container-highest" />
+          <div className="relative space-y-16">
+            {fases.map((f, i) => {
+              const estado = estadoDe(i);
+              if (estado === "activo") {
+                return (
+                  <div key={f.fase} className="relative flex flex-col items-center">
+                    <div className="glow-node relative z-10 flex h-16 w-16 animate-pulse-subtle items-center justify-center rounded-full border-4 border-white bg-secondary">
+                      <Icon name={ICONO_NODO[estado]} className="text-3xl text-white" />
+                    </div>
+                    <div className="atmospheric-shadow mt-4 w-full max-w-xs rounded-xl border-2 border-secondary/20 bg-white p-6 text-center">
+                      <h4 className="font-headline-md text-headline-md text-secondary">
+                        Fase: {f.fase}
+                      </h4>
+                      <p className="my-2 text-on-surface-variant">{f.descripcion}</p>
+                      <div className="mb-4 h-1.5 w-full rounded-full bg-surface-container-highest">
+                        <div
+                          className="h-full rounded-full bg-secondary"
+                          style={{
+                            width: progresoRutas[f.fase] === "en_progreso" ? "65%" : "25%",
+                          }}
+                        />
+                      </div>
+                      <button
+                        onClick={() => router.push("/rutas/reto")}
+                        className="w-full rounded-full bg-secondary py-3 font-bold text-on-secondary transition-shadow hover:shadow-lg"
+                      >
+                        VER RETOS
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => avanzarFase(fase.fase)}
-                    className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-colors ${
-                      estado === "completado"
-                        ? "bg-primary text-on-primary"
-                        : estado === "en_progreso"
-                          ? "bg-secondary-fixed text-on-secondary-fixed"
-                          : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container"
+                );
+              }
+              return (
+                <div
+                  key={f.fase}
+                  className={`relative flex items-center justify-center ${
+                    estado === "bloqueado" ? "opacity-30" : estado === "proximo" ? "opacity-50" : ""
+                  }`}
+                >
+                  <div
+                    className={`z-10 flex h-12 w-12 items-center justify-center rounded-full border-4 border-white shadow-lg ${
+                      estado === "completado" ? "bg-tertiary-container" : "bg-surface-container-highest"
                     }`}
                   >
-                    {estado === "completado" && <CheckCircle2 size={14} />}
-                    {estado === "en_progreso" && <PlayCircle size={14} />}
-                    {estado === "pendiente" && <Circle size={14} />}
-                    {ETIQUETA_ESTADO[estado]}
-                  </button>
+                    <Icon
+                      name={ICONO_NODO[estado]}
+                      className={estado === "completado" ? "text-white" : "text-on-surface-variant"}
+                    />
+                  </div>
+                  {estado === "completado" && (
+                    <div className="absolute left-20 hidden w-48 rounded-xl border-l-4 border-tertiary-container bg-white p-4 shadow-md md:block">
+                      <p className="text-body-sm font-bold">Fase: {f.fase}</p>
+                      <span className="text-[12px] font-black text-tertiary-container">
+                        COMPLETADO
+                      </span>
+                    </div>
+                  )}
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-
-        <p className="mt-4 text-xs text-on-surface-variant">
-          Toca el estado de cada fase para avanzarla. En Fase 4 del roadmap
-          esto se conecta a retos reales con evidencia, no solo un click.
-        </p>
       </div>
     </AppShell>
   );
