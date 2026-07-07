@@ -193,13 +193,20 @@ export default function ResultadoTmaidPage() {
         </div>
       </div>
 
-      <div className="mx-auto mt-8 max-w-5xl">
+      <div className="mx-auto mt-8 max-w-5xl space-y-3">
         <Link
           href="/rutas"
           className="font-headline-md group flex w-full items-center justify-between rounded-full bg-on-secondary-fixed px-10 py-5 text-on-secondary shadow-xl transition-all hover:bg-secondary active:scale-95"
         >
           Ver Mi Plan de Ruta Personalizado
           <Icon name="trending_flat" className="transition-transform group-hover:translate-x-2" />
+        </Link>
+        <Link
+          href="/tmaid/resultado/detallado"
+          className="flex w-full items-center justify-between rounded-full border border-outline-variant px-10 py-4 text-on-surface transition-all hover:bg-surface-container-low active:scale-95"
+        >
+          Ver análisis detallado de mi perfil IA
+          <Icon name="arrow_forward" />
         </Link>
       </div>
     </AppShell>
