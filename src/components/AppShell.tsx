@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, ClipboardList, Map, UserRound, Lock, LogOut, Flame, Star } from "lucide-react";
+import { Home, ClipboardList, Map, BarChart3, UserRound, Lock, LogOut, Flame, Star } from "lucide-react";
 import { useSession } from "@/lib/store/session";
 import { calcularNivel } from "@/lib/gamification/badges";
 
@@ -18,6 +18,7 @@ const TABS: Tab[] = [
   { href: "/dashboard", label: "Inicio", icon: Home, requiereTmaid: false },
   { href: "/tmaid", label: "Diagnostico", icon: ClipboardList, requiereTmaid: false },
   { href: "/rutas", label: "Rutas", icon: Map, requiereTmaid: true },
+  { href: "/progreso", label: "Progreso", icon: BarChart3, requiereTmaid: true },
   { href: "/tmaid/resultado", label: "Perfil", icon: UserRound, requiereTmaid: true },
 ];
 
