@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Epilogue, Manrope } from "next/font/google";
 import { SessionProvider } from "@/lib/store/session";
+import { DemoBanner } from "@/components/DemoBanner";
 import "./globals.css";
 
 // Tipografia Humanist Futurist (DESIGN.md real): Epilogue (headlines) + Manrope (body/labels)
@@ -32,7 +33,7 @@ export default function RootLayout({
     <html lang="es" className={`${epilogue.variable} ${manrope.variable}`}>
       <head>
         {/* Iconografia real de Stitch: Material Symbols Outlined (usado en
-            splash, login, onboarding, dashboard, herramientas, etc.) */}
+        splash, login, onboarding, dashboard, herramientas, etc.) */}
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
           rel="stylesheet"
@@ -40,6 +41,7 @@ export default function RootLayout({
       </head>
       <body>
         <SessionProvider>{children}</SessionProvider>
+        <DemoBanner />
       </body>
     </html>
   );
