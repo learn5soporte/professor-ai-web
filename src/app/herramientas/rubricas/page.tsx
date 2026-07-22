@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useSession } from "@/lib/store/session";
+import { useSession, perfilCompleto } from "@/lib/store/session";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
 
@@ -107,6 +107,7 @@ export default function CreadorRubricasPage() {
   useEffect(() => {
     if (cargando) return;
     if (!perfil) router.replace("/login");
+    else if (!perfilCompleto(perfil)) router.replace("/onboarding");
   }, [cargando, perfil, router]);
 
   const [paso, setPaso] = useState<1 | 2 | 3>(1);
@@ -121,7 +122,7 @@ export default function CreadorRubricasPage() {
   const [generando, setGenerando] = useState(false);
   const [mensajeBorrador, setMensajeBorrador] = useState<string | null>(null);
 
-  if (cargando || !perfil) return null;
+  if (cargando || !perfil || !perfilCompleto(perfil)) return null;
 
   function irACriterios() {
     const base = CRITERIOS_SUGERIDOS[tipoActividad] ?? CRITERIOS_SUGERIDOS["Ensayo Crítico"];
