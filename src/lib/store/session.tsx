@@ -184,7 +184,7 @@ function traducirErrorSupabase(mensaje: string): string {
   return mensaje;
 }
 
-function mensajeError(e: unknown): string {
+export function mensajeError(e: unknown): string {
   if (e && typeof e === "object" && "message" in e && typeof (e as { message?: unknown }).message === "string") {
     return traducirErrorSupabase((e as { message: string }).message);
   }
