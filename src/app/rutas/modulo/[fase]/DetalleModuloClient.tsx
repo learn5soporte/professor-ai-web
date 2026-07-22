@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useSession } from "@/lib/store/session";
+import { useSession, perfilCompleto } from "@/lib/store/session";
 import { BADGES } from "@/lib/gamification/badges";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
@@ -41,10 +41,11 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
   useEffect(() => {
     if (cargando) return;
     if (!perfil) router.replace("/login");
+    else if (!perfilCompleto(perfil)) router.replace("/onboarding");
     else if (!resultadoTmaid) router.replace("/tmaid");
   }, [cargando, perfil, resultadoTmaid, router]);
 
-  if (cargando || !perfil || !resultadoTmaid || !nombreFase) return null;
+  if (cargando || !perfil || !perfilCompleto(perfil) || !resultadoTmaid || !nombreFase) return null;
 
   const fases = resultadoTmaid.rutaPersonalizada;
   const fase = fases.find((f) => f.fase === nombreFase);
