@@ -21,6 +21,7 @@ import {
   actualizarProgresoFase as actualizarProgresoFaseSupabase,
   otorgarBadge as otorgarBadgeSupabase,
   registrarActividadDiaria as registrarActividadDiariaSupabase,
+  reenviarConfirmacion as reenviarConfirmacionSupabase,
 } from "@/lib/supabase/datos";
 
 /**
@@ -88,7 +89,14 @@ type SessionState = {
   ultimaFechaActiva: string | null;
 };
 
-type ResultadoAuth = { error: string | null; tienePerfil: boolean };
+type ResultadoAuth = {
+  error: string | null;
+  tienePerfil: boolean;
+  /** true si el error es específicamente "el email todavía no está confirmado" -- permite mostrar un botón de reenvío en vez de solo el mensaje. */
+  requiereConfirmacion?: boolean;
+  /** true si el error es específicamente "ya existe una cuenta con este email" -- permite ofrecer un link directo a /login. */
+  yaExiste?: boolean;
+};
 
 type SessionContextValue = SessionState & {
   cargando: boolean;
@@ -99,6 +107,8 @@ type SessionContextValue = SessionState & {
   registrar: (email: string, password: string, nombre: string) => Promise<ResultadoAuth>;
   /** Login real (o mock, segun usarSupabase) -- usado por /login. */
   iniciarSesion: (email: string, password: string) => Promise<ResultadoAuth>;
+  /** Reenvía el correo de confirmación de cuenta. No-op (sin error) si usarSupabase es false. */
+  reenviarConfirmacion: (email: string) => Promise<{ error: string | null }>;
   guardarPerfil: (perfil: PerfilDocente) => void;
   guardarResultadoTmaid: (resultado: ResultadoTmaid) => void;
   actualizarProgresoFase: (fase: string, estado: EstadoFase) => void;
@@ -126,6 +136,13 @@ const defaultState: SessionState = {
  * substring porque Supabase no expone códigos de error estables para todos
  * los casos -- solo el texto del mensaje.
  */
+function mensajeCrudo(e: unknown): string | null {
+  if (e && typeof e === "object" && "message" in e && typeof (e as { message?: unknown }).message === "string") {
+    return (e as { message: string }).message;
+  }
+  return null;
+}
+
 function traducirErrorSupabase(mensaje: string): string {
   const m = mensaje.toLowerCase();
   if (m.includes("email rate limit exceeded")) {
@@ -247,7 +264,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         setState((prev) => ({ ...prev, autenticado: true }));
         return { error: null, tienePerfil: false };
       } catch (e) {
-        return { error: mensajeError(e), tienePerfil: false };
+        const crudo = mensajeCrudo(e);
+        const yaExiste = Boolean(crudo && crudo.toLowerCase().includes("already registered"));
+        return { error: mensajeError(e), tienePerfil: false, yaExiste };
       }
     },
 
@@ -268,7 +287,19 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         }
         return { error: null, tienePerfil: false };
       } catch (e) {
-        return { error: mensajeError(e), tienePerfil: false };
+        const crudo = mensajeCrudo(e);
+        const requiereConfirmacion = Boolean(crudo && crudo.toLowerCase().includes("email not confirmed"));
+        return { error: mensajeError(e), tienePerfil: false, requiereConfirmacion };
+      }
+    },
+
+    reenviarConfirmacion: async (email: string) => {
+      if (!usarSupabase) return { error: null };
+      try {
+        await reenviarConfirmacionSupabase(email);
+        return { error: null };
+      } catch (e) {
+        return { error: mensajeError(e) };
       }
     },
 
