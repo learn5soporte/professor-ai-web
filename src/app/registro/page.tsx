@@ -8,21 +8,38 @@ import { Icon } from "@/components/Icon";
 
 /**
  * SCREEN 3: REGISTRO -- base literal: code.html real de Stitch
- * (bloque_1_y_2_acceso_y_onboarding). Fase 0: crea la sesion mock
- * directamente (sin Supabase Auth todavia).
+ * (bloque_1_y_2_acceso_y_onboarding).
+ *
+ * Fase 1.1: si el deploy tiene credenciales de Supabase (usarSupabase),
+ * este formulario crea una cuenta real (Supabase Auth). Si no (como en
+ * todo deploy hasta ahora), sigue funcionando exactamente igual que en
+ * Fase 0: crea la sesión mock directamente, sin cambios de comportamiento.
  */
 export default function RegistroPage() {
   const router = useRouter();
-  const { iniciarSesionMock } = useSession();
+  const { usarSupabase, registrar } = useSession();
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [cargando, setCargando] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!aceptaTerminos) return;
-    iniciarSesionMock(nombre.trim() || email.split("@")[0] || "Docente");
+    setError(null);
+    setCargando(true);
+    const { error: errorAuth } = await registrar(
+      email,
+      password,
+      nombre.trim() || email.split("@")[0] || "Docente"
+    );
+    setCargando(false);
+    if (errorAuth) {
+      setError(errorAuth);
+      return;
+    }
     router.push("/onboarding");
   }
 
@@ -36,6 +53,11 @@ export default function RegistroPage() {
           <h2 className="font-headline-md text-headline-md text-white">
             Crea tu cuenta
           </h2>
+          {usarSupabase && (
+            <p className="mt-2 text-center text-body-sm text-white/40">
+              Usa un email y contraseña reales -- vas a necesitarlos para volver a entrar.
+            </p>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="glass-card space-y-5 rounded-xl p-8">
@@ -72,6 +94,7 @@ export default function RegistroPage() {
             <input
               type="password"
               required
+              minLength={usarSupabase ? 6 : undefined}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
@@ -90,8 +113,17 @@ export default function RegistroPage() {
               Acepto los términos y condiciones
             </span>
           </label>
-          <button type="submit" className="btn-accent flex w-full items-center justify-center gap-2">
-            Crear mi cuenta <Icon name="arrow_forward" className="text-[18px]" />
+          {error && (
+            <p className="text-body-sm rounded-lg bg-red-500/10 px-4 py-3 text-red-300">
+              {error}
+            </p>
+          )}
+          <button
+            type="submit"
+            disabled={cargando}
+            className="btn-accent flex w-full items-center justify-center gap-2 disabled:opacity-60"
+          >
+            {cargando ? "Creando..." : "Crear mi cuenta"} <Icon name="arrow_forward" className="text-[18px]" />
           </button>
         </form>
       </section>
