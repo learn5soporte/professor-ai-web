@@ -62,6 +62,34 @@ export async function reenviarConfirmacion(email: string) {
   if (error) throw error;
 }
 
+/**
+ * Envía el correo de "recuperar contraseña" (Supabase Auth). El enlace del
+ * correo redirige a /restablecer-password con un token en el hash de la
+ * URL; el SDK de Supabase lo detecta solo (detectSessionInUrl) y crea una
+ * sesión temporal de tipo "recovery" que esa pantalla usa para permitir
+ * poner una contraseña nueva.
+ */
+export async function solicitarRecuperacion(email: string) {
+  const supabase = createClient();
+  const redirectTo =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/professor-ai-web/restablecer-password`
+      : undefined;
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+  if (error) throw error;
+}
+
+/**
+ * Actualiza la contraseña del usuario autenticado -- usado por
+ * /restablecer-password sobre la sesión temporal de recuperación descrita
+ * arriba.
+ */
+export async function actualizarContrasena(nuevaPassword: string) {
+  const supabase = createClient();
+  const { error } = await supabase.auth.updateUser({ password: nuevaPassword });
+  if (error) throw error;
+}
+
 export async function obtenerUsuarioActual() {
   const supabase = createClient();
   const { data } = await supabase.auth.getUser();
