@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "@/lib/store/session";
+import { useSession, perfilCompleto } from "@/lib/store/session";
 import {
   PREGUNTAS_LIKERT,
   PREGUNTA_ABIERTA,
@@ -43,6 +43,7 @@ export default function TmaidPage() {
   useEffect(() => {
     if (cargando) return;
     if (!perfil) router.replace("/login");
+    else if (!perfilCompleto(perfil)) router.replace("/onboarding");
   }, [cargando, perfil, router]);
 
   useEffect(() => {
@@ -68,7 +69,7 @@ export default function TmaidPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paso]);
 
-  if (cargando || !perfil) return null;
+  if (cargando || !perfil || !perfilCompleto(perfil)) return null;
 
   const esIntro = paso === "intro";
   const esProcesando = paso === "procesando";
