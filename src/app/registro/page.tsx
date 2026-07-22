@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useSession } from "@/lib/store/session";
 import { DarkScreen } from "@/components/DarkScreen";
 import { Icon } from "@/components/Icon";
@@ -24,13 +25,15 @@ export default function RegistroPage() {
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
+  const [yaExiste, setYaExiste] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!aceptaTerminos) return;
     setError(null);
+    setYaExiste(false);
     setCargando(true);
-    const { error: errorAuth } = await registrar(
+    const { error: errorAuth, yaExiste: cuentaExistente } = await registrar(
       email,
       password,
       nombre.trim() || email.split("@")[0] || "Docente"
@@ -38,6 +41,7 @@ export default function RegistroPage() {
     setCargando(false);
     if (errorAuth) {
       setError(errorAuth);
+      setYaExiste(Boolean(cuentaExistente));
       return;
     }
     router.push("/onboarding");
@@ -114,9 +118,14 @@ export default function RegistroPage() {
             </span>
           </label>
           {error && (
-            <p className="text-body-sm rounded-lg bg-red-500/10 px-4 py-3 text-red-300">
-              {error}
-            </p>
+            <div className="space-y-2 rounded-lg bg-red-500/10 px-4 py-3">
+              <p className="text-body-sm text-red-300">{error}</p>
+              {yaExiste && (
+                <Link href="/login" className="text-body-sm font-bold text-tertiary-fixed-dim underline">
+                  Ir a iniciar sesión
+                </Link>
+              )}
+            </div>
           )}
           <button
             type="submit"
