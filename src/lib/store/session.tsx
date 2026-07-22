@@ -271,9 +271,16 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         return { error: null, tienePerfil: false };
       }
       try {
-        const usuario = await registrarUsuarioSupabase(email, password, nombre);
+        const { usuario, sesionActiva } = await registrarUsuarioSupabase(email, password, nombre);
         if (!usuario) {
           return { error: "No se pudo crear la cuenta. Intenta de nuevo.", tienePerfil: false };
+        }
+        if (!sesionActiva) {
+          // "Confirm email" esta activo en el proyecto: la cuenta se creo
+          // pero todavia no hay sesion -- el docente tiene que confirmar el
+          // correo antes de poder usar la app. No hay perfil ni dashboard
+          // que mostrar todavia, asi que no tratamos esto como un login.
+          return { error: null, tienePerfil: false, requiereConfirmacion: true };
         }
         usuarioIdRef.current = usuario.id;
         setState((prev) => ({ ...prev, autenticado: true }));
