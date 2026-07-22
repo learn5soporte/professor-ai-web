@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useSession } from "@/lib/store/session";
+import { useSession, perfilCompleto } from "@/lib/store/session";
 import { BADGES } from "@/lib/gamification/badges";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
@@ -51,10 +51,11 @@ export default function InsigniasPage() {
   useEffect(() => {
     if (cargando) return;
     if (!perfil) router.replace("/login");
+    else if (!perfilCompleto(perfil)) router.replace("/onboarding");
     else if (!resultadoTmaid) router.replace("/tmaid");
   }, [cargando, perfil, resultadoTmaid, router]);
 
-  if (cargando || !perfil || !resultadoTmaid) return null;
+  if (cargando || !perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
 
   const catalogo = Object.values(BADGES);
   const desbloqueadas = catalogo.filter((b) => badges.includes(b.id));
