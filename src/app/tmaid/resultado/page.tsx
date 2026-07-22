@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useSession } from "@/lib/store/session";
+import { useSession, perfilCompleto } from "@/lib/store/session";
 import { ETIQUETA_DIMENSION } from "@/lib/tmaid/scoring";
 import { BADGES, calcularNivel } from "@/lib/gamification/badges";
 import { AppShell } from "@/components/AppShell";
@@ -50,12 +50,14 @@ export default function ResultadoTmaidPage() {
     if (cargando) return;
     if (!perfil) {
       router.replace("/login");
+    } else if (!perfilCompleto(perfil)) {
+      router.replace("/onboarding");
     } else if (!resultadoTmaid) {
       router.replace("/tmaid");
     }
   }, [cargando, perfil, resultadoTmaid, router]);
 
-  if (cargando || !perfil || !resultadoTmaid) {
+  if (cargando || !perfil || !perfilCompleto(perfil) || !resultadoTmaid) {
     return null;
   }
 
