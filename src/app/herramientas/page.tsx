@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useSession } from "@/lib/store/session";
+import { useSession, perfilCompleto } from "@/lib/store/session";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
 
@@ -63,9 +63,10 @@ export default function HerramientasHubPage() {
   useEffect(() => {
     if (cargando) return;
     if (!perfil) router.replace("/login");
+    else if (!perfilCompleto(perfil)) router.replace("/onboarding");
   }, [cargando, perfil, router]);
 
-  if (cargando || !perfil) return null;
+  if (cargando || !perfil || !perfilCompleto(perfil)) return null;
 
   return (
     <AppShell titulo="Herramientas">
