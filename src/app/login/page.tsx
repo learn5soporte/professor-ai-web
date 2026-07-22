@@ -9,19 +9,32 @@ import { Icon } from "@/components/Icon";
 
 /**
  * SCREEN 2: LOGIN -- base literal: code.html real de Stitch
- * (bloque_1_y_2_acceso_y_onboarding). Fase 0: no hay Supabase Auth todavia,
- * el email ingresado simula la sesion (cualquier password es aceptada).
+ * (bloque_1_y_2_acceso_y_onboarding).
+ *
+ * Fase 1.1: si el deploy tiene credenciales de Supabase (usarSupabase),
+ * este formulario hace un login real (email/password verificados de
+ * verdad). Si no (como en todo deploy hasta ahora), sigue funcionando
+ * exactamente igual que en Fase 0: cualquier email/password te deja entrar
+ * -- comportamiento sin cambios para no romper la demo actual.
  */
 export default function LoginPage() {
   const router = useRouter();
-  const { perfil, iniciarSesionMock } = useSession();
+  const { usarSupabase, iniciarSesion } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [cargando, setCargando] = useState(false);
 
-  function entrar() {
-    const nombre = email.split("@")[0] || "Docente";
-    iniciarSesionMock(nombre);
-    router.push(perfil ? "/dashboard" : "/onboarding");
+  async function entrar() {
+    setError(null);
+    setCargando(true);
+    const { error: errorAuth, tienePerfil } = await iniciarSesion(email, password);
+    setCargando(false);
+    if (errorAuth) {
+      setError(errorAuth);
+      return;
+    }
+    router.push(tienePerfil ? "/dashboard" : "/onboarding");
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -40,8 +53,9 @@ export default function LoginPage() {
             Iniciar Sesión
           </h2>
           <p className="mt-2 text-center text-body-sm text-white/40">
-            Prototipo Fase 0 -- sin cuenta real todavía. Cualquier email /
-            contraseña te lleva al flujo completo.
+            {usarSupabase
+              ? "Ingresa con el email y contraseña de tu cuenta."
+              : "Prototipo Fase 0 -- sin cuenta real todavía. Cualquier email / contraseña te lleva al flujo completo."}
           </p>
         </div>
 
@@ -72,20 +86,33 @@ export default function LoginPage() {
               className="w-full rounded-xl border-none bg-white/5 px-4 py-4 text-white placeholder:text-white/20 focus:ring-2 focus:ring-secondary-container"
             />
           </div>
-          <button type="submit" className="btn-accent flex w-full items-center justify-center gap-2">
-            Entrar <Icon name="arrow_forward" className="text-[18px]" />
+          {error && (
+            <p className="text-body-sm rounded-lg bg-red-500/10 px-4 py-3 text-red-300">
+              {error}
+            </p>
+          )}
+          <button
+            type="submit"
+            disabled={cargando}
+            className="btn-accent flex w-full items-center justify-center gap-2 disabled:opacity-60"
+          >
+            {cargando ? "Entrando..." : "Entrar"} <Icon name="arrow_forward" className="text-[18px]" />
           </button>
-          <div className="flex items-center gap-4 py-2">
-            <div className="h-px flex-1 bg-tertiary-fixed-dim/20" />
-            <span className="text-body-sm font-bold uppercase tracking-widest text-tertiary-fixed-dim">
-              o
-            </span>
-            <div className="h-px flex-1 bg-tertiary-fixed-dim/20" />
-          </div>
-          <button type="button" onClick={entrar} className="btn-outline-dark flex w-full items-center justify-center gap-2">
-            <Icon name="account_circle" />
-            Continuar con Google
-          </button>
+          {!usarSupabase && (
+            <>
+              <div className="flex items-center gap-4 py-2">
+                <div className="h-px flex-1 bg-tertiary-fixed-dim/20" />
+                <span className="text-body-sm font-bold uppercase tracking-widest text-tertiary-fixed-dim">
+                  o
+                </span>
+                <div className="h-px flex-1 bg-tertiary-fixed-dim/20" />
+              </div>
+              <button type="button" onClick={entrar} className="btn-outline-dark flex w-full items-center justify-center gap-2">
+                <Icon name="account_circle" />
+                Continuar con Google
+              </button>
+            </>
+          )}
           <p className="text-center text-body-sm text-white/40">
             ¿No tienes cuenta?{" "}
             <Link href="/registro" className="font-bold text-tertiary-fixed-dim">
