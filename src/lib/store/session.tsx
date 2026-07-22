@@ -120,9 +120,41 @@ const defaultState: SessionState = {
   ultimaFechaActiva: null,
 };
 
+/**
+ * Traduce los mensajes de error crudos de Supabase Auth (siempre en
+ * inglés) a texto claro en español para el docente. Usa coincidencia de
+ * substring porque Supabase no expone códigos de error estables para todos
+ * los casos -- solo el texto del mensaje.
+ */
+function traducirErrorSupabase(mensaje: string): string {
+  const m = mensaje.toLowerCase();
+  if (m.includes("email rate limit exceeded")) {
+    return "Supabase limitó el envío de correos de confirmación por ahora (pasa cuando se registran muchas cuentas seguidas en poco tiempo con el plan gratuito). Espera unos minutos e intenta de nuevo, o pide que desactiven \"Confirm email\" en Supabase mientras se prueba.";
+  }
+  if (m.includes("user already registered") || m.includes("already registered")) {
+    return "Ya existe una cuenta con este email. Intenta iniciar sesión en vez de registrarte.";
+  }
+  if (m.includes("invalid login credentials")) {
+    return "Email o contraseña incorrectos.";
+  }
+  if (m.includes("email not confirmed")) {
+    return "Todavía no confirmaste tu email. Revisa tu bandeja de entrada (o la carpeta de spam) y haz clic en el enlace de confirmación antes de iniciar sesión.";
+  }
+  if (m.includes("password") && m.includes("6 characters")) {
+    return "La contraseña debe tener al menos 6 caracteres.";
+  }
+  if (m.includes("invalid format") || m.includes("unable to validate email")) {
+    return "El email no tiene un formato válido.";
+  }
+  if (m.includes("failed to fetch") || m.includes("networkerror")) {
+    return "No se pudo conectar con el servidor. Revisa tu conexión a internet e intenta de nuevo.";
+  }
+  return mensaje;
+}
+
 function mensajeError(e: unknown): string {
   if (e && typeof e === "object" && "message" in e && typeof (e as { message?: unknown }).message === "string") {
-    return (e as { message: string }).message;
+    return traducirErrorSupabase((e as { message: string }).message);
   }
   return "Ocurrió un error inesperado. Intenta de nuevo.";
 }
