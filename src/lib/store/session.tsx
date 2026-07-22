@@ -154,7 +154,7 @@ function mensajeCrudo(e: unknown): string | null {
  * primer campo requerido del onboarding, así que su presencia es una
  * señal confiable de que el flujo se completó.
  */
-function perfilCompleto(perfil: PerfilDocente | null): boolean {
+export function perfilCompleto(perfil: PerfilDocente | null): boolean {
   return Boolean(perfil && perfil.nivelEducativo.trim().length > 0);
 }
 
