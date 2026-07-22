@@ -19,22 +19,36 @@ import { Icon } from "@/components/Icon";
  */
 export default function LoginPage() {
   const router = useRouter();
-  const { usarSupabase, iniciarSesion } = useSession();
+  const { usarSupabase, iniciarSesion, reenviarConfirmacion } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
+  const [requiereConfirmacion, setRequiereConfirmacion] = useState(false);
+  const [reenviando, setReenviando] = useState(false);
+  const [reenvioMensaje, setReenvioMensaje] = useState<string | null>(null);
 
   async function entrar() {
     setError(null);
+    setRequiereConfirmacion(false);
+    setReenvioMensaje(null);
     setCargando(true);
-    const { error: errorAuth, tienePerfil } = await iniciarSesion(email, password);
+    const { error: errorAuth, tienePerfil, requiereConfirmacion: pideConfirmacion } = await iniciarSesion(email, password);
     setCargando(false);
     if (errorAuth) {
       setError(errorAuth);
+      setRequiereConfirmacion(Boolean(pideConfirmacion));
       return;
     }
     router.push(tienePerfil ? "/dashboard" : "/onboarding");
+  }
+
+  async function reenviarCorreo() {
+    setReenviando(true);
+    setReenvioMensaje(null);
+    const { error: errorReenvio } = await reenviarConfirmacion(email);
+    setReenviando(false);
+    setReenvioMensaje(errorReenvio ?? "Correo reenviado -- revisa tu bandeja de entrada (o spam).");
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -87,8 +101,23 @@ export default function LoginPage() {
             />
           </div>
           {error && (
-            <p className="text-body-sm rounded-lg bg-red-500/10 px-4 py-3 text-red-300">
-              {error}
+            <div className="space-y-2 rounded-lg bg-red-500/10 px-4 py-3">
+              <p className="text-body-sm text-red-300">{error}</p>
+              {requiereConfirmacion && (
+                <button
+                  type="button"
+                  onClick={reenviarCorreo}
+                  disabled={reenviando || !email}
+                  className="text-body-sm font-bold text-tertiary-fixed-dim underline disabled:opacity-60"
+                >
+                  {reenviando ? "Reenviando..." : "Reenviar correo de confirmación"}
+                </button>
+              )}
+            </div>
+          )}
+          {reenvioMensaje && (
+            <p className="text-body-sm rounded-lg bg-white/5 px-4 py-3 text-white/70">
+              {reenvioMensaje}
             </p>
           )}
           <button
