@@ -4,18 +4,47 @@ import {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import { BADGES } from "@/lib/gamification/badges";
+import {
+  supabaseConfigurado,
+  registrarUsuario as registrarUsuarioSupabase,
+  iniciarSesion as iniciarSesionSupabase,
+  cerrarSesion as cerrarSesionSupabase,
+  obtenerUsuarioActual,
+  cargarSesionCompleta,
+  guardarPerfilDocente as guardarPerfilDocenteSupabase,
+  guardarResultadoTmaid as guardarResultadoTmaidSupabase,
+  actualizarProgresoFase as actualizarProgresoFaseSupabase,
+  otorgarBadge as otorgarBadgeSupabase,
+  registrarActividadDiaria as registrarActividadDiariaSupabase,
+} from "@/lib/supabase/datos";
 
 /**
- * Sesión simulada (Fase 0 — prototipo visual).
+ * Sesion del docente -- Fase 1.1.
  *
- * No hay backend real todavía: esto guarda el estado del docente en
- * localStorage para poder navegar login -> onboarding -> TMAID -> dashboard
- * como un flujo completo. Cuando conectemos Supabase (Fase 1), este mismo
- * shape de datos migra a las tablas `perfil_docente` / `resultado_tmaid`.
+ * Dos backends posibles, decididos en tiempo de build por
+ * supabaseConfigurado() (ver src/lib/supabase/datos.ts):
+ *  - Sin NEXT_PUBLIC_SUPABASE_URL/ANON_KEY (como en cada deploy hasta ahora):
+ *    todo sigue exactamente igual que en Fase 0 -- Context + localStorage,
+ *    mismo comportamiento byte-a-byte que antes de esta migracion.
+ *  - Con esas variables presentes (secrets de GitHub Actions): el
+ *    registro/login/lectura/escritura pasan a ser llamadas reales a
+ *    Supabase, con Row Level Security protegiendo los datos de cada
+ *    docente. El shape de SessionState es identico en ambos casos, asi que
+ *    ninguna otra pantalla de la app necesito cambios para este soporte
+ *    dual -- solo login/page.tsx y registro/page.tsx (que ahora piden
+ *    email+password reales en vez de simular la sesion con solo el email).
+ *
+ * Patron usado para los mutadores (guardarPerfil, otorgarBadge, etc.):
+ * actualizacion local optimista SINCRONA (identica a la de antes) + una
+ * escritura a Supabase en segundo plano ("fire and forget", con
+ * console.error si falla) cuando usarSupabase es true. Esto evita tener que
+ * tocar cada pantalla que llama a estos mutadores -- todas siguen
+ * llamandolos exactamente igual, de forma sincrona.
  */
 
 export type PerfilDocente = {
@@ -59,9 +88,17 @@ type SessionState = {
   ultimaFechaActiva: string | null;
 };
 
+type ResultadoAuth = { error: string | null; tienePerfil: boolean };
+
 type SessionContextValue = SessionState & {
   cargando: boolean;
+  /** true si el deploy actual tiene credenciales reales de Supabase. */
+  usarSupabase: boolean;
   iniciarSesionMock: (nombre: string) => void;
+  /** Alta real (o mock, segun usarSupabase) -- usado por /registro. */
+  registrar: (email: string, password: string, nombre: string) => Promise<ResultadoAuth>;
+  /** Login real (o mock, segun usarSupabase) -- usado por /login. */
+  iniciarSesion: (email: string, password: string) => Promise<ResultadoAuth>;
   guardarPerfil: (perfil: PerfilDocente) => void;
   guardarResultadoTmaid: (resultado: ResultadoTmaid) => void;
   actualizarProgresoFase: (fase: string, estado: EstadoFase) => void;
@@ -83,56 +120,156 @@ const defaultState: SessionState = {
   ultimaFechaActiva: null,
 };
 
+function mensajeError(e: unknown): string {
+  if (e && typeof e === "object" && "message" in e && typeof (e as { message?: unknown }).message === "string") {
+    return (e as { message: string }).message;
+  }
+  return "Ocurrió un error inesperado. Intenta de nuevo.";
+}
+
 const SessionContext = createContext<SessionContextValue | null>(null);
 
 export function SessionProvider({ children }: { children: ReactNode }) {
+  const usarSupabase = supabaseConfigurado();
   const [state, setState] = useState<SessionState>(defaultState);
   const [hydrated, setHydrated] = useState(false);
+  const usuarioIdRef = useRef<string | null>(null);
 
   useEffect(() => {
+    let cancelado = false;
+
+    if (usarSupabase) {
+      obtenerUsuarioActual()
+        .then(async (usuario) => {
+          if (cancelado) return;
+          if (!usuario) {
+            setHydrated(true);
+            return;
+          }
+          usuarioIdRef.current = usuario.id;
+          const sesion = await cargarSesionCompleta();
+          if (cancelado) return;
+          if (sesion) setState((prev) => ({ ...prev, ...sesion }));
+          setHydrated(true);
+        })
+        .catch(() => {
+          if (!cancelado) setHydrated(true);
+        });
+      return () => {
+        cancelado = true;
+      };
+    }
+
+    // Fallback localStorage -- identico al comportamiento de Fase 0.
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
       try {
         setState({ ...defaultState, ...JSON.parse(raw) });
       } catch {
-        // localStorage corrupto o de otra versión: ignorar y empezar de cero
+        // localStorage corrupto o de otra version: ignorar y empezar de cero
       }
     }
     setHydrated(true);
-  }, []);
+  }, [usarSupabase]);
 
   useEffect(() => {
-    if (hydrated) {
+    if (hydrated && !usarSupabase) {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
-  }, [state, hydrated]);
+  }, [state, hydrated, usarSupabase]);
+
+  function iniciarSesionMockInterno(nombre: string) {
+    setState((prev) => ({
+      ...prev,
+      autenticado: true,
+      perfil: prev.perfil ?? {
+        nombre,
+        nivelEducativo: "",
+        materia: "",
+        pais: "",
+        usoPrevioIA: "",
+        mayorDesafio: "",
+        objetivoPrincipal: "",
+      },
+    }));
+  }
 
   const value: SessionContextValue = {
     ...state,
     cargando: !hydrated,
-    iniciarSesionMock: (nombre: string) =>
-      setState((prev) => ({
-        ...prev,
-        autenticado: true,
-        perfil: prev.perfil ?? {
-          nombre,
-          nivelEducativo: "",
-          materia: "",
-          pais: "",
-          usoPrevioIA: "",
-          mayorDesafio: "",
-          objetivoPrincipal: "",
-        },
-      })),
-    guardarPerfil: (perfil: PerfilDocente) =>
-      setState((prev) => ({ ...prev, perfil })),
-    guardarResultadoTmaid: (resultado: ResultadoTmaid) =>
-      setState((prev) => ({ ...prev, resultadoTmaid: resultado })),
-    actualizarProgresoFase: (fase: string, estado: EstadoFase) =>
+    usarSupabase,
+
+    iniciarSesionMock: iniciarSesionMockInterno,
+
+    registrar: async (email, password, nombre) => {
+      if (!usarSupabase) {
+        iniciarSesionMockInterno(nombre);
+        return { error: null, tienePerfil: false };
+      }
+      try {
+        const usuario = await registrarUsuarioSupabase(email, password, nombre);
+        if (!usuario) {
+          return { error: "No se pudo crear la cuenta. Intenta de nuevo.", tienePerfil: false };
+        }
+        usuarioIdRef.current = usuario.id;
+        setState((prev) => ({ ...prev, autenticado: true }));
+        return { error: null, tienePerfil: false };
+      } catch (e) {
+        return { error: mensajeError(e), tienePerfil: false };
+      }
+    },
+
+    iniciarSesion: async (email, password) => {
+      if (!usarSupabase) {
+        const nombre = email.split("@")[0] || "Docente";
+        iniciarSesionMockInterno(nombre);
+        return { error: null, tienePerfil: Boolean(state.perfil) };
+      }
+      try {
+        await iniciarSesionSupabase(email, password);
+        const usuario = await obtenerUsuarioActual();
+        usuarioIdRef.current = usuario?.id ?? null;
+        const sesion = await cargarSesionCompleta();
+        if (sesion) {
+          setState((prev) => ({ ...prev, ...sesion }));
+          return { error: null, tienePerfil: Boolean(sesion.perfil) };
+        }
+        return { error: null, tienePerfil: false };
+      } catch (e) {
+        return { error: mensajeError(e), tienePerfil: false };
+      }
+    },
+
+    guardarPerfil: (perfil: PerfilDocente) => {
+      setState((prev) => ({ ...prev, perfil }));
+      if (usarSupabase && usuarioIdRef.current) {
+        guardarPerfilDocenteSupabase(usuarioIdRef.current, perfil).catch((e) =>
+          console.error("guardarPerfilDocente", e)
+        );
+      }
+    },
+
+    guardarResultadoTmaid: (resultado: ResultadoTmaid) => {
+      setState((prev) => ({ ...prev, resultadoTmaid: resultado }));
+      if (usarSupabase && usuarioIdRef.current) {
+        guardarResultadoTmaidSupabase(usuarioIdRef.current, resultado).catch((e) =>
+          console.error("guardarResultadoTmaid", e)
+        );
+      }
+    },
+
+    actualizarProgresoFase: (fase: string, estado: EstadoFase) => {
       setState((prev) => ({
         ...prev,
         progresoRutas: { ...prev.progresoRutas, [fase]: estado },
-      })),
+      }));
+      if (usarSupabase && usuarioIdRef.current) {
+        actualizarProgresoFaseSupabase(usuarioIdRef.current, fase, estado).catch((e) =>
+          console.error("actualizarProgresoFase", e)
+        );
+      }
+    },
+
     otorgarBadge: (badgeId: string) => {
       const yaLoTiene = state.badges.includes(badgeId);
       if (yaLoTiene) return false;
@@ -142,22 +279,38 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         badges: [...prev.badges, badgeId],
         puntos: prev.puntos + (badge?.puntos ?? 0),
       }));
+      if (usarSupabase && usuarioIdRef.current) {
+        otorgarBadgeSupabase(usuarioIdRef.current, badgeId, badge?.puntos ?? 0).catch((e) =>
+          console.error("otorgarBadge", e)
+        );
+      }
       return true;
     },
+
     registrarActividadDiaria: () => {
       const hoy = new Date().toISOString().slice(0, 10);
+      const racha0 = state.racha;
+      const ultimaFechaActiva0 = state.ultimaFechaActiva;
       setState((prev) => {
         if (prev.ultimaFechaActiva === hoy) return prev;
-        const ayer = new Date(Date.now() - 86400000)
-          .toISOString()
-          .slice(0, 10);
-        const nuevaRacha =
-          prev.ultimaFechaActiva === ayer ? prev.racha + 1 : 1;
+        const ayer = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+        const nuevaRacha = prev.ultimaFechaActiva === ayer ? prev.racha + 1 : 1;
         return { ...prev, ultimaFechaActiva: hoy, racha: nuevaRacha };
       });
+      if (usarSupabase && usuarioIdRef.current && ultimaFechaActiva0 !== hoy) {
+        registrarActividadDiariaSupabase(usuarioIdRef.current, racha0, ultimaFechaActiva0).catch((e) =>
+          console.error("registrarActividadDiaria", e)
+        );
+      }
     },
+
     reiniciar: () => {
-      window.localStorage.removeItem(STORAGE_KEY);
+      if (usarSupabase) {
+        cerrarSesionSupabase().catch((e) => console.error("cerrarSesion", e));
+        usuarioIdRef.current = null;
+      } else {
+        window.localStorage.removeItem(STORAGE_KEY);
+      }
       setState(defaultState);
     },
   };
