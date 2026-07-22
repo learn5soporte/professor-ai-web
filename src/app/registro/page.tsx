@@ -26,6 +26,7 @@ export default function RegistroPage() {
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
   const [yaExiste, setYaExiste] = useState(false);
+  const [confirmacionPendiente, setConfirmacionPendiente] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -33,7 +34,7 @@ export default function RegistroPage() {
     setError(null);
     setYaExiste(false);
     setCargando(true);
-    const { error: errorAuth, yaExiste: cuentaExistente } = await registrar(
+    const { error: errorAuth, yaExiste: cuentaExistente, requiereConfirmacion } = await registrar(
       email,
       password,
       nombre.trim() || email.split("@")[0] || "Docente"
@@ -44,7 +45,39 @@ export default function RegistroPage() {
       setYaExiste(Boolean(cuentaExistente));
       return;
     }
+    if (requiereConfirmacion) {
+      // La cuenta se creo pero todavia no hay sesion activa -- el proyecto
+      // tiene "Confirm email" activo. No hay perfil que llenar todavia, asi
+      // que no lo mandamos a /onboarding: le pedimos que confirme el correo.
+      setConfirmacionPendiente(true);
+      return;
+    }
     router.push("/onboarding");
+  }
+
+  if (confirmacionPendiente) {
+    return (
+      <DarkScreen>
+        <section className="flex w-full max-w-md flex-col px-margin-mobile">
+          <div className="mb-8 flex flex-col items-center text-center">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container">
+              <Icon name="mail" className="text-[28px] text-white" />
+            </div>
+            <h2 className="font-headline-md text-headline-md text-white">
+              Confirma tu correo
+            </h2>
+            <p className="mt-3 text-body-md text-white/60">
+              Creamos tu cuenta. Revisa tu bandeja de entrada (o la carpeta de spam) en{" "}
+              <span className="font-bold text-white">{email}</span> y haz clic en el enlace de
+              confirmación antes de iniciar sesión.
+            </p>
+          </div>
+          <Link href="/login" className="btn-accent flex w-full items-center justify-center gap-2">
+            Ir a iniciar sesión
+          </Link>
+        </section>
+      </DarkScreen>
+    );
   }
 
   return (
