@@ -99,6 +99,13 @@ export default function LoginPage() {
               placeholder="••••••••"
               className="w-full rounded-xl border-none bg-white/5 px-4 py-4 text-white placeholder:text-white/20 focus:ring-2 focus:ring-secondary-container"
             />
+            {usarSupabase && (
+              <p className="text-right text-body-sm">
+                <Link href="/recuperar" className="text-white/40 underline hover:text-white/70">
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </p>
+            )}
           </div>
           {error && (
             <div className="space-y-2 rounded-lg bg-red-500/10 px-4 py-3">
