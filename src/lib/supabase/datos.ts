@@ -4,22 +4,12 @@ import type { EstadoFase, PerfilDocente, ResultadoTmaid } from "@/lib/store/sess
 /**
  * Capa de datos real de Supabase — Fase 1.1.
  *
- * Este archivo es NUEVO y todavia no esta conectado a `session.tsx` (que
- * hoy sigue usando localStorage al 100%, sin cambios). La razon: escribir
- * la capa de datos (esto) es seguro de validar por lectura/tipos; conectar
- * el SessionProvider real a Supabase de forma asincrona es un cambio de
- * mayor riesgo para toda la app (cada pantalla depende de session.tsx) que
- * no se puede probar contra un proyecto Supabase real todavia (no existe
- * uno creado). Por eso se deja completo y listo, pero como pieza aislada
- * que no se ejecuta desde ninguna pantalla hoy.
- *
- * Cuando exista un proyecto Supabase real (NEXT_PUBLIC_SUPABASE_URL +
- * NEXT_PUBLIC_SUPABASE_ANON_KEY en .env.local), el siguiente paso es
- * reescribir SessionProvider en session.tsx para que, cuando
- * `supabaseConfigurado()` sea true, delegue cada mutador a las funciones
- * de aqui en vez de a localStorage. Mientras esas variables no existan
- * (como en el deploy actual de GitHub Pages), nada de este archivo se
- * ejecuta ni se referencia desde ninguna pagina.
+ * Conectada desde `session.tsx`: cuando `supabaseConfigurado()` es true
+ * (credenciales reales presentes en el build vía secrets de GitHub
+ * Actions), el SessionProvider delega auth/lectura/escritura a las
+ * funciones de aqui en vez de a localStorage. Si no hay credenciales
+ * (deploys sin los secrets configurados), nada de este archivo se
+ * ejecuta y la app se comporta igual que en Fase 0.
  *
  * Esquema de referencia: supabase/migrations/0001_init.sql +
  * 0002_professor_ai_schema.sql.
@@ -56,6 +46,19 @@ export async function iniciarSesion(email: string, password: string) {
 export async function cerrarSesion() {
   const supabase = createClient();
   const { error } = await supabase.auth.signOut();
+  if (error) throw error;
+}
+
+/**
+ * Reenvía el correo de confirmación de cuenta (Supabase Auth). Útil cuando
+ * el login falla con "Email not confirmed" -- el docente puede pedir que
+ * se lo manden de nuevo sin tener que registrarse otra vez. Sujeto al
+ * mismo límite de envíos por hora del plan gratuito de Supabase que
+ * "email rate limit exceeded" ya cubre en session.tsx.
+ */
+export async function reenviarConfirmacion(email: string) {
+  const supabase = createClient();
+  const { error } = await supabase.auth.resend({ type: "signup", email });
   if (error) throw error;
 }
 
