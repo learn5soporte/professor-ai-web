@@ -25,6 +25,15 @@ export function supabaseConfigurado(): boolean {
 // Autenticacion
 // ---------------------------------------------------------------------------
 
+/**
+ * Registra una cuenta nueva. Devuelve tambien si quedo una sesion activa:
+ * si "Confirm email" esta prendido en el proyecto de Supabase (el default,
+ * y el estado actual de este proyecto), signUp crea el usuario pero
+ * `data.session` viene null hasta que el docente confirma el correo -- no
+ * hay forma de saltarse eso desde el cliente. Quien llama necesita esa
+ * distincion para no tratar el registro como un login real cuando todavia
+ * no hay sesion (ver session.tsx: registrar()).
+ */
 export async function registrarUsuario(email: string, password: string, nombre: string) {
   const supabase = createClient();
   const { data, error } = await supabase.auth.signUp({
@@ -33,7 +42,7 @@ export async function registrarUsuario(email: string, password: string, nombre: 
     options: { data: { nombre } },
   });
   if (error) throw error;
-  return data.user;
+  return { usuario: data.user, sesionActiva: Boolean(data.session) };
 }
 
 export async function iniciarSesion(email: string, password: string) {
