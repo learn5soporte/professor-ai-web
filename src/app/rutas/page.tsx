@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "@/lib/store/session";
+import { useSession, perfilCompleto } from "@/lib/store/session";
 import { AppShell } from "@/components/AppShell";
 import { BadgeUnlockToast } from "@/components/BadgeUnlockToast";
 import { BADGES } from "@/lib/gamification/badges";
@@ -38,10 +38,11 @@ export default function RutasPage() {
   useEffect(() => {
     if (cargando) return;
     if (!perfil) router.replace("/login");
+    else if (!perfilCompleto(perfil)) router.replace("/onboarding");
     else if (!resultadoTmaid) router.replace("/tmaid");
   }, [cargando, perfil, resultadoTmaid, router]);
 
-  if (cargando || !perfil || !resultadoTmaid) return null;
+  if (cargando || !perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
 
   const fases = resultadoTmaid.rutaPersonalizada;
   const indiceActivo = fases.findIndex((f) => progresoRutas[f.fase] !== "completado");
