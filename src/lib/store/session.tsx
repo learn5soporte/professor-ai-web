@@ -143,6 +143,21 @@ function mensajeCrudo(e: unknown): string | null {
   return null;
 }
 
+/**
+ * Un objeto PerfilDocente puede existir pero estar "vacío" -- tanto
+ * cargarSesionCompleta() (cuando solo hay fila en `usuarios` pero nunca se
+ * llenó `perfil_docente`) como iniciarSesionMockInterno() crean un
+ * placeholder con nivelEducativo/materia/etc en "" apenas se inicia
+ * sesión, antes de pasar por /onboarding. Usar Boolean(perfil) a secas
+ * para decidir si ya completó el onboarding manda a un docente nuevo
+ * directo a /dashboard con un perfil en blanco. nivelEducativo es el
+ * primer campo requerido del onboarding, así que su presencia es una
+ * señal confiable de que el flujo se completó.
+ */
+function perfilCompleto(perfil: PerfilDocente | null): boolean {
+  return Boolean(perfil && perfil.nivelEducativo.trim().length > 0);
+}
+
 function traducirErrorSupabase(mensaje: string): string {
   const m = mensaje.toLowerCase();
   if (m.includes("email rate limit exceeded")) {
@@ -274,7 +289,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       if (!usarSupabase) {
         const nombre = email.split("@")[0] || "Docente";
         iniciarSesionMockInterno(nombre);
-        return { error: null, tienePerfil: Boolean(state.perfil) };
+        return { error: null, tienePerfil: perfilCompleto(state.perfil) };
       }
       try {
         await iniciarSesionSupabase(email, password);
@@ -283,7 +298,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         const sesion = await cargarSesionCompleta();
         if (sesion) {
           setState((prev) => ({ ...prev, ...sesion }));
-          return { error: null, tienePerfil: Boolean(sesion.perfil) };
+          return { error: null, tienePerfil: perfilCompleto(sesion.perfil) };
         }
         return { error: null, tienePerfil: false };
       } catch (e) {
