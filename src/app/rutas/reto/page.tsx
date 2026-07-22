@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "@/lib/store/session";
+import { useSession, perfilCompleto } from "@/lib/store/session";
 import { BADGES } from "@/lib/gamification/badges";
 import { Icon } from "@/components/Icon";
 import { Confetti } from "@/components/Confetti";
@@ -83,10 +83,11 @@ export default function RetoPage() {
   useEffect(() => {
     if (cargando) return;
     if (!perfil) router.replace("/login");
+    else if (!perfilCompleto(perfil)) router.replace("/onboarding");
     else if (!resultadoTmaid) router.replace("/tmaid");
   }, [cargando, perfil, resultadoTmaid, router]);
 
-  if (cargando || !perfil || !resultadoTmaid) return null;
+  if (cargando || !perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
 
   const fases = resultadoTmaid.rutaPersonalizada;
   const indiceActivo = fases.findIndex((f) => progresoRutas[f.fase] !== "completado");
