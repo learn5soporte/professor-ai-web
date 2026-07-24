@@ -31,10 +31,21 @@ function promedioPorDimension(
   return suma / preguntas.length;
 }
 
+/**
+ * Umbrales centrados en cada valor de la escala Likert (1-5), con
+ * fronteras a ±0.5 de cada entero -- no en los enteros mismos. Antes los
+ * cortes estaban en 2/3/4, lo que en la practica significaba que
+ * responder "Neutral" (3) en todo daba "Avanzado" y "De acuerdo" (4) ya
+ * daba el nivel maximo "Experto": el resultado terminaba pareciendo
+ * positivo casi sin importar lo que el docente respondiera. Con los
+ * cortes en 2.5/3.5/4.5, cada respuesta entera cae en el nivel que le
+ * corresponde de verdad: 1-2 -> Iniciante, 3 -> En desarrollo, 4 ->
+ * Avanzado, 5 -> Experto.
+ */
 function nivelDesdePromedio(promedio: number): ResultadoTmaid["nivelAsignado"] {
-  if (promedio < 2) return "Iniciante";
-  if (promedio < 3) return "En desarrollo";
-  if (promedio < 4) return "Avanzado";
+  if (promedio < 2.5) return "Iniciante";
+  if (promedio < 3.5) return "En desarrollo";
+  if (promedio < 4.5) return "Avanzado";
   return "Experto";
 }
 
@@ -57,8 +68,14 @@ export function calcularResultadoTmaid(
   const masFuerte = DIMENSIONES.reduce((a, b) =>
     dimensiones[a] >= dimensiones[b] ? a : b
   );
+  // Comparacion estricta (no <=): con <= y todas las dimensiones empatadas,
+  // masDebil colisionaba siempre con la primera dimension de la lista --
+  // la misma que elegia masFuerte -- y el texto terminaba diciendo "tienes
+  // buena base en X, tu oportunidad es fortalecer X". Con < estricto,
+  // masFuerte y masDebil recorren la lista en direcciones distintas y solo
+  // coinciden cuando de verdad las 4 dimensiones son identicas.
   const masDebil = DIMENSIONES.reduce((a, b) =>
-    dimensiones[a] <= dimensiones[b] ? a : b
+    dimensiones[a] < dimensiones[b] ? a : b
   );
 
   const mapaBrechas = DIMENSIONES.filter((d) => dimensiones[d] < 3).map(
