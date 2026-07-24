@@ -59,6 +59,23 @@ export type PerfilDocente = {
   objetivoPrincipal: string;
 };
 
+/**
+ * Tipo de recurso complementario sugerido dentro de un modulo de la ruta
+ * formativa (feedback real: "necesitamos que los invite a ver videos o
+ * hacer actividades, consultas, libros"). Decision deliberada: estas son
+ * SUGERENCIAS POR TEMA, nunca un link/titulo especifico inventado -- igual
+ * que el resto de la app nunca fabrica datos que parezcan reales sin
+ * serlo (ver Adaptador de Contenido "Proximamente", PremiumUpgradeModal
+ * honesto sobre pagos no activos, etc.). El docente decide que video o
+ * libro concreto buscar; nosotros le decimos sobre que tema y por que.
+ */
+export type TipoRecurso = "video" | "lectura" | "libro" | "consulta";
+
+export type RecursoSugerido = {
+  tipo: TipoRecurso;
+  sugerencia: string;
+};
+
 export type ResultadoTmaid = {
   nivelAsignado: "Iniciante" | "En desarrollo" | "Avanzado" | "Experto";
   puntajePromedio: number;
@@ -70,9 +87,25 @@ export type ResultadoTmaid = {
   };
   perfilPedagogicoIA: string;
   mapaBrechas: string[];
+  /**
+   * Antes SIEMPRE tenia exactamente 3 fases (Explorar/Aplicar/Dominar).
+   * Feedback real: la ruta se sentia corta y terminaba muy rapido, y no
+   * variaba de verdad "por nivel" (solo el texto cambiaba, no el largo).
+   * Ahora `fase` es un identificador de modulo mas amplio (ver
+   * MODULOS_POR_NIVEL en scoring.ts) y la cantidad de modulos (4-5) y
+   * cuales aparecen dependen del nivelAsignado real del docente. `fase`
+   * se mantiene como string (no un union literal estricto) para no romper
+   * registros ya guardados en Supabase con los 3 valores originales --
+   * esos siguen siendo validos, solo que ya no se generan para
+   * diagnosticos nuevos. `recursos` es opcional por la misma razon:
+   * registros guardados antes de este campo existir simplemente no lo
+   * traen, y el codigo debe tratar eso como "sin recursos" en vez de
+   * fallar.
+   */
   rutaPersonalizada: {
-    fase: "Explorar" | "Aplicar" | "Dominar";
+    fase: string;
     descripcion: string;
+    recursos?: RecursoSugerido[];
   }[];
 };
 
