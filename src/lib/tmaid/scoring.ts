@@ -77,18 +77,172 @@ const EXPLORAR_POR_NIVEL: Record<ResultadoTmaid["nivelAsignado"], (materia: stri
 };
 
 /**
- * Descripción de la fase "Dominar", con la misma lógica de variación por
- * nivel que EXPLORAR_POR_NIVEL.
+ * Descripción del módulo "Evaluar" (retroalimentación/rúbricas con IA),
+ * variando por nivel con la misma lógica que EXPLORAR_POR_NIVEL. Este
+ * módulo reemplaza el contenido de lo que antes era "Dominar" -- el
+ * nombre "Dominar" se sentía como un techo (como si ya no hubiera más
+ * ruta después), así que ese contenido se repartió entre Evaluar,
+ * Liderar e Innovar (ver MODULOS_POR_NIVEL más abajo), y el id de fase
+ * "Dominar" ya no se genera para diagnósticos nuevos (el badge
+ * "fase-dominar" se deja intacto en el catálogo por los docentes que ya
+ * lo ganaron con la ruta vieja).
  */
-const DOMINAR_POR_NIVEL: Record<ResultadoTmaid["nivelAsignado"], string> = {
+const EVALUAR_POR_NIVEL: Record<ResultadoTmaid["nivelAsignado"], string> = {
   Iniciante:
-    "Cuando te sientas cómodo/a con lo básico, usa IA de forma regular en una sola tarea (por ejemplo, planeación de clases) antes de expandir a más.",
+    "Cuando ya tengas algo de práctica, usa IA para tu primera rúbrica o pauta de retroalimentación -- pide primero los criterios y después la evaluación en sí, nunca las dos cosas en un solo prompt.",
   "En desarrollo":
-    "Integra IA de forma regular en planeación y evaluación, y comparte tu experiencia con colegas.",
+    "Diseña una rúbrica completa con ayuda de IA y pruébala calificando 3-5 trabajos reales -- compara si el criterio se sostiene o si necesitas ajustarlo.",
   Avanzado:
-    "Sistematiza tu uso de IA (plantillas propias, prompts reutilizables) y empieza a orientar a otros docentes que están empezando.",
+    "Sistematiza tus rúbricas y prompts de evaluación en plantillas reutilizables, y cruza la retroalimentación de la IA con tu propio criterio pedagógico para detectar dónde discrepan.",
   Experto:
-    "Lidera la adopción de IA en tu institución: documenta tus prompts y resultados para que otros docentes los repliquen.",
+    "Diseña un esquema de evaluación asistido por IA para un curso completo (no solo una tarea), documentando qué automatizar y qué siempre debe pasar por tu criterio humano.",
+};
+
+/**
+ * Descripción del módulo "Fundamentos" -- paso previo a "Explorar", solo
+ * para el nivel Iniciante (ver MODULOS_POR_NIVEL). No varía por nivel
+ * porque solo un nivel lo recibe.
+ */
+function descripcionFundamentos(): string {
+  return "Antes de escribir tu primer prompt, vale la pena entender qué es (y qué NO es) la IA generativa: no \"sabe\" nada con certeza, solo predice la palabra más probable a partir de tu instrucción -- por eso puede sonar muy segura y aun así estar equivocada. Dedica 15-20 minutos a algo introductorio sobre esto antes de seguir.";
+}
+
+/**
+ * Descripción del módulo "Integrar" -- llevar la IA de una actividad
+ * puntual a un uso semanal real. Aparece en TODOS los niveles (ver
+ * MODULOS_POR_NIVEL) porque es el paso que casi siempre se salta:
+ * probar una vez algo y no volver a usarlo.
+ */
+function descripcionIntegrar(materia: string): string {
+  return `No te quedes en una sola actividad: durante al menos una semana, usa IA de forma regular en 2-3 tareas distintas de tu rutina con ${materia} (planeación, retroalimentación, comunicación con estudiantes) y anota qué te ahorró tiempo de verdad y qué no.`;
+}
+
+/**
+ * Descripción del módulo "Liderar" -- para Avanzado/Experto. Antes esto
+ * era parte del texto de "Dominar" para el nivel Experto; ahora es su
+ * propio módulo con su propio reto/badge.
+ */
+function descripcionLiderar(): string {
+  return "Ya tienes práctica real -- ahora ayuda a que no sea solo tuya. Comparte con un/a colega el prompt o la herramienta que más te ha servido, y ofrécele 15 minutos para mostrársela en persona. Sistematizar lo que sabes (plantillas propias, prompts guardados) también es parte de este paso.";
+}
+
+/**
+ * Descripción del módulo "Innovar" -- exclusivo del nivel Experto, el
+ * módulo más avanzado de la ruta.
+ */
+function descripcionInnovar(materia: string): string {
+  return `Explora usos menos comunes de IA en ${materia}: simulaciones de escenarios, generación dinámica de casos de evaluación, o IA como asistente de investigación para mantener actualizado tu propio contenido de clase.`;
+}
+
+/**
+ * Sugerencias de recursos complementarios por módulo -- 2 por módulo,
+ * mezclando tipos (video/lectura/libro/consulta). Deliberadamente NO
+ * traen un link o título específico (ver comentario en RecursoSugerido,
+ * session.tsx): son sugerencias de tema/acción honestas sobre qué buscar
+ * o con quién hablar, no una biblioteca curada que no existe todavía.
+ */
+const RECURSOS_POR_MODULO: Record<string, ResultadoTmaid["rutaPersonalizada"][number]["recursos"]> = {
+  Fundamentos: [
+    {
+      tipo: "video",
+      sugerencia:
+        "Busca un video corto (5-10 min) que explique en términos simples qué es un modelo de lenguaje.",
+    },
+    {
+      tipo: "lectura",
+      sugerencia:
+        "Busca un artículo introductorio sobre \"qué es una alucinación de IA\" -- es la primera trampa en la que caen la mayoría de los docentes nuevos en esto.",
+    },
+  ],
+  Explorar: [
+    {
+      tipo: "consulta",
+      sugerencia:
+        "Pregúntale a un/a colega que ya use IA qué herramienta usa y para qué -- 10 minutos de conversación te pueden ahorrar horas de prueba y error.",
+    },
+    {
+      tipo: "video",
+      sugerencia:
+        "Busca una demostración en video de la herramienta de IA que más te interese (ChatGPT, Gemini, Claude) usada para tareas docentes.",
+    },
+  ],
+  Aplicar: [
+    {
+      tipo: "lectura",
+      sugerencia:
+        "Busca guías sobre \"diseño de prompts educativos\" -- ya existen bastantes enfocadas específicamente en docentes.",
+    },
+    {
+      tipo: "libro",
+      sugerencia:
+        "Busca libros o guías cortas sobre IA generativa aplicada a la educación en tu materia específica.",
+    },
+  ],
+  Integrar: [
+    {
+      tipo: "consulta",
+      sugerencia:
+        "Conversa con 2-3 estudiantes sobre cómo ELLOS ya usan IA fuera de clase -- te da pistas reales de qué permitir y qué no.",
+    },
+    {
+      tipo: "lectura",
+      sugerencia:
+        "Busca casos de otros docentes de tu materia integrando IA en su rutina semanal (blogs o comunidades docentes).",
+    },
+  ],
+  Evaluar: [
+    {
+      tipo: "video",
+      sugerencia:
+        "Busca un video sobre \"cómo diseñar una rúbrica con ayuda de IA\" -- hay bastante contenido reciente sobre el tema.",
+    },
+    {
+      tipo: "libro",
+      sugerencia:
+        "Busca material sobre evaluación formativa asistida por IA -- es un área con publicaciones nuevas cada pocos meses.",
+    },
+  ],
+  Liderar: [
+    {
+      tipo: "consulta",
+      sugerencia:
+        "Ofrécete a mostrarle a un/a colega, en 15 minutos, el prompt o la herramienta que más te ha servido.",
+    },
+    {
+      tipo: "lectura",
+      sugerencia:
+        "Busca marcos de adopción de tecnología en instituciones educativas -- dan lenguaje útil para proponer esto a nivel institucional, no solo en tu aula.",
+    },
+  ],
+  Innovar: [
+    {
+      tipo: "libro",
+      sugerencia:
+        "Busca literatura reciente (2025-2026) sobre IA generativa e innovación curricular -- es un área que cambia rápido.",
+    },
+    {
+      tipo: "video",
+      sugerencia:
+        "Busca charlas o conferencias recientes sobre usos experimentales de IA en educación secundaria o superior.",
+    },
+  ],
+};
+
+/**
+ * Qué módulos recibe cada nivel, y en qué orden -- esto es lo que hace
+ * que la ruta sea "por nivel" de verdad (largo y contenido distintos),
+ * no solo el texto de cada módulo como antes. Antes SIEMPRE eran 3
+ * módulos (Explorar/Aplicar/Dominar) para cualquier nivel; ahora son 4-5,
+ * y varían: un Iniciante arranca desde Fundamentos, mientras que un
+ * Experto se salta lo básico y va directo a los módulos más avanzados
+ * (Integrar/Evaluar/Liderar/Innovar) en vez de repetir Explorar/Aplicar
+ * con un texto apenas distinto.
+ */
+const MODULOS_POR_NIVEL: Record<ResultadoTmaid["nivelAsignado"], string[]> = {
+  Iniciante: ["Fundamentos", "Explorar", "Aplicar", "Integrar", "Evaluar"],
+  "En desarrollo": ["Explorar", "Aplicar", "Integrar", "Evaluar"],
+  Avanzado: ["Aplicar", "Integrar", "Evaluar", "Liderar"],
+  Experto: ["Integrar", "Evaluar", "Liderar", "Innovar"],
 };
 
 function promedioPorDimension(
@@ -177,20 +331,43 @@ export function calcularResultadoTmaid(
     masDebil
   ].toLowerCase()}, especialmente pensando en resolver ${desafio}. Si sigues tu ruta personalizada, en las próximas semanas deberías notar menos tiempo invertido en tareas repetitivas (armar materiales, dar retroalimentación) y más margen para lo pedagógico.${notaMiedos}`;
 
-  const rutaPersonalizada: ResultadoTmaid["rutaPersonalizada"] = [
-    {
-      fase: "Explorar",
-      descripcion: EXPLORAR_POR_NIVEL[nivelAsignado](materia),
-    },
-    {
-      fase: "Aplicar",
-      descripcion: `Lleva una primera actividad con IA a tu aula enfocada en ${desafio}. Un ejemplo concreto: ${EJEMPLO_DIMENSION[masDebil]}`,
-    },
-    {
-      fase: "Dominar",
-      descripcion: DOMINAR_POR_NIVEL[nivelAsignado],
-    },
-  ];
+  // Antes esta lista SIEMPRE tenia exactamente estas 3 entradas
+  // (Explorar/Aplicar/Dominar), sin importar el nivel. Ahora se arma a
+  // partir de MODULOS_POR_NIVEL[nivelAsignado] -- 4 o 5 modulos segun el
+  // nivel real del docente, cada uno con su propia descripcion y sus
+  // recursos sugeridos (video/lectura/libro/consulta por tema, sin link
+  // inventado -- ver RECURSOS_POR_MODULO).
+  const rutaPersonalizada: ResultadoTmaid["rutaPersonalizada"] = MODULOS_POR_NIVEL[
+    nivelAsignado
+  ].map((fase) => {
+    let descripcion: string;
+    switch (fase) {
+      case "Fundamentos":
+        descripcion = descripcionFundamentos();
+        break;
+      case "Explorar":
+        descripcion = EXPLORAR_POR_NIVEL[nivelAsignado](materia);
+        break;
+      case "Aplicar":
+        descripcion = `Lleva una primera actividad con IA a tu aula enfocada en ${desafio}. Un ejemplo concreto: ${EJEMPLO_DIMENSION[masDebil]}`;
+        break;
+      case "Integrar":
+        descripcion = descripcionIntegrar(materia);
+        break;
+      case "Evaluar":
+        descripcion = EVALUAR_POR_NIVEL[nivelAsignado];
+        break;
+      case "Liderar":
+        descripcion = descripcionLiderar();
+        break;
+      case "Innovar":
+        descripcion = descripcionInnovar(materia);
+        break;
+      default:
+        descripcion = "";
+    }
+    return { fase, descripcion, recursos: RECURSOS_POR_MODULO[fase] ?? [] };
+  });
 
   return {
     nivelAsignado,
@@ -202,4 +379,4 @@ export function calcularResultadoTmaid(
   };
 }
 
-export { ETIQUETA_DIMENSION };
+export { ETIQUETA_DIMENSION, MODULOS_POR_NIVEL };
