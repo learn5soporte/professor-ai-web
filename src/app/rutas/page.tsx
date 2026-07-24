@@ -68,14 +68,24 @@ export default function RutasPage() {
           </h2>
         </div>
 
-        {/* Selector de fase */}
+        {/* Selector de fase. Ampliado (jul 2026): la ruta paso de tener
+            siempre 3 fases cortas (Explorar/Aplicar/Dominar) a 4-5 modulos
+            con nombres a veces mas largos (Fundamentos/Integrar) segun el
+            nivel -- sin overflow-x-auto esta fila desbordaba el ancho de
+            pantalla en movil (mismo tipo de bug ya encontrado antes en la
+            tabla de la rubrica). */}
         <div className="flex justify-center">
-          <div className="inline-flex gap-1 rounded-full bg-surface-container p-1">
+          <p className="no-scrollbar mb-1 text-center text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/70 sm:hidden">
+            Desliza para ver todos los módulos
+          </p>
+        </div>
+        <div className="no-scrollbar -mx-margin-mobile overflow-x-auto px-margin-mobile">
+          <div className="inline-flex w-max gap-1 rounded-full bg-surface-container p-1">
             {fases.map((f) => (
               <button
                 key={f.fase}
                 onClick={() => setFaseSeleccionada(f.fase)}
-                className={`rounded-full px-8 py-2 font-bold uppercase transition-all ${
+                className={`whitespace-nowrap rounded-full px-4 py-2 font-bold uppercase transition-all sm:px-8 ${
                   (faseSeleccionada ?? fases[Math.max(indiceActivo, 0)]?.fase) === f.fase
                     ? "bg-white text-secondary shadow-sm"
                     : "text-on-surface-variant hover:text-on-surface"
