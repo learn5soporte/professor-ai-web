@@ -14,9 +14,49 @@ import { Icon } from "@/components/Icon";
  * (banco_de_prompts_para_el_aula). Búsqueda + chips de categoría son
  * funcionales de verdad (filtran el catálogo real en src/lib/herramientas
  * /prompts.ts). "Guardados" persiste en localStorage -- no es decorativo.
+ *
+ * Bug real reportado (feedback de un docente probando el prototipo,
+ * 2026-07-23, vía WhatsApp): "no pudo usar el Banco de Prompts". Causa
+ * raíz encontrada en auditoría: "Usar en clase" dependía por completo de
+ * `navigator.clipboard.writeText()`, sin fallback. Esa API requiere
+ * contexto seguro + permisos, y falla en silencio (try/catch vacío) en
+ * varios navegadores in-app comunes en Android (el navegador embebido de
+ * WhatsApp entre ellos) y en Safari/iOS más viejo -- el docente hacía clic
+ * y no pasaba nada visible, sin ningún indicio de qué falló ni cómo
+ * conseguir el texto de otra forma. Ahora: (1) se intenta la Clipboard API
+ * si existe, (2) si falla o no existe, se usa un fallback con
+ * document.execCommand("copy"), (3) si ambos fallan, el prompt se expande
+ * automáticamente para que el docente pueda seleccionarlo y copiarlo a
+ * mano, con un aviso explícito en vez de fallar en silencio.
  */
 
 const FAVORITOS_KEY = "professor-ai:prompts-guardados";
+
+async function copiarAlPortapapeles(texto: string): Promise<boolean> {
+  if (typeof navigator !== "undefined" && navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(texto);
+      return true;
+    } catch {
+      // sigue al fallback de abajo
+    }
+  }
+  try {
+    const textarea = document.createElement("textarea");
+    textarea.value = texto;
+    textarea.style.position = "fixed";
+    textarea.style.top = "-1000px";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    const exito = document.execCommand("copy");
+    document.body.removeChild(textarea);
+    return exito;
+  } catch {
+    return false;
+  }
+}
 
 export default function BancoPromptsPage() {
   const router = useRouter();
@@ -25,6 +65,7 @@ export default function BancoPromptsPage() {
   const [categoria, setCategoria] = useState<string>("Todos");
   const [expandidoIdx, setExpandidoIdx] = useState<number | null>(null);
   const [copiadoIdx, setCopiadoIdx] = useState<number | null>(null);
+  const [errorCopiadoIdx, setErrorCopiadoIdx] = useState<number | null>(null);
   const [guardados, setGuardados] = useState<string[]>([]);
   const [hidratado, setHidratado] = useState(false);
   const [badgeGanado, setBadgeGanado] = useState<null | (typeof BADGES)[string]>(
@@ -74,16 +115,23 @@ export default function BancoPromptsPage() {
   if (cargando || !perfil || !perfilCompleto(perfil)) return null;
 
   async function usarEnClase(texto: string, idx: number) {
-    try {
-      await navigator.clipboard.writeText(texto);
+    const copiado = await copiarAlPortapapeles(texto);
+    if (copiado) {
+      setErrorCopiadoIdx(null);
       setCopiadoIdx(idx);
       setTimeout(() => setCopiadoIdx((cur) => (cur === idx ? null : cur)), 1500);
       if (otorgarBadge("primer-prompt")) {
         setBadgeGanado(BADGES["primer-prompt"]);
       }
-    } catch {
-      // Si el navegador bloquea el portapapeles, no rompemos la UI.
+      return;
     }
+    // No se pudo copiar automáticamente (Clipboard API bloqueada o
+    // ausente). En vez de fallar en silencio, mostramos el prompt
+    // expandido y avisamos para que el docente pueda copiarlo a mano.
+    setCopiadoIdx(null);
+    setExpandidoIdx(idx);
+    setErrorCopiadoIdx(idx);
+    setTimeout(() => setErrorCopiadoIdx((cur) => (cur === idx ? null : cur)), 5000);
   }
 
   function toggleGuardado(titulo: string) {
@@ -149,6 +197,7 @@ export default function BancoPromptsPage() {
             const idx = PROMPTS.indexOf(p);
             const guardado = guardados.includes(p.titulo);
             const expandido = expandidoIdx === idx;
+            const conError = errorCopiadoIdx === idx;
             return (
               <div
                 key={p.titulo}
@@ -175,8 +224,15 @@ export default function BancoPromptsPage() {
                   {p.paraQueSirve}
                 </p>
                 {expandido && (
-                  <p className="text-body-sm mb-4 rounded-lg bg-surface-container-low p-3 font-mono text-on-surface">
+                  <p className="text-body-sm mb-2 select-all rounded-lg bg-surface-container-low p-3 font-mono text-on-surface">
                     {p.prompt}
+                  </p>
+                )}
+                {conError && (
+                  <p className="text-body-sm mb-2 rounded-lg bg-error-container/20 p-3 text-error">
+                    No pudimos copiar automáticamente en este navegador. Selecciona el
+                    texto de arriba y cópialo con el gesto de copiar de tu teléfono o
+                    computador.
                   </p>
                 )}
                 <button
