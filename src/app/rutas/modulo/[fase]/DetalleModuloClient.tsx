@@ -13,9 +13,10 @@ import { Icon } from "@/components/Icon";
  * (detalle_de_m_dulo_diferenciaci_n_pedag_gica). A diferencia del original
  * de Stitch (que mostraba 3 "retos" ficticios dentro de un mismo módulo,
  * con fechas inventadas como "Finalizado hace 2 días"), aquí el "módulo"
- * ES una fase real de rutaPersonalizada y la "Lista de Retos" muestra las
- * 3 fases reales de la ruta (Explorar/Aplicar/Dominar) con su estado real
- * (progresoRutas), sin datos de relleno ni fechas falsas.
+ * ES un modulo real de rutaPersonalizada y la "Lista de Retos" muestra los
+ * modulos reales de la ruta (4-5 segun el nivel, ver MODULOS_POR_NIVEL en
+ * scoring.ts) con su estado real (progresoRutas), sin datos de relleno ni
+ * fechas falsas.
  *
  * Este es un componente cliente separado de page.tsx porque una página
  * "use client" no puede exportar generateStaticParams (requerido por
@@ -23,15 +24,23 @@ import { Icon } from "@/components/Icon";
  */
 
 const BADGE_POR_FASE: Record<string, string> = {
+  Fundamentos: "fase-fundamentos",
   Explorar: "fase-explorar",
   Aplicar: "fase-aplicar",
-  Dominar: "fase-dominar",
+  Integrar: "fase-integrar",
+  Evaluar: "fase-evaluar",
+  Liderar: "fase-liderar",
+  Innovar: "fase-innovar",
 };
 
 const ICONO_POR_FASE: Record<string, string> = {
+  Fundamentos: "school",
   Explorar: "explore",
   Aplicar: "psychology",
-  Dominar: "military_tech",
+  Integrar: "sync_alt",
+  Evaluar: "fact_check",
+  Liderar: "groups",
+  Innovar: "rocket_launch",
 };
 
 export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null }) {
@@ -106,6 +115,22 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
                 </div>
               </div>
             </div>
+
+            {fase.recursos && fase.recursos.length > 0 && (
+              <div className="space-y-2 pt-2">
+                <span className="text-label-lg font-label-lg text-primary">
+                  PARA COMPLEMENTAR
+                </span>
+                <ul className="space-y-2">
+                  {fase.recursos.map((r, i) => (
+                    <li key={i} className="text-body-sm flex items-start gap-2 text-on-surface-variant">
+                      <Icon name="lightbulb" className="mt-0.5 text-[16px] text-secondary" />
+                      <span>{r.sugerencia}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
           <div className="lg:col-span-5">
