@@ -22,6 +22,75 @@ const ETIQUETA_DIMENSION: Record<Dimension, string> = {
   actitudCambio: "Actitud ante el cambio",
 };
 
+/**
+ * Consejo concreto por dimensión -- feedback de un docente probando el
+ * prototipo (jul 2026): el resultado se sentía corto y genérico ("oportunidad
+ * clara de refuerzo" no dice nada accionable). Cada tip aquí da algo
+ * concreto que hacer: un término que aprender, cómo acotar un prompt, por
+ * dónde empezar. Se usa en mapaBrechas, en las 4 dimensiones siempre (no
+ * solo las que están por debajo de 3), ordenadas de la más débil a la más
+ * fuerte -- así el resultado siempre trae contenido sustancial, no solo
+ * cuando el docente respondió mal.
+ */
+const DIMENSION_TIP: Record<Dimension, string> = {
+  conocimientoIA:
+    "aprende términos clave como \"prompt\", \"alucinación\" y \"temperatura\": te ayudan a saber cuándo confiar en una respuesta de IA y cuándo conviene verificarla.",
+  usoHerramientas:
+    "acota tus prompts con contexto (tema, nivel del curso, cantidad, formato) en vez de pedir algo genérico -- así obtienes resultados usables a la primera.",
+  integracionAula:
+    "empieza con una sola actividad piloto (por ejemplo, dar retroalimentación a un ensayo) antes de llevar IA a toda la materia.",
+  actitudCambio:
+    "dale 2-3 vueltas al mismo prompt antes de descartarlo -- la primera respuesta de la IA casi nunca es la definitiva.",
+};
+
+/**
+ * Ejemplo concreto en cifras por dimensión, usado en la fase "Aplicar" de
+ * la ruta personalizada. Pedido explícito de feedback: "en cifras, en
+ * lugar de demorar 30 minutos en una rúbrica se puede hacer en 5".
+ */
+const EJEMPLO_DIMENSION: Record<Dimension, string> = {
+  conocimientoIA:
+    "revisar 30 respuestas de un examen a mano puede tomarte 45 minutos; usando IA como primer filtro (y revisando tú después), baja a unos 15.",
+  usoHerramientas:
+    "armar una rúbrica desde cero puede tomarte 30 minutos; con el Banco de Prompts y el Creador de Rúbricas de Professor AI, ese mismo trabajo baja a 5-10 minutos.",
+  integracionAula:
+    "diseñar una actividad nueva con IA para tu clase puede tomarte 1 hora la primera vez; repitiéndola 2-3 veces con ajustes, baja a 15-20 minutos.",
+  actitudCambio:
+    "ajustar y volver a pedirle algo a la IA toma 2-3 minutos extra, pero te puede ahorrar hasta 20 minutos de trabajo manual después.",
+};
+
+/**
+ * Descripción de la fase "Explorar", variando según el nivel asignado --
+ * antes era el mismo texto para un Iniciante que para un Experto, lo que
+ * contribuía a que el resultado se sintiera genérico/repetido entre
+ * intentos distintos.
+ */
+const EXPLORAR_POR_NIVEL: Record<ResultadoTmaid["nivelAsignado"], (materia: string) => string> = {
+  Iniciante: (materia) =>
+    `Antes que nada, dedica 20-30 minutos a probar una herramienta de IA (como ChatGPT o Gemini) haciendo preguntas simples sobre ${materia} -- sin buscar un resultado perfecto, solo para perder el miedo inicial.`,
+  "En desarrollo": (materia) =>
+    `Prueba 2-3 herramientas de IA aplicadas a ${materia} y compara qué tan útiles te resultan para tareas puntuales: resumir, generar ejemplos, dar feedback.`,
+  Avanzado: (materia) =>
+    `Explora funciones más avanzadas de las herramientas que ya usas (plantillas, prompts guardados) para ${materia}, buscando ahorrar más tiempo del que ya ahorras hoy.`,
+  Experto: (materia) =>
+    `Explora casos de uso menos comunes de IA en ${materia} -- por ejemplo, generar escenarios de evaluación o simulaciones para tus estudiantes.`,
+};
+
+/**
+ * Descripción de la fase "Dominar", con la misma lógica de variación por
+ * nivel que EXPLORAR_POR_NIVEL.
+ */
+const DOMINAR_POR_NIVEL: Record<ResultadoTmaid["nivelAsignado"], string> = {
+  Iniciante:
+    "Cuando te sientas cómodo/a con lo básico, usa IA de forma regular en una sola tarea (por ejemplo, planeación de clases) antes de expandir a más.",
+  "En desarrollo":
+    "Integra IA de forma regular en planeación y evaluación, y comparte tu experiencia con colegas.",
+  Avanzado:
+    "Sistematiza tu uso de IA (plantillas propias, prompts reutilizables) y empieza a orientar a otros docentes que están empezando.",
+  Experto:
+    "Lidera la adopción de IA en tu institución: documenta tus prompts y resultados para que otros docentes los repliquen.",
+};
+
 function promedioPorDimension(
   respuestas: Record<string, number>,
   dimension: Dimension
@@ -65,27 +134,25 @@ export function calcularResultadoTmaid(
 
   const nivelAsignado = nivelDesdePromedio(puntajePromedio);
 
-  const masFuerte = DIMENSIONES.reduce((a, b) =>
-    dimensiones[a] >= dimensiones[b] ? a : b
-  );
-  // Comparacion estricta (no <=): con <= y todas las dimensiones empatadas,
-  // masDebil colisionaba siempre con la primera dimension de la lista --
-  // la misma que elegia masFuerte -- y el texto terminaba diciendo "tienes
-  // buena base en X, tu oportunidad es fortalecer X". Con < estricto,
-  // masFuerte y masDebil recorren la lista en direcciones distintas y solo
-  // coinciden cuando de verdad las 4 dimensiones son identicas.
-  const masDebil = DIMENSIONES.reduce((a, b) =>
-    dimensiones[a] < dimensiones[b] ? a : b
-  );
+  // Ordena las 4 dimensiones de la mas debil a la mas fuerte. Array.sort es
+  // estable, asi que en caso de empate se conserva el orden original de
+  // DIMENSIONES -- masFuerte y masDebil nunca colisionan salvo que las 4
+  // dimensiones sean identicas, y en ese caso quedan en extremos distintos
+  // de la lista (primera vs. ultima), no en la misma.
+  const dimsPorNivel = [...DIMENSIONES].sort((a, b) => dimensiones[a] - dimensiones[b]);
+  const masDebil = dimsPorNivel[0];
+  const masFuerte = dimsPorNivel[dimsPorNivel.length - 1];
 
-  const mapaBrechas = DIMENSIONES.filter((d) => dimensiones[d] < 3).map(
-    (d) => `${ETIQUETA_DIMENSION[d]}: oportunidad clara de refuerzo.`
+  // Antes solo se listaban las dimensiones por debajo de 3, con un mensaje
+  // generico ("oportunidad clara de refuerzo") y un fallback cuando ninguna
+  // calificaba. Feedback de un docente probando el prototipo: el resultado
+  // se sentia corto y decia lo mismo en cada intento. Ahora siempre se
+  // listan las 4, de la mas debil a la mas fuerte, cada una con un consejo
+  // especifico y accionable -- el contenido varia con las respuestas reales
+  // del docente, no solo con el promedio general.
+  const mapaBrechas = dimsPorNivel.map(
+    (d) => `${ETIQUETA_DIMENSION[d]}: ${DIMENSION_TIP[d]}`
   );
-  if (mapaBrechas.length === 0) {
-    mapaBrechas.push(
-      `${ETIQUETA_DIMENSION[masDebil]} es tu dimensión relativamente más baja — buen punto de partida para seguir creciendo.`
-    );
-  }
 
   const materia = perfil.materia || "tu materia";
   const desafio = perfil.mayorDesafio || "tu mayor desafío actual";
@@ -94,20 +161,20 @@ export function calcularResultadoTmaid(
     dimensiones[masFuerte] >= 4 ? "muy buena" : "cierta"
   } base en ${ETIQUETA_DIMENSION[masFuerte].toLowerCase()}. Tu mayor oportunidad está en fortalecer ${ETIQUETA_DIMENSION[
     masDebil
-  ].toLowerCase()}, especialmente pensando en resolver ${desafio}.`;
+  ].toLowerCase()}, especialmente pensando en resolver ${desafio}. Si sigues tu ruta personalizada, en las próximas semanas deberías notar menos tiempo invertido en tareas repetitivas (armar materiales, dar retroalimentación) y más margen para lo pedagógico.`;
 
   const rutaPersonalizada: ResultadoTmaid["rutaPersonalizada"] = [
     {
       fase: "Explorar",
-      descripcion: `Familiarízate con 2-3 herramientas de IA aplicadas a ${materia}, sin presión de usarlas aún en clase.`,
+      descripcion: EXPLORAR_POR_NIVEL[nivelAsignado](materia),
     },
     {
       fase: "Aplicar",
-      descripcion: `Lleva una primera actividad con IA a tu aula enfocada en ${desafio}, usando el Banco de Prompts.`,
+      descripcion: `Lleva una primera actividad con IA a tu aula enfocada en ${desafio}. Un ejemplo concreto: ${EJEMPLO_DIMENSION[masDebil]}`,
     },
     {
       fase: "Dominar",
-      descripcion: `Integra IA de forma regular en planeación y evaluación, y comparte tu experiencia con colegas.`,
+      descripcion: DOMINAR_POR_NIVEL[nivelAsignado],
     },
   ];
 
