@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calcularResultadoTmaid, ETIQUETA_DIMENSION } from "../scoring";
+import { calcularResultadoTmaid, ETIQUETA_DIMENSION, MODULOS_POR_NIVEL } from "../scoring";
 import { PREGUNTAS_LIKERT } from "../preguntas";
 import type { PerfilDocente } from "@/lib/store/session";
 
@@ -101,16 +101,47 @@ describe("calcularResultadoTmaid", () => {
     expect(resultado.mapaBrechas[0]).toContain(ETIQUETA_DIMENSION.conocimientoIA);
   });
 
-  it("siempre devuelve las 3 fases de rutaPersonalizada en el orden Explorar/Aplicar/Dominar", () => {
-    const resultado = calcularResultadoTmaid(respuestasConValor(3), perfilBase);
-    expect(resultado.rutaPersonalizada.map((f) => f.fase)).toEqual([
-      "Explorar",
-      "Aplicar",
-      "Dominar",
-    ]);
-    resultado.rutaPersonalizada.forEach((f) => {
-      expect(f.descripcion.length).toBeGreaterThan(0);
+  // Antes rutaPersonalizada SIEMPRE tenia exactamente 3 fases fijas
+  // (Explorar/Aplicar/Dominar), sin importar el nivel -- feedback real:
+  // la ruta se sentia corta y terminaba muy rapido, y "por nivel" solo
+  // cambiaba el texto, no el largo. Ahora la cantidad y el contenido de
+  // modulos dependen de MODULOS_POR_NIVEL (scoring.ts): 4 o 5 modulos,
+  // variando segun el nivel real del docente.
+  it("la cantidad y el orden de modulos de rutaPersonalizada coincide con MODULOS_POR_NIVEL para cada nivel", () => {
+    const casos: [number, "Iniciante" | "En desarrollo" | "Avanzado" | "Experto"][] = [
+      [1, "Iniciante"],
+      [3, "En desarrollo"],
+      [4, "Avanzado"],
+      [5, "Experto"],
+    ];
+    casos.forEach(([valor, nivelEsperado]) => {
+      const resultado = calcularResultadoTmaid(respuestasConValor(valor), perfilBase);
+      expect(resultado.nivelAsignado).toBe(nivelEsperado);
+      expect(resultado.rutaPersonalizada.map((f) => f.fase)).toEqual(
+        MODULOS_POR_NIVEL[nivelEsperado]
+      );
+      // Ya no deben quedar fases vacias ni sin recursos sugeridos -- cada
+      // modulo siempre trae descripcion y al menos 1 recurso (video,
+      // lectura, libro o consulta -- sugerencia por tema, sin link
+      // inventado, ver RecursoSugerido en session.tsx).
+      resultado.rutaPersonalizada.forEach((f) => {
+        expect(f.descripcion.length).toBeGreaterThan(0);
+        expect(f.recursos?.length ?? 0).toBeGreaterThan(0);
+      });
     });
+  });
+
+  it("Iniciante recibe mas modulos que Experto (ruta mas larga para quien recien empieza)", () => {
+    const iniciante = calcularResultadoTmaid(respuestasConValor(1), perfilBase);
+    const experto = calcularResultadoTmaid(respuestasConValor(5), perfilBase);
+    expect(iniciante.rutaPersonalizada.length).toBeGreaterThanOrEqual(4);
+    expect(experto.rutaPersonalizada.length).toBeGreaterThanOrEqual(4);
+    // Iniciante arranca con el modulo previo "Fundamentos" que Experto no
+    // tiene -- Experto se salta lo basico e incluye "Innovar", que
+    // Iniciante todavia no tiene.
+    expect(iniciante.rutaPersonalizada.map((f) => f.fase)).toContain("Fundamentos");
+    expect(experto.rutaPersonalizada.map((f) => f.fase)).not.toContain("Fundamentos");
+    expect(experto.rutaPersonalizada.map((f) => f.fase)).toContain("Innovar");
   });
 
   it("la fase Aplicar incluye un ejemplo concreto en cifras ligado a la dimension mas debil", () => {
@@ -125,21 +156,29 @@ describe("calcularResultadoTmaid", () => {
     expect(aplicar?.descripcion).toContain("5-10 minutos");
   });
 
-  it("las fases Explorar y Dominar varian segun el nivel asignado", () => {
+  it("la fase Explorar varia segun el nivel asignado (comparando 2 niveles que ambos la incluyen)", () => {
+    // Experto ya no incluye el modulo Explorar (ver MODULOS_POR_NIVEL), asi
+    // que la comparacion valida es entre Iniciante y "En desarrollo", que
+    // son los 2 niveles que si lo incluyen.
     const iniciante = calcularResultadoTmaid(respuestasConValor(1), perfilBase);
-    const experto = calcularResultadoTmaid(respuestasConValor(5), perfilBase);
+    const enDesarrollo = calcularResultadoTmaid(respuestasConValor(3), perfilBase);
 
     const explorarIniciante = iniciante.rutaPersonalizada.find((f) => f.fase === "Explorar")
       ?.descripcion;
-    const explorarExperto = experto.rutaPersonalizada.find((f) => f.fase === "Explorar")
+    const explorarEnDesarrollo = enDesarrollo.rutaPersonalizada.find((f) => f.fase === "Explorar")
       ?.descripcion;
-    expect(explorarIniciante).not.toBe(explorarExperto);
+    expect(explorarIniciante).not.toBe(explorarEnDesarrollo);
+  });
 
-    const dominarIniciante = iniciante.rutaPersonalizada.find((f) => f.fase === "Dominar")
+  it("la fase Evaluar varia segun el nivel asignado (todos los niveles la incluyen)", () => {
+    const iniciante = calcularResultadoTmaid(respuestasConValor(1), perfilBase);
+    const experto = calcularResultadoTmaid(respuestasConValor(5), perfilBase);
+
+    const evaluarIniciante = iniciante.rutaPersonalizada.find((f) => f.fase === "Evaluar")
       ?.descripcion;
-    const dominarExperto = experto.rutaPersonalizada.find((f) => f.fase === "Dominar")
+    const evaluarExperto = experto.rutaPersonalizada.find((f) => f.fase === "Evaluar")
       ?.descripcion;
-    expect(dominarIniciante).not.toBe(dominarExperto);
+    expect(evaluarIniciante).not.toBe(evaluarExperto);
   });
 
   it("perfilPedagogicoIA incorpora la materia y el mayor desafio del perfil", () => {
