@@ -73,7 +73,7 @@ export default function DashboardPage() {
               Hacer mi diagnóstico <Icon name="rocket_launch" />
             </Link>
             <span className="text-body-sm flex items-center gap-2 text-outline">
-              <Icon name="timer" className="text-[18px]" /> Toma menos de 3 minutos
+              <Icon name="timer" className="text-[18px]" /> Toma unos 5 minutos
             </span>
           </div>
 
