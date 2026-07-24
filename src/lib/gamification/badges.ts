@@ -47,6 +47,47 @@ export const BADGES: Record<string, Badge> = {
     emoji: "🏆",
     puntos: 50,
   },
+  // Los 5 badges siguientes son nuevos (ruta formativa ampliada, jul 2026):
+  // la ruta paso de tener siempre 3 fases fijas (Explorar/Aplicar/Dominar)
+  // a 4-5 modulos segun el nivel real del docente (ver MODULOS_POR_NIVEL en
+  // scoring.ts). "fase-dominar" se deja intacto arriba para los docentes
+  // que ya lo ganaron con la ruta vieja, pero deja de otorgarse a partir de
+  // ahora -- su contenido se reparte entre Evaluar/Liderar/Innovar.
+  "fase-fundamentos": {
+    id: "fase-fundamentos",
+    nombre: "Sin miedo",
+    descripcion: "Completaste el módulo Fundamentos de tu ruta.",
+    emoji: "🌱",
+    puntos: 15,
+  },
+  "fase-integrar": {
+    id: "fase-integrar",
+    nombre: "Rutina con IA",
+    descripcion: "Completaste el módulo Integrar de tu ruta.",
+    emoji: "🔄",
+    puntos: 25,
+  },
+  "fase-evaluar": {
+    id: "fase-evaluar",
+    nombre: "Evaluador/a IA",
+    descripcion: "Completaste el módulo Evaluar de tu ruta.",
+    emoji: "📋",
+    puntos: 35,
+  },
+  "fase-liderar": {
+    id: "fase-liderar",
+    nombre: "Líder IA",
+    descripcion: "Completaste el módulo Liderar de tu ruta.",
+    emoji: "🤝",
+    puntos: 40,
+  },
+  "fase-innovar": {
+    id: "fase-innovar",
+    nombre: "Innovador/a IA",
+    descripcion: "Completaste el módulo Innovar de tu ruta.",
+    emoji: "🧪",
+    puntos: 55,
+  },
   "primer-prompt": {
     id: "primer-prompt",
     nombre: "Primer prompt copiado",
