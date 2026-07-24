@@ -73,25 +73,32 @@ describe("calcularResultadoTmaid", () => {
     expect(resultado.nivelAsignado).toBe("En desarrollo");
   });
 
-  it("mapaBrechas incluye una entrada por cada dimension por debajo de 3", () => {
+  it("mapaBrechas siempre incluye las 4 dimensiones, cada una con su etiqueta y un consejo especifico", () => {
+    // Antes solo se listaban las dimensiones por debajo de 3 (con fallback
+    // generico si ninguna calificaba). Feedback real: el resultado se
+    // sentia corto y repetido entre intentos. Ahora siempre trae las 4,
+    // con contenido accionable en vez del texto generico "oportunidad
+    // clara de refuerzo".
+    const resultado = calcularResultadoTmaid(respuestasConValor(5), perfilBase);
+    expect(resultado.mapaBrechas).toHaveLength(4);
+    Object.values(ETIQUETA_DIMENSION).forEach((etiqueta) => {
+      expect(resultado.mapaBrechas.some((b) => b.includes(etiqueta))).toBe(true);
+    });
+    // Ya no debe quedar el texto generico anterior.
+    resultado.mapaBrechas.forEach((b) => {
+      expect(b).not.toMatch(/oportunidad clara de refuerzo/);
+    });
+  });
+
+  it("mapaBrechas ordena las dimensiones de la mas debil a la mas fuerte", () => {
     const respuestas = respuestasConValor(5);
-    // Fuerza conocimientoIA por debajo de 3, el resto se queda en 5.
-    const preguntasConocimiento = PREGUNTAS_LIKERT.filter(
-      (p) => p.dimension === "conocimientoIA"
-    );
-    preguntasConocimiento.forEach((p) => {
+    // Fuerza conocimientoIA muy por debajo del resto.
+    PREGUNTAS_LIKERT.filter((p) => p.dimension === "conocimientoIA").forEach((p) => {
       respuestas[p.id] = 1;
     });
 
     const resultado = calcularResultadoTmaid(respuestas, perfilBase);
-    expect(resultado.mapaBrechas).toHaveLength(1);
     expect(resultado.mapaBrechas[0]).toContain(ETIQUETA_DIMENSION.conocimientoIA);
-  });
-
-  it("mapaBrechas cae en el mensaje de fallback cuando ninguna dimension esta por debajo de 3", () => {
-    const resultado = calcularResultadoTmaid(respuestasConValor(5), perfilBase);
-    expect(resultado.mapaBrechas).toHaveLength(1);
-    expect(resultado.mapaBrechas[0]).toMatch(/dimensión relativamente más baja/);
   });
 
   it("siempre devuelve las 3 fases de rutaPersonalizada en el orden Explorar/Aplicar/Dominar", () => {
@@ -104,6 +111,35 @@ describe("calcularResultadoTmaid", () => {
     resultado.rutaPersonalizada.forEach((f) => {
       expect(f.descripcion.length).toBeGreaterThan(0);
     });
+  });
+
+  it("la fase Aplicar incluye un ejemplo concreto en cifras ligado a la dimension mas debil", () => {
+    const respuestas = respuestasConValor(5);
+    PREGUNTAS_LIKERT.filter((p) => p.dimension === "usoHerramientas").forEach((p) => {
+      respuestas[p.id] = 1;
+    });
+
+    const resultado = calcularResultadoTmaid(respuestas, perfilBase);
+    const aplicar = resultado.rutaPersonalizada.find((f) => f.fase === "Aplicar");
+    expect(aplicar?.descripcion).toContain("30 minutos");
+    expect(aplicar?.descripcion).toContain("5-10 minutos");
+  });
+
+  it("las fases Explorar y Dominar varian segun el nivel asignado", () => {
+    const iniciante = calcularResultadoTmaid(respuestasConValor(1), perfilBase);
+    const experto = calcularResultadoTmaid(respuestasConValor(5), perfilBase);
+
+    const explorarIniciante = iniciante.rutaPersonalizada.find((f) => f.fase === "Explorar")
+      ?.descripcion;
+    const explorarExperto = experto.rutaPersonalizada.find((f) => f.fase === "Explorar")
+      ?.descripcion;
+    expect(explorarIniciante).not.toBe(explorarExperto);
+
+    const dominarIniciante = iniciante.rutaPersonalizada.find((f) => f.fase === "Dominar")
+      ?.descripcion;
+    const dominarExperto = experto.rutaPersonalizada.find((f) => f.fase === "Dominar")
+      ?.descripcion;
+    expect(dominarIniciante).not.toBe(dominarExperto);
   });
 
   it("perfilPedagogicoIA incorpora la materia y el mayor desafio del perfil", () => {
