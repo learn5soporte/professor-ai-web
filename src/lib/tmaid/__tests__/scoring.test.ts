@@ -34,33 +34,43 @@ describe("calcularResultadoTmaid", () => {
     expect(resultado.puntajePromedio).toBe(1);
   });
 
-  it("respeta los umbrales exactos de nivelDesdePromedio (< 2 / < 3 / < 4 / >= 4)", () => {
+  it("respeta los umbrales exactos de nivelDesdePromedio (< 2.5 / < 3.5 / < 4.5 / >= 4.5)", () => {
     // Umbral es sobre el promedio general, no por dimension individual, pero
     // con todas las respuestas iguales el promedio == esa misma respuesta.
-    expect(calcularResultadoTmaid(respuestasConValor(1.9), perfilBase).nivelAsignado).toBe(
+    // Los cortes estan centrados en cada valor entero de la escala Likert
+    // (1-5) para que responder consistentemente un valor te de el nivel
+    // que ese valor realmente representa -- "Neutral" (3) no debe sonar a
+    // "Avanzado", ni "De acuerdo" (4) a "Experto".
+    expect(calcularResultadoTmaid(respuestasConValor(2.4), perfilBase).nivelAsignado).toBe(
       "Iniciante"
     );
-    expect(calcularResultadoTmaid(respuestasConValor(2), perfilBase).nivelAsignado).toBe(
-      "En desarrollo"
-    );
-    expect(calcularResultadoTmaid(respuestasConValor(2.9), perfilBase).nivelAsignado).toBe(
+    expect(calcularResultadoTmaid(respuestasConValor(2.5), perfilBase).nivelAsignado).toBe(
       "En desarrollo"
     );
     expect(calcularResultadoTmaid(respuestasConValor(3), perfilBase).nivelAsignado).toBe(
-      "Avanzado"
+      "En desarrollo"
     );
-    expect(calcularResultadoTmaid(respuestasConValor(3.9), perfilBase).nivelAsignado).toBe(
+    expect(calcularResultadoTmaid(respuestasConValor(3.4), perfilBase).nivelAsignado).toBe(
+      "En desarrollo"
+    );
+    expect(calcularResultadoTmaid(respuestasConValor(3.5), perfilBase).nivelAsignado).toBe(
       "Avanzado"
     );
     expect(calcularResultadoTmaid(respuestasConValor(4), perfilBase).nivelAsignado).toBe(
+      "Avanzado"
+    );
+    expect(calcularResultadoTmaid(respuestasConValor(4.4), perfilBase).nivelAsignado).toBe(
+      "Avanzado"
+    );
+    expect(calcularResultadoTmaid(respuestasConValor(4.5), perfilBase).nivelAsignado).toBe(
       "Experto"
     );
   });
 
-  it("usa 3 (neutral) como default para preguntas sin responder", () => {
+  it("usa 3 (neutral) como default para preguntas sin responder, lo que da nivel En desarrollo", () => {
     const resultado = calcularResultadoTmaid({}, perfilBase);
     expect(resultado.puntajePromedio).toBe(3);
-    expect(resultado.nivelAsignado).toBe("Avanzado");
+    expect(resultado.nivelAsignado).toBe("En desarrollo");
   });
 
   it("mapaBrechas incluye una entrada por cada dimension por debajo de 3", () => {
