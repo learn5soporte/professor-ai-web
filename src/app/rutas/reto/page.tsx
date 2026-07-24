@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, perfilCompleto } from "@/lib/store/session";
 import { BADGES } from "@/lib/gamification/badges";
+import { generarFeedbackIA } from "@/lib/rutas/feedback";
 import { Icon } from "@/components/Icon";
 import { Confetti } from "@/components/Confetti";
 
@@ -24,6 +25,16 @@ import { Confetti } from "@/components/Confetti";
  * completada ahora depende de que el docente complete su autoevaluación
  * real (calificación de 1-5 estrellas + checkbox), no de un timeout
  * automático.
+ *
+ * Bug real encontrado por el usuario (2026-07-23): "feedbackIA" era un
+ * string fijo ("Excelente enfoque...") sin importar lo que se escribiera
+ * -- probó con texto sin sentido ("xczvgzdfsbgzdfgdf") y la
+ * retroalimentación seguía elogiándolo. Reemplazado por
+ * generarFeedbackIA() (src/lib/rutas/feedback.ts), que aplica una
+ * heurística simple (sin NLP real, pero honesta al respecto en sus
+ * comentarios) para distinguir texto que no parece un prompt, uno muy
+ * corto, uno largo sin los elementos clave de la fase, y uno que sí los
+ * tiene.
  */
 
 const BADGE_POR_FASE: Record<string, string> = {
@@ -97,7 +108,7 @@ export default function RetoPage() {
   const badgeId = BADGE_POR_FASE[faseActual.fase];
   const badge = badgeId ? BADGES[badgeId] : null;
   const xpDisponible = badge?.puntos ?? 10;
-  const feedbackIA = `Excelente enfoque. Tu prompt considera el contexto de tus estudiantes y un objetivo claro -- justo lo que buscamos en la fase ${faseActual.fase}. Sigue documentando tus resultados en el aula.`;
+  const feedbackIA = generarFeedbackIA(prompt, faseActual.fase, teoria.tips);
 
   function enviar() {
     if (!prompt.trim() || estado !== "editando") return;
