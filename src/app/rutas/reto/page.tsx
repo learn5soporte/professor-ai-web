@@ -113,6 +113,17 @@ export default function RetoPage() {
   function enviar() {
     if (!prompt.trim() || estado !== "editando") return;
     setEstado("procesando");
+    // Bug real encontrado en auditoria (2026-07-23): "en_progreso" existe
+    // como estado de EstadoFase y /rutas/page.tsx ya tenia logica para
+    // mostrar una barra al 65% cuando una fase esta "en_progreso" (vs 25%
+    // si no) -- pero ningun lugar del codigo llamaba nunca
+    // actualizarProgresoFase(fase, "en_progreso"), asi que esa rama nunca
+    // se activaba y la barra de la fase activa mostraba siempre el mismo
+    // 25%, sin importar cuanto hubiera avanzado el docente. Marcar
+    // "en_progreso" aqui (cuando el docente ya envio una propuesta real,
+    // no solo abrio la pantalla) hace que ese indicador refleje avance de
+    // verdad.
+    actualizarProgresoFase(faseActual.fase, "en_progreso");
     setTimeout(() => {
       setEstado("revision");
     }, 1500);
