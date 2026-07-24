@@ -20,6 +20,12 @@ import { Icon } from "@/components/Icon";
  * (bloque_3_diagn_stico_tmaid): SCREEN 9 (intro oscura), SCREEN 10 (Likert,
  * header fijo tipo glass-card), SCREEN 11 (pregunta abierta) y SCREEN 12
  * (procesando). El resultado (SCREEN 13) vive en /tmaid/resultado.
+ *
+ * Bug real encontrado en auditoría (2026-07-23): "miedos" (la respuesta a
+ * PREGUNTA_ABIERTA) se capturaba y se mostraba en pantalla, pero nunca se
+ * pasaba a calcularResultadoTmaid() -- se descartaba por completo, aunque
+ * la pantalla de "procesando" dice literalmente que la IA está
+ * "analizando tus respuestas". Ahora sí se pasa (ver scoring.ts).
  */
 
 const TOTAL_LIKERT = PREGUNTAS_LIKERT.length;
@@ -56,7 +62,7 @@ export default function TmaidPage() {
         router.push("/onboarding");
         return;
       }
-      const resultado = calcularResultadoTmaid(respuestas, perfil);
+      const resultado = calcularResultadoTmaid(respuestas, perfil, miedos);
       guardarResultadoTmaid(resultado);
       const gano = otorgarBadge("diagnostico-completo");
       if (gano) setBadgeGanado(BADGES["diagnostico-completo"]);
