@@ -224,6 +224,11 @@ export default function TmaidPage() {
         total={TOTAL_PASOS}
       />
       <div className="mx-auto flex w-full max-w-4xl flex-col items-center justify-center px-margin-mobile">
+        {pregunta?.ejemplo && (
+          <span className="mb-4 inline-flex items-center gap-1 rounded-full bg-tertiary-fixed px-3 py-1 text-[11px] font-black uppercase tracking-widest text-on-tertiary-fixed">
+            <Icon name="auto_stories" className="text-[14px]" /> Escenario
+          </span>
+        )}
         <h2 className="font-headline-md mb-16 px-4 text-center text-headline-md text-primary">
           {pregunta?.texto}
         </h2>
