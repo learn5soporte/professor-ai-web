@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-import type { EstadoFase, PerfilDocente, ResultadoTmaid } from "@/lib/store/session";
+import type { BaselineTmaid, EstadoFase, PerfilDocente, ResultadoTmaid } from "@/lib/store/session";
 
 /**
  * Capa de datos real de Supabase — Fase 1.1.
@@ -116,6 +116,7 @@ export type SesionSupabase = {
   autenticado: boolean;
   perfil: PerfilDocente | null;
   resultadoTmaid: ResultadoTmaid | null;
+  baselineTmaid: BaselineTmaid | null;
   progresoRutas: Record<string, EstadoFase>;
   badges: string[];
   puntos: number;
@@ -186,6 +187,28 @@ export async function cargarSesionCompleta(): Promise<SesionSupabase | null> {
       }
     : null;
 
+  // primer_resultado viene de la migracion 0003_tmaid_baseline.sql
+  // (aditiva, opcional). select("*") arriba nunca falla si esa columna
+  // todavia no existe en el proyecto de Supabase del usuario -- en ese
+  // caso resultadoRes.data?.primer_resultado es simplemente undefined y
+  // baselineTmaid queda null sin romper el resto de la carga de sesion.
+  const primerResultadoCrudo = resultadoRes.data?.primer_resultado as
+    | { puntajePromedio?: number; nivelAsignado?: ResultadoTmaid["nivelAsignado"]; dimensiones?: Record<string, number> }
+    | null
+    | undefined;
+  const baselineTmaid: BaselineTmaid | null = primerResultadoCrudo
+    ? {
+        nivelAsignado: primerResultadoCrudo.nivelAsignado ?? "Iniciante",
+        puntajePromedio: Number(primerResultadoCrudo.puntajePromedio ?? 0),
+        dimensiones: {
+          conocimientoIA: Number(primerResultadoCrudo.dimensiones?.conocimientoIA ?? 0),
+          usoHerramientas: Number(primerResultadoCrudo.dimensiones?.usoHerramientas ?? 0),
+          integracionAula: Number(primerResultadoCrudo.dimensiones?.integracionAula ?? 0),
+          actitudCambio: Number(primerResultadoCrudo.dimensiones?.actitudCambio ?? 0),
+        },
+      }
+    : null;
+
   const progresoRutas: Record<string, EstadoFase> = {};
   (progresoRes.data ?? []).forEach((fila: { fase: string; estado: EstadoFase }) => {
     progresoRutas[fila.fase] = fila.estado;
@@ -197,6 +220,7 @@ export async function cargarSesionCompleta(): Promise<SesionSupabase | null> {
     autenticado: true,
     perfil,
     resultadoTmaid,
+    baselineTmaid,
     progresoRutas,
     badges,
     puntos: usuariosRes.data?.puntos ?? 0,
