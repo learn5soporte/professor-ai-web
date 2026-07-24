@@ -37,13 +37,34 @@ import { Confetti } from "@/components/Confetti";
  * tiene.
  */
 
+/**
+ * Ampliado (jul 2026): la ruta paso de tener siempre 3 fases fijas a 4-5
+ * modulos segun el nivel real del docente (ver MODULOS_POR_NIVEL en
+ * scoring.ts). Estos 2 mapas ahora cubren los 7 modulos posibles, no solo
+ * los 3 originales -- si un modulo nuevo llegara sin entrada aqui, el
+ * fallback a TEORIA_POR_FASE.Explorar de mas abajo evitaria un crash, pero
+ * mostraria contenido equivocado, asi que se completaron todos.
+ */
 const BADGE_POR_FASE: Record<string, string> = {
+  Fundamentos: "fase-fundamentos",
   Explorar: "fase-explorar",
   Aplicar: "fase-aplicar",
-  Dominar: "fase-dominar",
+  Integrar: "fase-integrar",
+  Evaluar: "fase-evaluar",
+  Liderar: "fase-liderar",
+  Innovar: "fase-innovar",
 };
 
 const TEORIA_POR_FASE: Record<string, { titulo: string; parrafo: string; tips: string[] }> = {
+  Fundamentos: {
+    titulo: "Teoría esencial: Antes de tu primer prompt",
+    parrafo:
+      "Un modelo de lenguaje no \"sabe\" nada con certeza -- predice la palabra más probable dada tu instrucción. Por eso puede sonar muy segura y aun así estar equivocada (una \"alucinación\").",
+    tips: [
+      "Pídele siempre que sea concreta: mientras más vago tu pedido, más genérica (o inventada) la respuesta.",
+      "Verifica cualquier dato, cifra o cita antes de usarla con tus estudiantes.",
+    ],
+  },
   Explorar: {
     titulo: "Teoría esencial: Primeros prompts",
     parrafo:
@@ -62,15 +83,57 @@ const TEORIA_POR_FASE: Record<string, { titulo: string; parrafo: string; tips: s
       'Sube o baja la dificultad: "Adapta este texto para un nivel..."',
     ],
   },
-  Dominar: {
+  Integrar: {
+    titulo: "Teoría esencial: Prompts para tu rutina semanal",
+    parrafo:
+      "Integrar de verdad significa reutilizar: en vez de escribir un prompt distinto cada vez, guarda y ajusta los que ya te funcionaron para planeación, retroalimentación o comunicación con estudiantes.",
+    tips: [
+      "Guarda tus prompts que sí funcionaron -- reutilizarlos ahorra más tiempo que escribir uno nuevo cada vez.",
+      "Fíjate una tarea semanal fija donde siempre uses IA (por ejemplo, el borrador de tu planeación).",
+    ],
+  },
+  Evaluar: {
     titulo: "Teoría esencial: Prompts de evaluación",
     parrafo:
-      "Para dominar la IA en evaluación, encadena instrucciones: primero pide criterios, luego pide retroalimentación específica por estudiante.",
+      "Para evaluar con IA, encadena instrucciones: primero pide criterios, luego pide retroalimentación específica por estudiante.",
     tips: [
       "Pide una rúbrica antes de pedir la evaluación en sí.",
       "Solicita siempre retroalimentación accionable, no solo una nota.",
     ],
   },
+  Liderar: {
+    titulo: "Teoría esencial: Prompts para explicarle a otros",
+    parrafo:
+      "Enseñar a un/a colega es distinto a usar algo tú mismo/a: necesitas poder explicar el prompt paso a paso, no solo el resultado final.",
+    tips: [
+      'Pide a la IA que te ayude a explicar un prompt "como si se lo enseñaras a alguien que nunca usó esto".',
+      "Documenta el prompt exacto que funcionó, no solo la idea general -- así otros pueden reutilizarlo tal cual.",
+    ],
+  },
+  Innovar: {
+    titulo: "Teoría esencial: Prompts para casos poco comunes",
+    parrafo:
+      "Los usos más innovadores de IA (simulaciones, generación dinámica de casos, asistencia de investigación) requieren prompts más largos y con más restricciones explícitas que los prompts básicos.",
+    tips: [
+      "Divide una tarea compleja en varios prompts encadenados en vez de uno solo gigante.",
+      "Pide siempre una justificación de la respuesta, no solo el resultado -- te ayuda a detectar errores sutiles.",
+    ],
+  },
+};
+
+/** Icono + etiqueta por tipo de recurso sugerido (ver RecursoSugerido en session.tsx). */
+const ICONO_POR_TIPO_RECURSO: Record<string, string> = {
+  video: "play_circle",
+  lectura: "article",
+  libro: "menu_book",
+  consulta: "forum",
+};
+
+const ETIQUETA_TIPO_RECURSO: Record<string, string> = {
+  video: "Video",
+  lectura: "Lectura",
+  libro: "Libro",
+  consulta: "Consulta",
 };
 
 export default function RetoPage() {
@@ -338,6 +401,37 @@ export default function RetoPage() {
           <h3 className="font-headline-md text-headline-md mb-2">TU DESAFÍO</h3>
           <p className="font-body-lg text-body-lg">{faseActual.descripcion}</p>
         </div>
+
+        {faseActual.recursos && faseActual.recursos.length > 0 && (
+          <div className="atmospheric-shadow rounded-xl bg-white p-6">
+            <h4 className="mb-1 flex items-center gap-2 font-bold text-primary">
+              <Icon name="explore" className="text-[18px]" /> Para complementar este módulo
+            </h4>
+            <p className="text-body-sm mb-4 text-on-surface-variant">
+              Sugerencias de tema, no un link específico -- tú eliges qué video, artículo o
+              persona concreta te sirve más.
+            </p>
+            <div className="grid grid-cols-1 gap-md sm:grid-cols-2">
+              {faseActual.recursos.map((r, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-3 rounded-xl bg-surface-container-low p-4"
+                >
+                  <Icon
+                    name={ICONO_POR_TIPO_RECURSO[r.tipo] ?? "lightbulb"}
+                    className="mt-0.5 text-[20px] text-secondary"
+                  />
+                  <div>
+                    <span className="text-[11px] font-black uppercase tracking-widest text-secondary">
+                      {ETIQUETA_TIPO_RECURSO[r.tipo] ?? r.tipo}
+                    </span>
+                    <p className="text-body-sm mt-1 text-on-surface-variant">{r.sugerencia}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="grid h-auto grid-cols-1 gap-lg lg:h-[500px] lg:grid-cols-2">
           <div className="atmospheric-shadow flex flex-col gap-md rounded-xl bg-white p-6">
