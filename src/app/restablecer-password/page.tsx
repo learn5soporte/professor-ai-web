@@ -34,10 +34,42 @@ export default function RestablecerPasswordPage() {
       return;
     }
     const supabase = createClient();
-    supabase.auth.getSession().then(({ data }) => {
-      setSesionValida(Boolean(data.session));
+
+    // El SDK de Supabase detecta el token de recuperacion del hash de la
+    // URL (detectSessionInUrl) de forma asincrona, en paralelo a este
+    // efecto -- no hay garantia de que ya haya terminado cuando llamamos
+    // getSession() aqui abajo. Si nos quedamos solo con esa llamada,
+    // hay una carrera real: a veces getSession() devuelve null un
+    // instante antes de que la sesion de recuperacion quede lista, y el
+    // docente ve "enlace invalido" con un enlace que en realidad era
+    // valido. Por eso tambien escuchamos el evento PASSWORD_RECOVERY (o
+    // cualquier sesion) via onAuthStateChange, y solo si ninguno de los
+    // dos caminos resuelve nada en un par de segundos asumimos que el
+    // enlace de verdad es invalido o expiro.
+    let resuelto = false;
+    const resolver = (huboSesion: boolean) => {
+      if (resuelto) return;
+      resuelto = true;
+      setSesionValida(huboSesion);
       setListo(true);
+    };
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || session) {
+        resolver(Boolean(session));
+      }
     });
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) resolver(true);
+    });
+
+    const timeout = setTimeout(() => resolver(false), 2500);
+
+    return () => {
+      authListener.subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
