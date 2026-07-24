@@ -481,6 +481,19 @@ export default function CreadorRubricasPage() {
               </div>
             ) : (
               <>
+                {/* Feedback real (docente probando el prototipo, 2026-07-23,
+                    via WhatsApp): "en movil algunos cuadros no se ven
+                    completos, hay que hacer scroll". La tabla ya tenia
+                    overflow-x-auto (nada se corta ni se rompe), pero nada
+                    avisaba que el scroll horizontal era intencional -- en
+                    una pantalla angosta el docente veia una tabla "cortada"
+                    sin saber que debia deslizar. Este aviso solo aparece
+                    por debajo de md (en desktop la tabla ya entra
+                    completa). */}
+                <p className="mb-2 flex items-center gap-2 text-[12px] font-bold uppercase tracking-wide text-on-surface-variant md:hidden">
+                  <Icon name="swipe" className="text-[16px]" />
+                  Desliza para ver todos los niveles
+                </p>
                 <div className="atmospheric-shadow overflow-x-auto rounded-xl bg-surface-container-lowest p-6">
                   <table className="w-full min-w-[640px] border-separate border-spacing-2">
                     <thead>
