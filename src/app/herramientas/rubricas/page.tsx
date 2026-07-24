@@ -122,6 +122,26 @@ export default function CreadorRubricasPage() {
   const [generando, setGenerando] = useState(false);
   const [mensajeBorrador, setMensajeBorrador] = useState<string | null>(null);
 
+  // "Guardar borrador" solo tenia sentido si el docente encontraba su
+  // configuracion al volver -- antes se escribia en localStorage pero
+  // nada la leia de vuelta, asi que el boton mostraba "Borrador guardado"
+  // sin que eso fuera cierto en la practica.
+  useEffect(() => {
+    const raw = window.localStorage.getItem(BORRADOR_KEY);
+    if (!raw) return;
+    try {
+      const borrador: Partial<Borrador> = JSON.parse(raw);
+      if (borrador.tipoActividad) setTipoActividad(borrador.tipoActividad);
+      if (borrador.nivelAcademico) setNivelAcademico(borrador.nivelAcademico);
+      if (typeof borrador.descripcion === "string") setDescripcion(borrador.descripcion);
+      if (borrador.niveles) setNiveles(borrador.niveles);
+      if (borrador.tono) setTono(borrador.tono);
+      if (borrador.idioma) setIdioma(borrador.idioma);
+    } catch {
+      // borrador corrupto o de otra version: ignorar
+    }
+  }, []);
+
   if (cargando || !perfil || !perfilCompleto(perfil)) return null;
 
   function irACriterios() {
