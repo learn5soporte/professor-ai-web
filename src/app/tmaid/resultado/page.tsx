@@ -19,6 +19,11 @@ import { Icon } from "@/components/Icon";
  * "ACTITUD" (ancladas a los bordes, no centradas) se recortaban contra el
  * borde del viewBox original. El mismo ajuste se aplico en /progreso, que
  * reutiliza este radar.
+ *
+ * Nota (feedback docente, jul 2026): mapaBrechas ahora siempre trae las 4
+ * dimensiones (no solo las debiles) con un consejo especifico cada una --
+ * el titulo de esta seccion paso de "Brechas Identificadas" a "Diagnostico
+ * por Dimension" porque ya no todas son "brechas" en sentido estricto.
  */
 
 const PERSONA_POR_NIVEL: Record<string, string> = {
@@ -144,7 +149,7 @@ export default function ResultadoTmaidPage() {
 
           <div className="col-span-2 mt-4">
             <div className="atmospheric-shadow rounded-3xl bg-white/50 p-8">
-              <h4 className="font-headline-md mb-6">Brechas Identificadas</h4>
+              <h4 className="font-headline-md mb-6">Diagnóstico por Dimensión</h4>
               <ul className="space-y-4">
                 {resultadoTmaid.mapaBrechas.map((brecha) => (
                   <li key={brecha} className="flex items-center gap-4 text-on-surface-variant">
