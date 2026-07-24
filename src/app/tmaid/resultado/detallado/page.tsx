@@ -14,6 +14,12 @@ import { Icon } from "@/components/Icon";
  * (an_lisis_detallado_del_perfil_ia). A diferencia del Stitch original (que
  * inventaba un "95% de potencial" y un PDF descargable falso), aquí todo
  * numero sale de resultadoTmaid real, y la descarga genera un .txt real.
+ *
+ * Nota (jul 2026): masDebil usaba "<=" en el reduce, lo que con las 4
+ * dimensiones empatadas colisionaba con masFuerte (misma clase de bug ya
+ * corregida en scoring.ts -- ver ese archivo). Con "<" estricto, masFuerte
+ * y masDebil recorren la lista en direcciones distintas y solo coinciden
+ * si las 4 dimensiones son identicas.
  */
 
 const ICONO_DIMENSION: Record<Dimension, string> = {
@@ -39,7 +45,7 @@ export default function AnalisisDetalladoPage() {
   const { dimensiones } = resultadoTmaid;
   const dims = Object.keys(dimensiones) as Dimension[];
   const masFuerte = dims.reduce((a, b) => (dimensiones[a] >= dimensiones[b] ? a : b));
-  const masDebil = dims.reduce((a, b) => (dimensiones[a] <= dimensiones[b] ? a : b));
+  const masDebil = dims.reduce((a, b) => (dimensiones[a] < dimensiones[b] ? a : b));
   const afinidadIA = Math.round((resultadoTmaid.puntajePromedio / 5) * 100);
 
   const frac = {
@@ -68,7 +74,7 @@ export default function AnalisisDetalladoPage() {
         (d) => `- ${ETIQUETA_DIMENSION[d]}: ${Math.round((dimensiones[d] / 5) * 100)}%`
       ),
       "",
-      "Brechas identificadas:",
+      "Diagnóstico por dimensión:",
       ...resultadoTmaid.mapaBrechas.map((b) => `- ${b}`),
       "",
       "Plan de acción:",
