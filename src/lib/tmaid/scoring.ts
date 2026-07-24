@@ -120,7 +120,8 @@ function nivelDesdePromedio(promedio: number): ResultadoTmaid["nivelAsignado"] {
 
 export function calcularResultadoTmaid(
   respuestas: Record<string, number>,
-  perfil: PerfilDocente
+  perfil: PerfilDocente,
+  miedos?: string
 ): ResultadoTmaid {
   const dimensiones = {
     conocimientoIA: promedioPorDimension(respuestas, "conocimientoIA"),
@@ -157,11 +158,24 @@ export function calcularResultadoTmaid(
   const materia = perfil.materia || "tu materia";
   const desafio = perfil.mayorDesafio || "tu mayor desafío actual";
 
+  // La pregunta abierta "¿qué miedos o dudas tienes?" (PREGUNTA_ABIERTA en
+  // preguntas.ts) se pedía y se mostraba en pantalla, pero nunca llegaba
+  // hasta acá -- calcularResultadoTmaid() solo recibía las respuestas
+  // Likert, así que el docente escribía algo real y el "análisis de IA"
+  // lo ignoraba por completo, aunque la pantalla de "procesando" dice
+  // literalmente "analizando tus respuestas". Ahora, si vino texto, se
+  // referencia de forma honesta (cita textual, no interpretación
+  // inventada) en vez de fingir que nunca se escribió nada.
+  const miedosTexto = miedos?.trim();
+  const notaMiedos = miedosTexto
+    ? ` Además, nos contaste esto: "${miedosTexto}" -- vale la pena tenerlo presente en tu ruta.`
+    : "";
+
   const perfilPedagogicoIA = `Eres un/a docente de ${materia} con ${
     dimensiones[masFuerte] >= 4 ? "muy buena" : "cierta"
   } base en ${ETIQUETA_DIMENSION[masFuerte].toLowerCase()}. Tu mayor oportunidad está en fortalecer ${ETIQUETA_DIMENSION[
     masDebil
-  ].toLowerCase()}, especialmente pensando en resolver ${desafio}. Si sigues tu ruta personalizada, en las próximas semanas deberías notar menos tiempo invertido en tareas repetitivas (armar materiales, dar retroalimentación) y más margen para lo pedagógico.`;
+  ].toLowerCase()}, especialmente pensando en resolver ${desafio}. Si sigues tu ruta personalizada, en las próximas semanas deberías notar menos tiempo invertido en tareas repetitivas (armar materiales, dar retroalimentación) y más margen para lo pedagógico.${notaMiedos}`;
 
   const rutaPersonalizada: ResultadoTmaid["rutaPersonalizada"] = [
     {
