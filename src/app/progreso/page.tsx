@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSession, perfilCompleto } from "@/lib/store/session";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
+import { ETIQUETA_DIMENSION } from "@/lib/tmaid/scoring";
 
 /**
  * Mi Progreso -- base literal: code.html real de Stitch
@@ -24,7 +25,7 @@ const MESES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun"];
 
 export default function ProgresoPage() {
   const router = useRouter();
-  const { perfil, resultadoTmaid, badges, puntos, racha, cargando } = useSession();
+  const { perfil, resultadoTmaid, baselineTmaid, badges, puntos, racha, cargando } = useSession();
 
   useEffect(() => {
     if (cargando) return;
@@ -134,6 +135,8 @@ export default function ProgresoPage() {
           </div>
         </div>
 
+        <EvolucionTmaid resultadoTmaid={resultadoTmaid} baselineTmaid={baselineTmaid} />
+
         <div className="relative flex flex-col items-center justify-between gap-6 overflow-hidden rounded-[2rem] bg-gradient-to-r from-on-primary-fixed to-[#003baf] p-8 text-white md:flex-row">
           <div className="space-y-2 text-center md:text-left">
             <h3 className="font-headline-md text-headline-md">¿Listo para el siguiente nivel?</h3>
@@ -166,6 +169,132 @@ function StatCard({
     <div className="atmospheric-shadow rounded-2xl bg-white p-4 text-center">
       <span className={`font-headline-md text-headline-md block font-bold ${color}`}>{valor}</span>
       <span className="text-body-sm font-label-lg text-on-surface-variant">{etiqueta}</span>
+    </div>
+  );
+}
+
+
+/**
+ * "Tu evolucion" -- linea base de progreso pedida por un docente probando
+ * el prototipo ("asi comenzaste, en esto mejoraste", feedback 2026-07-23).
+ * baselineTmaid viene de la migracion 0003_tmaid_baseline.sql (columna
+ * primer_resultado, congelada por un trigger en el servidor la primera
+ * vez que el docente completa el TMAID -- nunca se pisa aunque lo repita
+ * despues). Si esa migracion todavia no corrio en el proyecto de Supabase
+ * del usuario, baselineTmaid es simplemente null (ver datos.ts) y esta
+ * seccion muestra el aviso "aun no hay datos" en vez de romper nada o
+ * inventar una comparacion falsa.
+ */
+function EvolucionTmaid({
+  resultadoTmaid,
+  baselineTmaid,
+}: {
+  resultadoTmaid: NonNullable<ReturnType<typeof useSession>["resultadoTmaid"]>;
+  baselineTmaid: ReturnType<typeof useSession>["baselineTmaid"];
+}) {
+  if (!baselineTmaid) {
+    return (
+      <div className="atmospheric-shadow rounded-[2rem] bg-white p-6">
+        <h4 className="font-label-lg text-label-lg mb-2 uppercase tracking-widest text-on-surface-variant">
+          Tu evolución
+        </h4>
+        <p className="text-body-sm text-on-surface-variant">
+          Todavía no hay suficientes datos para comparar. Esto se activa automáticamente
+          después de tu primer diagnóstico TMAID registrado.
+        </p>
+      </div>
+    );
+  }
+
+  const dimensionesIguales =
+    (Object.keys(resultadoTmaid.dimensiones) as (keyof typeof resultadoTmaid.dimensiones)[]).every(
+      (d) => resultadoTmaid.dimensiones[d] === baselineTmaid.dimensiones[d]
+    );
+  const esUnicoDiagnostico =
+    dimensionesIguales && resultadoTmaid.puntajePromedio === baselineTmaid.puntajePromedio;
+
+  if (esUnicoDiagnostico) {
+    return (
+      <div className="atmospheric-shadow rounded-[2rem] bg-white p-6">
+        <h4 className="font-label-lg text-label-lg mb-2 uppercase tracking-widest text-on-surface-variant">
+          Tu evolución
+        </h4>
+        <p className="text-body-sm text-on-surface-variant">
+          Este es tu único diagnóstico hasta ahora ({resultadoTmaid.nivelAsignado},{" "}
+          {resultadoTmaid.puntajePromedio.toFixed(1)}/5). Repite el TMAID más adelante desde
+          esta pantalla para ver cómo avanzas.
+        </p>
+      </div>
+    );
+  }
+
+  const deltaPromedio = Number(
+    (resultadoTmaid.puntajePromedio - baselineTmaid.puntajePromedio).toFixed(1)
+  );
+
+  return (
+    <div className="atmospheric-shadow rounded-[2rem] bg-white p-6">
+      <h4 className="font-label-lg text-label-lg mb-4 uppercase tracking-widest text-on-surface-variant">
+        Tu evolución
+      </h4>
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="text-center">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-outline">
+            Punto de partida
+          </p>
+          <p className="font-headline-md text-headline-md font-bold text-on-surface-variant">
+            {baselineTmaid.nivelAsignado}
+          </p>
+          <p className="text-body-sm text-outline">{baselineTmaid.puntajePromedio.toFixed(1)}/5</p>
+        </div>
+        <Icon name="trending_flat" className="text-2xl text-outline" />
+        <div className="text-center">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-outline">Ahora</p>
+          <p className="font-headline-md text-headline-md font-bold text-secondary">
+            {resultadoTmaid.nivelAsignado}
+          </p>
+          <p className="text-body-sm text-outline">{resultadoTmaid.puntajePromedio.toFixed(1)}/5</p>
+        </div>
+        <span
+          className={`ml-auto rounded-full px-3 py-1 text-xs font-bold ${
+            deltaPromedio >= 0
+              ? "bg-tertiary-fixed text-on-tertiary-fixed"
+              : "bg-surface-container-low text-on-surface-variant"
+          }`}
+        >
+          {deltaPromedio >= 0 ? "+" : ""}
+          {deltaPromedio}
+        </span>
+      </div>
+      <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        {(Object.keys(resultadoTmaid.dimensiones) as (keyof typeof resultadoTmaid.dimensiones)[]).map(
+          (d) => {
+            const delta = Number(
+              (resultadoTmaid.dimensiones[d] - baselineTmaid.dimensiones[d]).toFixed(1)
+            );
+            return (
+              <div
+                key={d}
+                className="flex items-center justify-between rounded-lg bg-surface-container-low px-3 py-2 text-xs"
+              >
+                <span className="text-on-surface-variant">{ETIQUETA_DIMENSION[d]}</span>
+                <span
+                  className={
+                    delta > 0
+                      ? "font-bold text-secondary"
+                      : delta < 0
+                      ? "font-bold text-error"
+                      : "text-on-surface-variant"
+                  }
+                >
+                  {delta > 0 ? "+" : ""}
+                  {delta}
+                </span>
+              </div>
+            );
+          }
+        )}
+      </div>
     </div>
   );
 }
