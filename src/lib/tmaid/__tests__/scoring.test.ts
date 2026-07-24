@@ -154,4 +154,27 @@ describe("calcularResultadoTmaid", () => {
     expect(resultado.perfilPedagogicoIA).toContain("tu materia");
     expect(resultado.perfilPedagogicoIA).toContain("tu mayor desafío actual");
   });
+
+  it("cita la respuesta abierta 'miedos' en perfilPedagogicoIA cuando viene con texto", () => {
+    // Bug real: la pregunta abierta se pedia y se mostraba en pantalla,
+    // pero nunca llegaba a calcularResultadoTmaid() -- se descartaba por
+    // completo. Ahora, si viene texto, se cita textualmente.
+    const resultado = calcularResultadoTmaid(
+      respuestasConValor(3),
+      perfilBase,
+      "Que los estudiantes hagan trampa con IA"
+    );
+    expect(resultado.perfilPedagogicoIA).toContain(
+      "Que los estudiantes hagan trampa con IA"
+    );
+  });
+
+  it("no agrega nada sobre 'miedos' si no se pasa o viene vacio/solo espacios", () => {
+    const sinParametro = calcularResultadoTmaid(respuestasConValor(3), perfilBase);
+    const vacio = calcularResultadoTmaid(respuestasConValor(3), perfilBase, "");
+    const soloEspacios = calcularResultadoTmaid(respuestasConValor(3), perfilBase, "   ");
+    expect(sinParametro.perfilPedagogicoIA).not.toContain("nos contaste");
+    expect(vacio.perfilPedagogicoIA).not.toContain("nos contaste");
+    expect(soloEspacios.perfilPedagogicoIA).not.toContain("nos contaste");
+  });
 });
