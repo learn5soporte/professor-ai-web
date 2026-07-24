@@ -45,13 +45,13 @@ export default function SplashPage() {
             Hecho para docentes
           </span>
 
-          <h1 className="font-headline-lg mb-4 text-headline-lg-mobile font-black tracking-tighter md:font-display-lg md:text-display-lg">
+          <h1 className="font-headline-lg mb-4 text-5xl font-black leading-[1.05] tracking-tighter sm:text-6xl md:text-7xl">
             <span className="bg-gradient-to-r from-white to-tertiary-fixed-dim bg-clip-text text-transparent">
               Professor AI
             </span>
           </h1>
 
-          <p className="font-body-lg mx-auto mb-8 max-w-md text-body-lg text-white/60 lg:mx-0">
+          <p className="font-body-lg mx-auto mb-8 max-w-md text-lg text-white/60 lg:mx-0">
             Tu asistente de IA para el aula. Diagnostica tu nivel, arma tu
             ruta y crea material en minutos, no en horas.
           </p>
