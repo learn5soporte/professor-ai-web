@@ -76,12 +76,26 @@ export type ResultadoTmaid = {
   }[];
 };
 
+/**
+ * Version reducida y congelada de ResultadoTmaid, usada como "punto de
+ * partida" en /progreso. Ver migracion 0003_tmaid_baseline.sql: el
+ * servidor la calcula una sola vez (INSERT del primer resultado) y la
+ * preserva para siempre aunque el docente repita el diagnostico despues.
+ */
+export type BaselineTmaid = {
+  nivelAsignado: ResultadoTmaid["nivelAsignado"];
+  puntajePromedio: number;
+  dimensiones: ResultadoTmaid["dimensiones"];
+};
+
 export type EstadoFase = "pendiente" | "en_progreso" | "completado";
 
 type SessionState = {
   autenticado: boolean;
   perfil: PerfilDocente | null;
   resultadoTmaid: ResultadoTmaid | null;
+  /** Punto de partida congelado -- null hasta el primer TMAID completado (o si la migracion 0003 todavia no corrio en Supabase). */
+  baselineTmaid: BaselineTmaid | null;
   progresoRutas: Record<string, EstadoFase>;
   badges: string[];
   puntos: number;
@@ -123,6 +137,7 @@ const defaultState: SessionState = {
   autenticado: false,
   perfil: null,
   resultadoTmaid: null,
+  baselineTmaid: null,
   progresoRutas: {},
   badges: [],
   puntos: 0,
@@ -335,7 +350,22 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     },
 
     guardarResultadoTmaid: (resultado: ResultadoTmaid) => {
-      setState((prev) => ({ ...prev, resultadoTmaid: resultado }));
+      setState((prev) => ({
+        ...prev,
+        resultadoTmaid: resultado,
+        // Actualizacion local optimista de la linea base (mismo patron
+        // que el resto de mutadores de este archivo): si todavia no hay
+        // baseline, se congela con este resultado. Si ya existia, se
+        // preserva -- exactamente lo que hace el trigger de
+        // 0003_tmaid_baseline.sql del lado del servidor. En modo
+        // localStorage (sin Supabase) esta es la UNICA fuente de verdad
+        // para la linea base, ya que ahi no hay trigger de base de datos.
+        baselineTmaid: prev.baselineTmaid ?? {
+          nivelAsignado: resultado.nivelAsignado,
+          puntajePromedio: resultado.puntajePromedio,
+          dimensiones: resultado.dimensiones,
+        },
+      }));
       if (usarSupabase && usuarioIdRef.current) {
         guardarResultadoTmaidSupabase(usuarioIdRef.current, resultado).catch((e) =>
           console.error("guardarResultadoTmaid", e)
