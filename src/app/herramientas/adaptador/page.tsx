@@ -8,6 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { BadgeUnlockToast } from "@/components/BadgeUnlockToast";
 import { BADGES } from "@/lib/gamification/badges";
 import { Icon } from "@/components/Icon";
+import { CargandoPantalla } from "@/components/CargandoPantalla";
 
 /**
  * Adaptador de Contenido -- herramienta nueva (jul 2026), pedida por el
@@ -133,7 +134,8 @@ export default function AdaptadorContenidoPage() {
     else if (!perfilCompleto(perfil)) router.replace("/onboarding");
   }, [cargando, perfil, router]);
 
-  if (cargando || !perfil || !perfilCompleto(perfil)) return null;
+  if (cargando) return <CargandoPantalla />;
+  if (!perfil || !perfilCompleto(perfil)) return null;
 
   function cambiarTipo(nuevo: TipoAdaptacion) {
     setTipo(nuevo);
