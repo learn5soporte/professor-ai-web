@@ -95,6 +95,13 @@ export const BADGES: Record<string, Badge> = {
     emoji: "✨",
     puntos: 10,
   },
+  "primera-adaptacion": {
+    id: "primera-adaptacion",
+    nombre: "Contenido para todos",
+    descripcion: "Usaste el Adaptador de Contenido por primera vez.",
+    emoji: "🧩",
+    puntos: 10,
+  },
 };
 
 export function calcularNivel(puntos: number) {
