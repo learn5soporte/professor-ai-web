@@ -7,6 +7,7 @@ import { useSession, perfilCompleto } from "@/lib/store/session";
 import { BADGES } from "@/lib/gamification/badges";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
+import { CargandoPantalla } from "@/components/CargandoPantalla";
 
 /**
  * Insignias -- base literal: code.html real de Stitch
@@ -55,7 +56,8 @@ export default function InsigniasPage() {
     else if (!resultadoTmaid) router.replace("/tmaid");
   }, [cargando, perfil, resultadoTmaid, router]);
 
-  if (cargando || !perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
+  if (cargando) return <CargandoPantalla />;
+  if (!perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
 
   const catalogo = Object.values(BADGES);
   const desbloqueadas = catalogo.filter((b) => badges.includes(b.id));
