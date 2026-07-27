@@ -103,12 +103,20 @@ export default function ProgresoPage() {
               <StatCard valor={`${puntos}`} etiqueta="XP" color="text-on-primary-fixed" />
             </div>
 
-            <Link
-              href="/insignias"
-              className="text-body-sm self-end font-bold text-secondary hover:underline"
-            >
-              Ver todas mis insignias →
-            </Link>
+            <div className="flex flex-wrap justify-end gap-x-4 gap-y-1 self-end">
+              <Link
+                href="/informes"
+                className="text-body-sm font-bold text-secondary hover:underline"
+              >
+                Generar mi informe →
+              </Link>
+              <Link
+                href="/insignias"
+                className="text-body-sm font-bold text-secondary hover:underline"
+              >
+                Ver todas mis insignias →
+              </Link>
+            </div>
 
             <div className="atmospheric-shadow space-y-4 rounded-[2rem] bg-white p-6">
               <h4 className="font-label-lg text-label-lg uppercase tracking-widest text-on-surface-variant">
