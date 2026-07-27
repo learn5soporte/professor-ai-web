@@ -7,6 +7,7 @@ import { useSession, perfilCompleto } from "@/lib/store/session";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
 import { ETIQUETA_DIMENSION } from "@/lib/tmaid/scoring";
+import { CargandoPantalla } from "@/components/CargandoPantalla";
 
 /**
  * Mi Progreso -- base literal: code.html real de Stitch
@@ -34,7 +35,8 @@ export default function ProgresoPage() {
     else if (!resultadoTmaid) router.replace("/tmaid");
   }, [cargando, perfil, resultadoTmaid, router]);
 
-  if (cargando || !perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
+  if (cargando) return <CargandoPantalla />;
+  if (!perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
 
   const { dimensiones } = resultadoTmaid;
   const frac = {
