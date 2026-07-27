@@ -8,6 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { BadgeUnlockToast } from "@/components/BadgeUnlockToast";
 import { BADGES } from "@/lib/gamification/badges";
 import { Icon } from "@/components/Icon";
+import { CargandoPantalla } from "@/components/CargandoPantalla";
 
 /**
  * Banco de Prompts -- base literal: code.html real de Stitch
@@ -112,7 +113,8 @@ export default function BancoPromptsPage() {
     return coincideTexto && coincideCategoria;
   });
 
-  if (cargando || !perfil || !perfilCompleto(perfil)) return null;
+  if (cargando) return <CargandoPantalla />;
+  if (!perfil || !perfilCompleto(perfil)) return null;
 
   async function usarEnClase(texto: string, idx: number) {
     const copiado = await copiarAlPortapapeles(texto);
