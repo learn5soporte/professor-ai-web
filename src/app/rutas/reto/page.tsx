@@ -7,6 +7,7 @@ import { BADGES } from "@/lib/gamification/badges";
 import { generarFeedbackIA } from "@/lib/rutas/feedback";
 import { Icon } from "@/components/Icon";
 import { Confetti } from "@/components/Confetti";
+import { CargandoPantalla } from "@/components/CargandoPantalla";
 
 /**
  * Espacio del Reto + Revisión/Autoevaluación + Celebración -- base literal:
@@ -210,7 +211,8 @@ export default function RetoPage() {
     setReflexionHidratada(true);
   }, [faseActualId]);
 
-  if (cargando || !perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
+  if (cargando) return <CargandoPantalla />;
+  if (!perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
 
   const fases = resultadoTmaid.rutaPersonalizada;
   const indiceActivo = fases.findIndex((f) => progresoRutas[f.fase] !== "completado");
