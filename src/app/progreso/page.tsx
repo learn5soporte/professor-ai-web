@@ -61,17 +61,17 @@ export default function ProgresoPage() {
     <AppShell titulo="Progreso">
       <div className="mx-auto max-w-4xl space-y-gap-xl">
         <div>
-          <span className="font-label-lg text-label-lg uppercase tracking-widest text-secondary">
+          <span className="font-label text-xs font-bold uppercase tracking-widest text-secondary">
             Seguimiento
           </span>
-          <h1 className="font-headline-lg text-headline-lg-mobile text-on-primary-fixed md:text-headline-lg">
+          <h1 className="font-headline text-3xl font-black tracking-tight text-on-primary-fixed sm:text-4xl md:text-5xl">
             Mi Progreso
           </h1>
         </div>
 
         <div className="flex flex-col gap-xl md:flex-row md:items-stretch">
           <div className="atmospheric-shadow flex flex-1 flex-col items-center rounded-[2.5rem] bg-white p-8">
-            <h3 className="font-headline-md text-headline-md mb-6 w-full">
+            <h3 className="font-headline mb-6 w-full text-xl font-bold">
               Perfil de Competencias
             </h3>
             <div className="w-full max-w-[300px]">
@@ -82,16 +82,16 @@ export default function ProgresoPage() {
                 <line x1="100" y1="20" x2="100" y2="180" stroke="#e1e3e4" strokeWidth="1" />
                 <line x1="20" y1="100" x2="180" y2="100" stroke="#e1e3e4" strokeWidth="1" />
                 <polygon fill="rgba(37, 82, 202, 0.2)" points={puntosRadar} stroke="#2552ca" strokeWidth="2" />
-                <text className="fill-on-surface-variant font-label-lg" style={{ fontSize: "8px" }} textAnchor="middle" x="100" y="15">
+                <text className="fill-on-surface-variant font-label font-bold" style={{ fontSize: "8px" }} textAnchor="middle" x="100" y="15">
                   CONOCIMIENTO
                 </text>
-                <text className="fill-on-surface-variant font-label-lg" style={{ fontSize: "8px" }} textAnchor="start" x="185" y="103">
+                <text className="fill-on-surface-variant font-label font-bold" style={{ fontSize: "8px" }} textAnchor="start" x="185" y="103">
                   HERRAMIENTAS
                 </text>
-                <text className="fill-on-surface-variant font-label-lg" style={{ fontSize: "8px" }} textAnchor="middle" x="100" y="193">
+                <text className="fill-on-surface-variant font-label font-bold" style={{ fontSize: "8px" }} textAnchor="middle" x="100" y="193">
                   INTEGRACIÓN
                 </text>
-                <text className="fill-on-surface-variant font-label-lg" style={{ fontSize: "8px" }} textAnchor="end" x="15" y="103">
+                <text className="fill-on-surface-variant font-label font-bold" style={{ fontSize: "8px" }} textAnchor="end" x="15" y="103">
                   ACTITUD
                 </text>
               </svg>
@@ -108,20 +108,20 @@ export default function ProgresoPage() {
             <div className="flex flex-wrap justify-end gap-x-4 gap-y-1 self-end">
               <Link
                 href="/informes"
-                className="text-body-sm font-bold text-secondary hover:underline"
+                className="text-sm font-bold text-secondary hover:underline"
               >
                 Generar mi informe →
               </Link>
               <Link
                 href="/insignias"
-                className="text-body-sm font-bold text-secondary hover:underline"
+                className="text-sm font-bold text-secondary hover:underline"
               >
                 Ver todas mis insignias →
               </Link>
             </div>
 
             <div className="atmospheric-shadow space-y-4 rounded-[2rem] bg-white p-6">
-              <h4 className="font-label-lg text-label-lg uppercase tracking-widest text-on-surface-variant">
+              <h4 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">
                 Actividad Mensual
               </h4>
               <div className="flex h-32 items-end justify-between gap-2 pt-4">
@@ -133,7 +133,7 @@ export default function ProgresoPage() {
                   />
                 ))}
               </div>
-              <div className="flex justify-between text-[10px] font-label-lg text-outline">
+              <div className="flex justify-between text-[10px] font-label font-bold text-outline">
                 {MESES.map((m) => (
                   <span key={m}>{m.toUpperCase()}</span>
                 ))}
@@ -149,8 +149,8 @@ export default function ProgresoPage() {
 
         <div className="relative flex flex-col items-center justify-between gap-6 overflow-hidden rounded-[2rem] bg-gradient-to-r from-on-primary-fixed to-[#003baf] p-8 text-white md:flex-row">
           <div className="space-y-2 text-center md:text-left">
-            <h3 className="font-headline-md text-headline-md">¿Listo para el siguiente nivel?</h3>
-            <p className="text-body-md text-white/80">
+            <h3 className="font-headline text-xl font-bold">¿Listo para el siguiente nivel?</h3>
+            <p className="text-base text-white/80">
               Puedes repetir tu diagnóstico TMAID cuando quieras para actualizar tu perfil de IA.
             </p>
           </div>
@@ -177,8 +177,8 @@ function StatCard({
 }) {
   return (
     <div className="atmospheric-shadow rounded-2xl bg-white p-4 text-center">
-      <span className={`font-headline-md text-headline-md block font-bold ${color}`}>{valor}</span>
-      <span className="text-body-sm font-label-lg text-on-surface-variant">{etiqueta}</span>
+      <span className={`font-headline block text-xl font-bold ${color}`}>{valor}</span>
+      <span className="font-label text-xs text-on-surface-variant">{etiqueta}</span>
     </div>
   );
 }
@@ -205,10 +205,10 @@ function EvolucionTmaid({
   if (!baselineTmaid) {
     return (
       <div className="atmospheric-shadow rounded-[2rem] bg-white p-6">
-        <h4 className="font-label-lg text-label-lg mb-2 uppercase tracking-widest text-on-surface-variant">
+        <h4 className="font-label text-xs font-bold mb-2 uppercase tracking-widest text-on-surface-variant">
           Tu evolución
         </h4>
-        <p className="text-body-sm text-on-surface-variant">
+        <p className="text-sm text-on-surface-variant">
           Todavía no hay suficientes datos para comparar. Esto se activa automáticamente
           después de tu primer diagnóstico TMAID registrado.
         </p>
@@ -226,10 +226,10 @@ function EvolucionTmaid({
   if (esUnicoDiagnostico) {
     return (
       <div className="atmospheric-shadow rounded-[2rem] bg-white p-6">
-        <h4 className="font-label-lg text-label-lg mb-2 uppercase tracking-widest text-on-surface-variant">
+        <h4 className="font-label text-xs font-bold mb-2 uppercase tracking-widest text-on-surface-variant">
           Tu evolución
         </h4>
-        <p className="text-body-sm text-on-surface-variant">
+        <p className="text-sm text-on-surface-variant">
           Este es tu único diagnóstico hasta ahora ({resultadoTmaid.nivelAsignado},{" "}
           {resultadoTmaid.puntajePromedio.toFixed(1)}/5). Repite el TMAID más adelante desde
           esta pantalla para ver cómo avanzas.
@@ -244,7 +244,7 @@ function EvolucionTmaid({
 
   return (
     <div className="atmospheric-shadow rounded-[2rem] bg-white p-6">
-      <h4 className="font-label-lg text-label-lg mb-4 uppercase tracking-widest text-on-surface-variant">
+      <h4 className="font-label text-xs font-bold mb-4 uppercase tracking-widest text-on-surface-variant">
         Tu evolución
       </h4>
       <div className="flex flex-wrap items-center gap-4">
@@ -252,18 +252,18 @@ function EvolucionTmaid({
           <p className="text-[10px] font-bold uppercase tracking-wide text-outline">
             Punto de partida
           </p>
-          <p className="font-headline-md text-headline-md font-bold text-on-surface-variant">
+          <p className="font-headline text-xl font-bold text-on-surface-variant">
             {baselineTmaid.nivelAsignado}
           </p>
-          <p className="text-body-sm text-outline">{baselineTmaid.puntajePromedio.toFixed(1)}/5</p>
+          <p className="text-sm text-outline">{baselineTmaid.puntajePromedio.toFixed(1)}/5</p>
         </div>
         <Icon name="trending_flat" className="text-2xl text-outline" />
         <div className="text-center">
           <p className="text-[10px] font-bold uppercase tracking-wide text-outline">Ahora</p>
-          <p className="font-headline-md text-headline-md font-bold text-secondary">
+          <p className="font-headline text-xl font-bold text-secondary">
             {resultadoTmaid.nivelAsignado}
           </p>
-          <p className="text-body-sm text-outline">{resultadoTmaid.puntajePromedio.toFixed(1)}/5</p>
+          <p className="text-sm text-outline">{resultadoTmaid.puntajePromedio.toFixed(1)}/5</p>
         </div>
         <span
           className={`ml-auto rounded-full px-3 py-1 text-xs font-bold ${
