@@ -71,10 +71,10 @@ export default function InsigniasPage() {
       <div className="mx-auto max-w-3xl space-y-gap-xl">
         <div className="flex items-end justify-between">
           <div>
-            <span className="font-label-lg text-label-lg uppercase tracking-widest text-secondary">
+            <span className="font-label text-xs font-bold uppercase tracking-widest text-secondary">
               Reconocimiento
             </span>
-            <h1 className="font-headline-lg text-headline-lg-mobile text-on-primary-fixed md:text-headline-lg">
+            <h1 className="font-headline text-3xl font-black tracking-tight text-on-primary-fixed sm:text-4xl md:text-5xl">
               Tus Insignias
             </h1>
           </div>
@@ -106,7 +106,7 @@ export default function InsigniasPage() {
                 >
                   {rareza}
                 </span>
-                <p className="text-body-sm text-center font-bold">{badge.nombre}</p>
+                <p className="text-sm text-center font-bold">{badge.nombre}</p>
               </div>
             );
           })}
@@ -122,19 +122,19 @@ export default function InsigniasPage() {
               </div>
               <div className="space-y-gap-lg w-full">
                 <div>
-                  <span className="font-label-lg text-label-lg uppercase tracking-widest text-tertiary-fixed">
+                  <span className="font-label text-xs font-bold uppercase tracking-widest text-tertiary-fixed">
                     Insignia Destacada
                   </span>
-                  <h3 className="font-headline-lg text-headline-lg mt-2">{destacada.nombre}</h3>
-                  <p className="text-body-lg mt-4 text-white/80">{destacada.descripcion}</p>
+                  <h3 className="font-headline mt-2 text-3xl font-black tracking-tight">{destacada.nombre}</h3>
+                  <p className="mt-4 text-base text-white/80 sm:text-lg">{destacada.descripcion}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2 rounded-xl bg-white/5 p-6 backdrop-blur-md">
-                    <span className="font-label-lg text-label-lg block text-white/50">
+                    <span className="font-label text-xs font-bold block text-white/50">
                       COLECCIÓN
                     </span>
                     <div className="flex items-end gap-2">
-                      <span className="font-headline-md text-headline-md font-bold text-tertiary-fixed">
+                      <span className="font-headline text-xl font-bold text-tertiary-fixed">
                         {desbloqueadas.length}/{catalogo.length}
                       </span>
                       <div className="mb-2 h-2 flex-1 overflow-hidden rounded-full bg-white/10">
@@ -146,18 +146,18 @@ export default function InsigniasPage() {
                     </div>
                   </div>
                   <div className="rounded-xl bg-white/5 p-6 backdrop-blur-md">
-                    <span className="font-label-lg text-label-lg block text-white/50">
+                    <span className="font-label text-xs font-bold block text-white/50">
                       RAREZA
                     </span>
-                    <span className="font-headline-md text-headline-md font-bold">
+                    <span className="font-headline text-xl font-bold">
                       {rarezaDestacada}
                     </span>
                   </div>
                   <div className="col-span-2 rounded-xl bg-white/5 p-6 backdrop-blur-md">
-                    <span className="font-label-lg text-label-lg block text-white/50">
+                    <span className="font-label text-xs font-bold block text-white/50">
                       VALOR
                     </span>
-                    <span className="font-headline-md text-headline-md font-bold text-tertiary-fixed">
+                    <span className="font-headline text-xl font-bold text-tertiary-fixed">
                       +{destacada.puntos} XP
                     </span>
                   </div>
@@ -168,13 +168,13 @@ export default function InsigniasPage() {
         ) : (
           <div className="atmospheric-shadow rounded-3xl bg-white p-8 text-center">
             <Icon name="emoji_events" className="text-4xl text-outline-variant" />
-            <p className="font-headline-md mt-2">Aún no tienes insignias desbloqueadas</p>
-            <p className="text-body-sm mt-1 text-on-surface-variant">
+            <p className="font-headline mt-2 text-lg font-bold">Aún no tienes insignias desbloqueadas</p>
+            <p className="text-sm mt-1 text-on-surface-variant">
               Completa retos en tu ruta formativa para ganar tu primera.
             </p>
             <Link
               href="/rutas"
-              className="text-body-sm mt-4 inline-block font-bold text-secondary hover:underline"
+              className="text-sm mt-4 inline-block font-bold text-secondary hover:underline"
             >
               Ir a mi ruta →
             </Link>
