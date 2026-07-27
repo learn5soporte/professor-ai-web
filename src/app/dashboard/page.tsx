@@ -7,6 +7,7 @@ import { useSession, perfilCompleto } from "@/lib/store/session";
 import { BADGES, calcularNivel } from "@/lib/gamification/badges";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
+import { CargandoPantalla } from "@/components/CargandoPantalla";
 
 const HERRAMIENTAS = [
   { nombre: "Generador de Planeaciones", href: "/herramientas/planeacion", disponible: true },
@@ -28,7 +29,8 @@ export default function DashboardPage() {
     }
   }, [cargando, perfil, router]);
 
-  if (cargando || !perfil || !perfilCompleto(perfil)) {
+  if (cargando) return <CargandoPantalla />;
+  if (!perfil || !perfilCompleto(perfil)) {
     return null;
   }
 
