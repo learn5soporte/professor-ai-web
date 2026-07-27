@@ -7,6 +7,7 @@ import { BadgeUnlockToast } from "@/components/BadgeUnlockToast";
 import { BADGES } from "@/lib/gamification/badges";
 import { DarkScreen } from "@/components/DarkScreen";
 import { Icon } from "@/components/Icon";
+import { CargandoPantalla } from "@/components/CargandoPantalla";
 
 /**
  * Onboarding (4 pasos) + transicion "Analizando tu perfil" -- base literal:
@@ -108,7 +109,8 @@ export default function OnboardingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
-  if (cargando || !perfil) return null;
+  if (cargando) return <CargandoPantalla oscuro />;
+  if (!perfil) return null;
 
   const canContinue =
     (step === 0 && form.nivelEducativo.trim().length > 0) ||
