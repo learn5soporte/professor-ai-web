@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSession, perfilCompleto } from "@/lib/store/session";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
+import { CargandoPantalla } from "@/components/CargandoPantalla";
 
 /**
  * Creador de Rúbricas -- base literal: code.html real de Stitch
@@ -142,7 +143,8 @@ export default function CreadorRubricasPage() {
     }
   }, []);
 
-  if (cargando || !perfil || !perfilCompleto(perfil)) return null;
+  if (cargando) return <CargandoPantalla />;
+  if (!perfil || !perfilCompleto(perfil)) return null;
 
   function irACriterios() {
     const base = CRITERIOS_SUGERIDOS[tipoActividad] ?? CRITERIOS_SUGERIDOS["Ensayo Crítico"];
