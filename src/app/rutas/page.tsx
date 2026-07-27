@@ -62,10 +62,10 @@ export default function RutasPage() {
       <BadgeUnlockToast badge={badgeGanado} onClose={() => {}} />
       <div className="mx-auto max-w-2xl space-y-gap-xl">
         <div className="flex flex-col items-center gap-4 text-center">
-          <span className="text-label-lg font-label-lg rounded-full bg-tertiary-fixed px-4 py-1 uppercase tracking-widest text-on-tertiary-fixed">
+          <span className="font-label rounded-full bg-tertiary-fixed px-4 py-1 text-xs font-bold uppercase tracking-widest text-on-tertiary-fixed">
             Tu Viaje de Aprendizaje
           </span>
-          <h2 className="font-headline-lg text-headline-lg text-on-primary-fixed">
+          <h2 className="font-headline text-3xl font-black tracking-tight text-on-primary-fixed sm:text-4xl">
             Ruta Formativa
           </h2>
         </div>
@@ -102,7 +102,7 @@ export default function RutasPage() {
         {rutaCompleta && (
           <div className="atmospheric-shadow rounded-xl bg-tertiary-fixed p-6 text-center text-on-tertiary-fixed">
             <Icon name="emoji_events" filled className="text-4xl" />
-            <p className="font-headline-md mt-2">¡Completaste toda tu ruta formativa!</p>
+            <p className="font-headline mt-2 text-lg font-bold">¡Completaste toda tu ruta formativa!</p>
           </div>
         )}
 
@@ -119,7 +119,7 @@ export default function RutasPage() {
                       <Icon name={ICONO_NODO[estado]} className="text-3xl text-white" />
                     </div>
                     <div className="atmospheric-shadow mt-4 w-full max-w-xs rounded-xl border-2 border-secondary/20 bg-white p-6 text-center">
-                      <h4 className="font-headline-md text-headline-md text-secondary">
+                      <h4 className="font-headline text-xl font-bold text-secondary">
                         Fase: {f.fase}
                       </h4>
                       <p className="my-2 text-on-surface-variant">{f.descripcion}</p>
@@ -160,7 +160,7 @@ export default function RutasPage() {
                   </div>
                   {estado === "completado" && (
                     <div className="absolute left-20 hidden w-48 rounded-xl border-l-4 border-tertiary-container bg-white p-4 shadow-md md:block">
-                      <p className="text-body-sm font-bold">Fase: {f.fase}</p>
+                      <p className="text-sm font-bold">Fase: {f.fase}</p>
                       <span className="text-[12px] font-black text-tertiary-container">
                         COMPLETADO
                       </span>
