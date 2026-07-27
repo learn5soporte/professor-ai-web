@@ -7,6 +7,7 @@ import { useSession, perfilCompleto } from "@/lib/store/session";
 import { BADGES } from "@/lib/gamification/badges";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
+import { CargandoPantalla } from "@/components/CargandoPantalla";
 
 /**
  * Detalle de Módulo -- base literal: code.html real de Stitch
@@ -54,7 +55,8 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
     else if (!resultadoTmaid) router.replace("/tmaid");
   }, [cargando, perfil, resultadoTmaid, router]);
 
-  if (cargando || !perfil || !perfilCompleto(perfil) || !resultadoTmaid || !nombreFase) return null;
+  if (cargando) return <CargandoPantalla />;
+  if (!perfil || !perfilCompleto(perfil) || !resultadoTmaid || !nombreFase) return null;
 
   const fases = resultadoTmaid.rutaPersonalizada;
   const fase = fases.find((f) => f.fase === nombreFase);
