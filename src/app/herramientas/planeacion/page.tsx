@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSession, perfilCompleto } from "@/lib/store/session";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
+import { CargandoPantalla } from "@/components/CargandoPantalla";
 
 /**
  * Generador de Clases (Planeación Pro) -- base literal: code.html real de
@@ -68,7 +69,8 @@ export default function PlaneacionProPage() {
     else if (!perfilCompleto(perfil)) router.replace("/onboarding");
   }, [cargando, perfil, router]);
 
-  if (cargando || !perfil || !perfilCompleto(perfil)) return null;
+  if (cargando) return <CargandoPantalla />;
+  if (!perfil || !perfilCompleto(perfil)) return null;
 
   function generar() {
     setEstado("generando");
