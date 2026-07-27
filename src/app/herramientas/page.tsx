@@ -11,10 +11,10 @@ import { Icon } from "@/components/Icon";
  * Caja de Herramientas -- base literal: code.html real de Stitch
  * (bloque_6_a_8_insignias_herramientas_y_progreso, Screen 23: ai-hub).
  * Estado de cada tarjeta refleja lo que REALMENTE existe hoy en la app
- * (no copiamos las etiquetas ficticias de Stitch tal cual): Planeacion Pro,
- * Banco de Prompts y (desde el Batch 9) Creador de Rubricas ya funcionan
- * (aunque sea simulado en Fase 0); el Adaptador de Contenido sigue
- * planificado para un batch futuro.
+ * (no copiamos las etiquetas ficticias de Stitch tal cual): las 4
+ * herramientas ya funcionan (aunque sea simulado en Fase 0) -- el
+ * Adaptador de Contenido (jul 2026) fue la ultima en pasar de
+ * "Proximamente" a real.
  */
 
 type Herramienta = {
@@ -49,10 +49,10 @@ const HERRAMIENTAS: Herramienta[] = [
   },
   {
     nombre: "Adaptador de Contenido",
-    descripcion: "Adapta contenidos para NEE o diferentes niveles.",
+    descripcion: "Guía real para adaptar tu material a NEE, nivel de lectura o idioma.",
     icono: "translate",
-    href: "#",
-    estado: "proximamente",
+    href: "/herramientas/adaptador",
+    estado: "disponible",
   },
 ];
 
