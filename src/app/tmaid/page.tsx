@@ -14,6 +14,7 @@ import { BadgeUnlockToast } from "@/components/BadgeUnlockToast";
 import { BADGES } from "@/lib/gamification/badges";
 import { DarkScreen } from "@/components/DarkScreen";
 import { Icon } from "@/components/Icon";
+import { CargandoPantalla } from "@/components/CargandoPantalla";
 
 /**
  * Diagnostico TMAID -- base literal: code.html real de Stitch
@@ -75,7 +76,8 @@ export default function TmaidPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paso]);
 
-  if (cargando || !perfil || !perfilCompleto(perfil)) return null;
+  if (cargando) return <CargandoPantalla oscuro />;
+  if (!perfil || !perfilCompleto(perfil)) return null;
 
   const esIntro = paso === "intro";
   const esProcesando = paso === "procesando";
