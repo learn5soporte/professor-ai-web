@@ -324,6 +324,24 @@ export async function otorgarBadge(
 }
 
 /**
+ * Suma puntos directamente, sin pasar por un badge -- reusa el mismo RPC
+ * incrementar_puntos (generico, no ligado a la tabla `badges`). Se agrego
+ * para las actividades nuevas de la ruta ampliada (reflexion + recursos
+ * marcados como hechos, jul 2026): darles un badge propio a cada una
+ * habria disparado el catalogo de badges innecesariamente (7 modulos x 3
+ * sub-actividades), asi que estas dan XP chico directo en vez de un
+ * logro/insignia.
+ */
+export async function sumarPuntos(usuarioId: string, delta: number) {
+  const supabase = createClient();
+  const { error } = await supabase.rpc("incrementar_puntos", {
+    p_usuario_id: usuarioId,
+    p_delta: delta,
+  });
+  if (error) throw error;
+}
+
+/**
  * Espejo de registrarActividadDiaria en session.tsx, pero escribiendo la
  * racha en `usuarios` en vez de en localStorage. Devuelve el nuevo valor
  * para que quien llame pueda actualizar el estado local sin releer.
