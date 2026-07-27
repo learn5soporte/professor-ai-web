@@ -8,6 +8,7 @@ import { ETIQUETA_DIMENSION } from "@/lib/tmaid/scoring";
 import { BADGES, calcularNivel } from "@/lib/gamification/badges";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
+import { CargandoPantalla } from "@/components/CargandoPantalla";
 
 /**
  * SCREEN 13: RESULTADO -- base literal: code.html real de Stitch
@@ -62,7 +63,8 @@ export default function ResultadoTmaidPage() {
     }
   }, [cargando, perfil, resultadoTmaid, router]);
 
-  if (cargando || !perfil || !perfilCompleto(perfil) || !resultadoTmaid) {
+  if (cargando) return <CargandoPantalla />;
+  if (!perfil || !perfilCompleto(perfil) || !resultadoTmaid) {
     return null;
   }
 
