@@ -8,6 +8,7 @@ import type { Dimension } from "@/lib/tmaid/preguntas";
 import { BADGES, calcularNivel } from "@/lib/gamification/badges";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
+import { CargandoPantalla } from "@/components/CargandoPantalla";
 
 /**
  * Mi Informe -- pantalla nueva (jul 2026), pedida por el usuario: "un
@@ -57,7 +58,8 @@ export default function InformesPage() {
     else if (!resultadoTmaid) router.replace("/tmaid");
   }, [cargando, perfil, resultadoTmaid, router]);
 
-  if (cargando || !perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
+  if (cargando) return <CargandoPantalla />;
+  if (!perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
 
   const { dimensiones } = resultadoTmaid;
   const dims = Object.keys(dimensiones) as Dimension[];
@@ -149,12 +151,9 @@ export default function InformesPage() {
           </p>
           <div className="space-y-2">
             {dims.map((d) => (
-              <div key={d} className="flex items-center gap-2 sm:gap-3">
-                <Icon
-                  name={ICONO_DIMENSION[d]}
-                  className="hidden w-6 shrink-0 text-[18px] text-secondary sm:block"
-                />
-                <span className="w-20 shrink-0 truncate text-xs text-on-surface-variant sm:w-40 sm:text-sm">
+              <div key={d} className="flex items-center gap-3">
+                <Icon name={ICONO_DIMENSION[d]} className="w-6 text-[18px] text-secondary" />
+                <span className="w-40 shrink-0 text-sm text-on-surface-variant">
                   {ETIQUETA_DIMENSION[d]}
                 </span>
                 <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-container-highest print:border print:border-outline-variant">
@@ -163,7 +162,7 @@ export default function InformesPage() {
                     style={{ width: `${Math.round((dimensiones[d] / 5) * 100)}%` }}
                   />
                 </div>
-                <span className="w-9 shrink-0 text-right text-xs font-bold text-on-surface sm:w-10 sm:text-sm">
+                <span className="w-10 text-right text-sm font-bold text-on-surface">
                   {Math.round((dimensiones[d] / 5) * 100)}%
                 </span>
               </div>
@@ -196,25 +195,20 @@ export default function InformesPage() {
               actividades
             </span>
           </div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-outline sm:hidden print:hidden">
-            Desliza para ver todas las columnas →
-          </p>
-          <div className="overflow-x-auto rounded-xl border border-outline-variant/40 print:overflow-visible">
-            <table className="w-full min-w-[420px] text-left text-sm">
+          <div className="overflow-hidden rounded-xl border border-outline-variant/40">
+            <table className="w-full text-left text-sm">
               <thead className="bg-surface-container-low text-xs uppercase tracking-wide text-on-surface-variant">
                 <tr>
-                  <th className="whitespace-nowrap px-4 py-2">Módulo</th>
-                  <th className="whitespace-nowrap px-4 py-2">Estado</th>
-                  <th className="whitespace-nowrap px-4 py-2">Actividades</th>
+                  <th className="px-4 py-2">Módulo</th>
+                  <th className="px-4 py-2">Estado</th>
+                  <th className="px-4 py-2">Actividades</th>
                 </tr>
               </thead>
               <tbody>
                 {modulos.map((m) => (
                   <tr key={m.fase} className="border-t border-outline-variant/30">
-                    <td className="whitespace-nowrap px-4 py-2 font-semibold text-on-surface">
-                      {m.fase}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-2">
+                    <td className="px-4 py-2 font-semibold text-on-surface">{m.fase}</td>
+                    <td className="px-4 py-2">
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs font-bold ${
                           m.estado === "Completado"
@@ -227,7 +221,7 @@ export default function InformesPage() {
                         {m.estado}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-4 py-2 text-on-surface-variant">
+                    <td className="px-4 py-2 text-on-surface-variant">
                       {m.hechas}/{m.total}
                     </td>
                   </tr>
