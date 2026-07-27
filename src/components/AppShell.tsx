@@ -51,7 +51,7 @@ export function AppShell({
 
   return (
     <div className="min-h-screen bg-surface">
-      <header className="glass-nav fixed top-0 z-50 flex w-full items-center justify-between px-6 py-4">
+      <header className="glass-nav fixed top-0 z-50 flex w-full items-center justify-between px-6 py-4 print:hidden">
         <div className="flex items-center gap-3">
           <span className="font-headline text-lg font-black tracking-tighter text-primary">
             Professor AI
@@ -97,9 +97,9 @@ export function AppShell({
         </div>
       </header>
 
-      <div className="px-6 pb-28 pt-20">{children}</div>
+      <div className="px-6 pb-28 pt-20 print:p-0">{children}</div>
 
-      <nav className="glass-nav fixed bottom-0 z-50 flex w-full items-center justify-around px-2 py-2">
+      <nav className="glass-nav fixed bottom-0 z-50 flex w-full items-center justify-around px-2 py-2 print:hidden">
         {TABS.map((tab) => {
           const activo = pathname === tab.href;
           const bloqueado = tab.requiereTmaid && !resultadoTmaid;
