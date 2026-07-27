@@ -121,6 +121,37 @@ const TEORIA_POR_FASE: Record<string, { titulo: string; parrafo: string; tips: s
   },
 };
 
+/**
+ * Pregunta de reflexión corta por módulo -- actividad nueva (jul 2026,
+ * pedido explícito del usuario: "necesitamos mas consistencia... mas
+ * carne para el docente"). A diferencia del reto (que evalúa un prompt
+ * escrito con una heurística), la reflexión no se "corrige": es un
+ * espacio real para que el docente piense por escrito, se guarda tal
+ * cual la escribió (ver REFLEXION_KEY más abajo) y se marca completa
+ * cuando el docente decide que ya terminó de escribirla.
+ */
+const REFLEXION_POR_FASE: Record<string, string> = {
+  Fundamentos:
+    "¿Qué fue lo que más te sorprendió sobre cómo funciona la IA? Escríbelo en 2-3 líneas.",
+  Explorar:
+    "Después de probar una herramienta de IA, ¿qué tarea concreta de tu semana te ahorraría más tiempo si la usaras ahí?",
+  Aplicar:
+    "¿Qué parte de tu prompt tuviste que ajustar más de una vez? ¿Qué aprendiste de eso?",
+  Integrar:
+    "De las tareas donde probaste IA esta semana, ¿cuál vas a seguir usando y cuál no? ¿Por qué?",
+  Evaluar:
+    "¿Hubo algo en la retroalimentación o rúbrica generada con IA con lo que no estuviste de acuerdo? ¿Qué cambiarías?",
+  Liderar:
+    "¿A qué colega le mostrarías primero lo que aprendiste, y por qué a esa persona en particular?",
+  Innovar:
+    "¿Qué uso de IA en tu materia todavía te parece arriesgado o poco probado? ¿Qué necesitarías ver para confiar en él?",
+};
+
+/** XP que se otorga (una sola vez por actividad) al completar la reflexión o marcar un recurso como hecho. */
+const XP_ACTIVIDAD_CHICA = 5;
+
+const REFLEXION_STORAGE_PREFIX = "professor-ai:reflexion:";
+
 /** Icono + etiqueta por tipo de recurso sugerido (ver RecursoSugerido en session.tsx). */
 const ICONO_POR_TIPO_RECURSO: Record<string, string> = {
   video: "play_circle",
@@ -144,6 +175,7 @@ export default function RetoPage() {
     progresoRutas,
     actualizarProgresoFase,
     otorgarBadge,
+    sumarPuntos,
     cargando,
   } = useSession();
   const [prompt, setPrompt] = useState("");
@@ -153,6 +185,12 @@ export default function RetoPage() {
   const [errorValidacion, setErrorValidacion] = useState<string | null>(null);
   const [celebracion, setCelebracion] = useState(false);
   const [puntosGanados, setPuntosGanados] = useState(0);
+  // Reflexion (actividad nueva, jul 2026): texto libre por modulo,
+  // guardado en localStorage (no en Supabase -- es una libreta personal,
+  // no un dato que otras pantallas necesiten leer). Se hidrata en un
+  // useEffect para evitar leer localStorage durante el render inicial.
+  const [reflexionTexto, setReflexionTexto] = useState("");
+  const [reflexionHidratada, setReflexionHidratada] = useState(false);
 
   useEffect(() => {
     if (cargando) return;
@@ -160,6 +198,17 @@ export default function RetoPage() {
     else if (!perfilCompleto(perfil)) router.replace("/onboarding");
     else if (!resultadoTmaid) router.replace("/tmaid");
   }, [cargando, perfil, resultadoTmaid, router]);
+
+  const faseActualId = resultadoTmaid?.rutaPersonalizada.find(
+    (f) => progresoRutas[f.fase] !== "completado"
+  )?.fase;
+
+  useEffect(() => {
+    if (!faseActualId) return;
+    const guardada = window.localStorage.getItem(`${REFLEXION_STORAGE_PREFIX}${faseActualId}`);
+    setReflexionTexto(guardada ?? "");
+    setReflexionHidratada(true);
+  }, [faseActualId]);
 
   if (cargando || !perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
 
@@ -172,6 +221,33 @@ export default function RetoPage() {
   const badge = badgeId ? BADGES[badgeId] : null;
   const xpDisponible = badge?.puntos ?? 10;
   const feedbackIA = generarFeedbackIA(prompt, faseActual.fase, teoria.tips);
+
+  const preguntaReflexion = REFLEXION_POR_FASE[faseActual.fase];
+  const claveReflexion = `${faseActual.fase}::reflexion`;
+  const reflexionCompleta = progresoRutas[claveReflexion] === "completado";
+  const recursos = faseActual.recursos ?? [];
+  const claveRecurso = (i: number) => `${faseActual.fase}::recurso-${i}`;
+  const recursoCompleto = (i: number) => progresoRutas[claveRecurso(i)] === "completado";
+  const actividadesTotal = 1 + (preguntaReflexion ? 1 : 0) + recursos.length;
+  const actividadesHechas =
+    (progresoRutas[faseActual.fase] === "completado" ? 1 : 0) +
+    (reflexionCompleta ? 1 : 0) +
+    recursos.filter((_, i) => recursoCompleto(i)).length;
+
+  function guardarReflexion() {
+    if (!reflexionTexto.trim()) return;
+    window.localStorage.setItem(`${REFLEXION_STORAGE_PREFIX}${faseActual.fase}`, reflexionTexto);
+    if (!reflexionCompleta) {
+      actualizarProgresoFase(claveReflexion, "completado");
+      sumarPuntos(XP_ACTIVIDAD_CHICA);
+    }
+  }
+
+  function alternarRecurso(i: number) {
+    const yaCompleto = recursoCompleto(i);
+    actualizarProgresoFase(claveRecurso(i), yaCompleto ? "pendiente" : "completado");
+    if (!yaCompleto) sumarPuntos(XP_ACTIVIDAD_CHICA);
+  }
 
   function enviar() {
     if (!prompt.trim() || estado !== "editando") return;
@@ -377,9 +453,28 @@ export default function RetoPage() {
             <Icon name="arrow_back" /> Atrás
           </button>
           <span className="font-bold uppercase tracking-widest text-tertiary-container">
-            Reto {indiceActivo + 1} de {fases.length}
+            Módulo {indiceActivo + 1} de {fases.length}
           </span>
           <div className="w-10" />
+        </div>
+
+        {/* Resumen de actividades del modulo -- ampliado (jul 2026): antes
+            cada modulo tenia una sola actividad (el reto); ahora hay hasta
+            4 (reto + reflexion + recursos marcables), asi que este chip le
+            deja claro al docente cuanto hay por hacer aqui, no solo el
+            reto. */}
+        <div className="flex items-center justify-center gap-2">
+          <div className="h-2 w-32 overflow-hidden rounded-full bg-surface-container-highest">
+            <div
+              className="h-full rounded-full bg-secondary transition-all"
+              style={{
+                width: `${actividadesTotal > 0 ? (actividadesHechas / actividadesTotal) * 100 : 0}%`,
+              }}
+            />
+          </div>
+          <span className="text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
+            {actividadesHechas}/{actividadesTotal} actividades de este módulo
+          </span>
         </div>
 
         <details className="group overflow-hidden rounded-xl bg-surface-container-low">
@@ -402,41 +497,10 @@ export default function RetoPage() {
           <p className="font-body-lg text-body-lg">{faseActual.descripcion}</p>
         </div>
 
-        {faseActual.recursos && faseActual.recursos.length > 0 && (
-          <div className="atmospheric-shadow rounded-xl bg-white p-6">
-            <h4 className="mb-1 flex items-center gap-2 font-bold text-primary">
-              <Icon name="explore" className="text-[18px]" /> Para complementar este módulo
-            </h4>
-            <p className="text-body-sm mb-4 text-on-surface-variant">
-              Sugerencias de tema, no un link específico -- tú eliges qué video, artículo o
-              persona concreta te sirve más.
-            </p>
-            <div className="grid grid-cols-1 gap-md sm:grid-cols-2">
-              {faseActual.recursos.map((r, i) => (
-                <div
-                  key={i}
-                  className="flex items-start gap-3 rounded-xl bg-surface-container-low p-4"
-                >
-                  <Icon
-                    name={ICONO_POR_TIPO_RECURSO[r.tipo] ?? "lightbulb"}
-                    className="mt-0.5 text-[20px] text-secondary"
-                  />
-                  <div>
-                    <span className="text-[11px] font-black uppercase tracking-widest text-secondary">
-                      {ETIQUETA_TIPO_RECURSO[r.tipo] ?? r.tipo}
-                    </span>
-                    <p className="text-body-sm mt-1 text-on-surface-variant">{r.sugerencia}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         <div className="grid h-auto grid-cols-1 gap-lg lg:h-[500px] lg:grid-cols-2">
           <div className="atmospheric-shadow flex flex-col gap-md rounded-xl bg-white p-6">
             <div className="flex items-center justify-between">
-              <span className="font-bold text-secondary">Área de Trabajo</span>
+              <span className="font-bold text-secondary">Actividad 1 · Área de Trabajo</span>
             </div>
             <textarea
               value={prompt}
@@ -482,6 +546,96 @@ export default function RetoPage() {
             </div>
           </div>
         </div>
+
+        {/* Actividad 2: Reflexion -- nueva (jul 2026). A diferencia del
+            reto, esto no se evalua con ninguna heuristica: es un espacio
+            para que el docente escriba y piense, se guarda tal cual en
+            localStorage y se marca completa cuando el/ella decide que ya
+            terminó. */}
+        {preguntaReflexion && (
+          <div className="atmospheric-shadow rounded-xl bg-white p-6">
+            <div className="mb-3 flex items-center justify-between">
+              <h4 className="flex items-center gap-2 font-bold text-primary">
+                <Icon name="self_improvement" className="text-[18px]" /> Actividad 2 · Reflexión
+              </h4>
+              {reflexionCompleta && (
+                <span className="flex items-center gap-1 text-[11px] font-black uppercase text-secondary">
+                  <Icon name="check_circle" filled className="text-[16px]" /> Hecha
+                </span>
+              )}
+            </div>
+            <p className="text-body-sm mb-3 text-on-surface-variant">{preguntaReflexion}</p>
+            <textarea
+              value={reflexionTexto}
+              onChange={(e) => setReflexionTexto(e.target.value)}
+              disabled={!reflexionHidratada}
+              placeholder="Escribe tu reflexión aquí..."
+              rows={3}
+              className="text-body-sm mb-3 w-full rounded-xl border-none bg-surface-container-lowest p-4 focus:ring-2 focus:ring-secondary/20"
+            />
+            <div className="flex items-center gap-3">
+              <button
+                onClick={guardarReflexion}
+                disabled={!reflexionTexto.trim() || !reflexionHidratada}
+                className="rounded-full bg-secondary px-6 py-2 text-sm font-bold text-on-secondary transition-opacity hover:opacity-90 disabled:opacity-40"
+              >
+                {reflexionCompleta ? "Actualizar reflexión" : "Guardar reflexión"}
+              </button>
+              {!reflexionCompleta && (
+                <span className="text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
+                  +{XP_ACTIVIDAD_CHICA} XP
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Actividades 3+: recursos marcables -- antes eran solo texto
+            decorativo ("para complementar"); ahora cada uno es un check
+            real que suma XP la primera vez, para que se sientan parte de
+            las actividades del modulo y no un anexo. */}
+        {recursos.length > 0 && (
+          <div className="atmospheric-shadow rounded-xl bg-white p-6">
+            <h4 className="mb-1 flex items-center gap-2 font-bold text-primary">
+              <Icon name="explore" className="text-[18px]" /> Actividades 3-{2 + recursos.length}{" "}
+              · Para complementar este módulo
+            </h4>
+            <p className="text-body-sm mb-4 text-on-surface-variant">
+              Sugerencias de tema, no un link específico -- tú eliges qué video, artículo o
+              persona concreta te sirve más. Márcalo cuando lo hagas.
+            </p>
+            <div className="grid grid-cols-1 gap-md sm:grid-cols-2">
+              {recursos.map((r, i) => {
+                const hecho = recursoCompleto(i);
+                return (
+                  <button
+                    key={i}
+                    onClick={() => alternarRecurso(i)}
+                    className={`flex items-start gap-3 rounded-xl p-4 text-left transition-colors ${
+                      hecho ? "bg-secondary-container/30" : "bg-surface-container-low hover:bg-surface-container"
+                    }`}
+                  >
+                    <Icon
+                      name={hecho ? "check_circle" : ICONO_POR_TIPO_RECURSO[r.tipo] ?? "lightbulb"}
+                      filled={hecho}
+                      className={`mt-0.5 text-[20px] ${hecho ? "text-secondary" : "text-secondary/70"}`}
+                    />
+                    <div>
+                      <span className="text-[11px] font-black uppercase tracking-widest text-secondary">
+                        {ETIQUETA_TIPO_RECURSO[r.tipo] ?? r.tipo}
+                        {!hecho && ` · +${XP_ACTIVIDAD_CHICA} XP`}
+                      </span>
+                      <p className="text-body-sm mt-1 text-on-surface-variant">{r.sugerencia}</p>
+                      <span className="mt-1 block text-[11px] font-bold text-secondary">
+                        {hecho ? "Marcado como hecho" : "Marcar como hecho"}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
