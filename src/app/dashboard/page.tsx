@@ -58,10 +58,10 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <h1 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-4 max-w-2xl text-primary">
+          <h1 className="font-headline mb-4 max-w-2xl text-3xl font-black tracking-tight text-primary sm:text-4xl md:text-5xl">
             Todo empieza aquí
           </h1>
-          <p className="text-body-lg mb-gap-xl max-w-lg text-on-surface-variant">
+          <p className="mb-gap-xl max-w-lg text-base text-on-surface-variant sm:text-lg">
             Para comenzar tu viaje de transformación académica con IA, necesitamos
             entender tu punto de partida. Realiza tu primer diagnóstico y
             desbloquea tu ruta personalizada.
@@ -70,11 +70,11 @@ export default function DashboardPage() {
           <div className="flex flex-col items-center gap-4">
             <Link
               href="/tmaid"
-              className="text-label-lg flex items-center gap-3 rounded-full bg-primary-container px-10 py-5 font-bold text-on-primary transition-all hover:opacity-90 active:scale-95"
+              className="font-label flex items-center gap-3 rounded-full bg-primary-container px-10 py-5 text-base font-bold text-on-primary transition-all hover:opacity-90 active:scale-95"
             >
               Hacer mi diagnóstico <Icon name="rocket_launch" />
             </Link>
-            <span className="text-body-sm flex items-center gap-2 text-outline">
+            <span className="flex items-center gap-2 text-sm text-outline">
               <Icon name="timer" className="text-[18px]" /> Toma unos 5 minutos
             </span>
           </div>
@@ -85,8 +85,8 @@ export default function DashboardPage() {
                 <Icon name="psychology" className="text-secondary" />
               </div>
               <div>
-                <h3 className="font-label-lg text-primary">Análisis IA</h3>
-                <p className="text-body-sm text-on-surface-variant">
+                <h3 className="font-label text-base font-bold text-primary">Análisis IA</h3>
+                <p className="text-sm text-on-surface-variant">
                   Evaluamos tus competencias actuales.
                 </p>
               </div>
@@ -96,8 +96,8 @@ export default function DashboardPage() {
                 <Icon name="route" className="text-secondary" />
               </div>
               <div>
-                <h3 className="font-label-lg text-primary">Ruta Única</h3>
-                <p className="text-body-sm text-on-surface-variant">
+                <h3 className="font-label text-base font-bold text-primary">Ruta Única</h3>
+                <p className="text-sm text-on-surface-variant">
                   Contenido adaptado a tu especialidad.
                 </p>
               </div>
@@ -107,8 +107,8 @@ export default function DashboardPage() {
                 <Icon name="verified" className="text-secondary" />
               </div>
               <div>
-                <h3 className="font-label-lg text-primary">Certificación</h3>
-                <p className="text-body-sm text-on-surface-variant">
+                <h3 className="font-label text-base font-bold text-primary">Certificación</h3>
+                <p className="text-sm text-on-surface-variant">
                   Valida tus avances ante la facultad.
                 </p>
               </div>
