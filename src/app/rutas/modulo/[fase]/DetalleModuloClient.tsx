@@ -64,6 +64,22 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
   const completado = progresoRutas[nombreFase] === "completado";
   const badgeInfo = BADGES[BADGE_POR_FASE[nombreFase]];
 
+  // Ampliado (jul 2026): cada modulo ya no tiene 1 sola actividad (el
+  // reto) -- tambien hay una reflexion (todos los modulos la tienen, ver
+  // REFLEXION_POR_FASE en reto/page.tsx) y N recursos marcables. Mismas
+  // claves compuestas que usa reto/page.tsx (`${fase}::reflexion`,
+  // `${fase}::recurso-{i}`) sobre el mismo progresoRutas generico -- sin
+  // necesidad de una migracion nueva.
+  const recursosDelModulo = fase.recursos ?? [];
+  const actividadesTotal = 1 + 1 + recursosDelModulo.length;
+  const reflexionHecha = progresoRutas[`${nombreFase}::reflexion`] === "completado";
+  const recursosHechos = recursosDelModulo.filter(
+    (_, i) => progresoRutas[`${nombreFase}::recurso-${i}`] === "completado"
+  ).length;
+  const actividadesHechas = (completado ? 1 : 0) + (reflexionHecha ? 1 : 0) + recursosHechos;
+  const porcentajeModulo =
+    actividadesTotal > 0 ? Math.round((actividadesHechas / actividadesTotal) * 100) : 0;
+
   function estadoDe(i: number): "completado" | "activo" | "proximo" | "bloqueado" {
     if (progresoRutas[fases[i].fase] === "completado") return "completado";
     if (i === indiceActivo) return "activo";
@@ -140,17 +156,17 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
                   PROGRESO DEL MÓDULO
                 </span>
                 <span className="text-body-sm font-bold text-secondary">
-                  {completado ? "100%" : "0%"}
+                  {porcentajeModulo}%
                 </span>
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container-highest">
                 <div
                   className="h-full rounded-full bg-secondary transition-all duration-1000"
-                  style={{ width: completado ? "100%" : "0%" }}
+                  style={{ width: `${porcentajeModulo}%` }}
                 />
               </div>
               <p className="text-body-sm mt-2 text-on-surface-variant">
-                {completado ? "1 de 1 reto completado" : "0 de 1 reto completado"}
+                {actividadesHechas} de {actividadesTotal} actividades completadas
               </p>
             </div>
           </div>
