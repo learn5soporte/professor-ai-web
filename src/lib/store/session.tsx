@@ -20,6 +20,7 @@ import {
   guardarResultadoTmaid as guardarResultadoTmaidSupabase,
   actualizarProgresoFase as actualizarProgresoFaseSupabase,
   otorgarBadge as otorgarBadgeSupabase,
+  sumarPuntos as sumarPuntosSupabase,
   registrarActividadDiaria as registrarActividadDiariaSupabase,
   reenviarConfirmacion as reenviarConfirmacionSupabase,
 } from "@/lib/supabase/datos";
@@ -160,6 +161,8 @@ type SessionContextValue = SessionState & {
   guardarResultadoTmaid: (resultado: ResultadoTmaid) => void;
   actualizarProgresoFase: (fase: string, estado: EstadoFase) => void;
   otorgarBadge: (badgeId: string) => boolean;
+  /** Suma puntos directo (sin badge) -- ver sumarPuntos en datos.ts. Usado por actividades chicas de la ruta (reflexion/recursos marcados como hechos). */
+  sumarPuntos: (cantidad: number) => void;
   registrarActividadDiaria: () => void;
   reiniciar: () => void;
 };
@@ -433,6 +436,15 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         );
       }
       return true;
+    },
+
+    sumarPuntos: (cantidad: number) => {
+      setState((prev) => ({ ...prev, puntos: prev.puntos + cantidad }));
+      if (usarSupabase && usuarioIdRef.current) {
+        sumarPuntosSupabase(usuarioIdRef.current, cantidad).catch((e) =>
+          console.error("sumarPuntos", e)
+        );
+      }
     },
 
     registrarActividadDiaria: () => {
