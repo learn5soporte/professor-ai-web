@@ -8,6 +8,7 @@ import { ETIQUETA_DIMENSION } from "@/lib/tmaid/scoring";
 import type { Dimension } from "@/lib/tmaid/preguntas";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
+import { CargandoPantalla } from "@/components/CargandoPantalla";
 
 /**
  * Análisis Detallado del Perfil IA -- base literal: code.html real de Stitch
@@ -40,7 +41,8 @@ export default function AnalisisDetalladoPage() {
     else if (!resultadoTmaid) router.replace("/tmaid");
   }, [cargando, perfil, resultadoTmaid, router]);
 
-  if (cargando || !perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
+  if (cargando) return <CargandoPantalla />;
+  if (!perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
 
   const { dimensiones } = resultadoTmaid;
   const dims = Object.keys(dimensiones) as Dimension[];
