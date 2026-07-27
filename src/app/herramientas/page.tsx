@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSession, perfilCompleto } from "@/lib/store/session";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
+import { CargandoPantalla } from "@/components/CargandoPantalla";
 
 /**
  * Caja de Herramientas -- base literal: code.html real de Stitch
@@ -66,7 +67,8 @@ export default function HerramientasHubPage() {
     else if (!perfilCompleto(perfil)) router.replace("/onboarding");
   }, [cargando, perfil, router]);
 
-  if (cargando || !perfil || !perfilCompleto(perfil)) return null;
+  if (cargando) return <CargandoPantalla />;
+  if (!perfil || !perfilCompleto(perfil)) return null;
 
   return (
     <AppShell titulo="Herramientas">
