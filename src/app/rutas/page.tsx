@@ -7,6 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { BadgeUnlockToast } from "@/components/BadgeUnlockToast";
 import { BADGES } from "@/lib/gamification/badges";
 import { Icon } from "@/components/Icon";
+import { CargandoPantalla } from "@/components/CargandoPantalla";
 
 /**
  * Mi Ruta Formativa -- base literal: code.html real de Stitch
@@ -42,7 +43,8 @@ export default function RutasPage() {
     else if (!resultadoTmaid) router.replace("/tmaid");
   }, [cargando, perfil, resultadoTmaid, router]);
 
-  if (cargando || !perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
+  if (cargando) return <CargandoPantalla />;
+  if (!perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
 
   const fases = resultadoTmaid.rutaPersonalizada;
   const indiceActivo = fases.findIndex((f) => progresoRutas[f.fase] !== "completado");
