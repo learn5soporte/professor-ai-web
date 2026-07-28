@@ -114,7 +114,7 @@ export default function PlaneacionProPage() {
       <div className="mx-auto max-w-2xl">
         <Link
           href="/herramientas"
-          className="text-body-sm mb-4 inline-flex items-center gap-1 font-bold text-on-primary-fixed"
+          className="text-sm mb-4 inline-flex items-center gap-1 font-bold text-on-primary-fixed"
         >
           <Icon name="arrow_back" /> Herramientas
         </Link>
@@ -122,8 +122,8 @@ export default function PlaneacionProPage() {
         <div className="rounded-[2.5rem] bg-surface-container-low p-8 md:p-12">
           <div className="space-y-gap-lg mx-auto max-w-2xl">
             <div className="text-center">
-              <h1 className="font-headline-lg text-headline-lg">Generador de Clases</h1>
-              <p className="text-body-lg mt-2 text-on-surface-variant">
+              <h1 className="font-headline text-3xl font-black">Generador de Clases</h1>
+              <p className="text-lg mt-2 text-on-surface-variant">
                 Personaliza tu secuencia didáctica con el poder de la IA.
               </p>
             </div>
@@ -131,7 +131,7 @@ export default function PlaneacionProPage() {
             <div className="space-y-6">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-label-lg ml-2 uppercase text-on-surface-variant">
+                  <label className="text-xs font-bold ml-2 uppercase text-on-surface-variant">
                     Tema de la clase
                   </label>
                   <input
@@ -143,7 +143,7 @@ export default function PlaneacionProPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-label-lg ml-2 uppercase text-on-surface-variant">
+                  <label className="text-xs font-bold ml-2 uppercase text-on-surface-variant">
                     Nivel
                   </label>
                   <select
@@ -157,7 +157,7 @@ export default function PlaneacionProPage() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-label-lg ml-2 uppercase text-on-surface-variant">
+                  <label className="text-xs font-bold ml-2 uppercase text-on-surface-variant">
                     Duración
                   </label>
                   <select
@@ -171,7 +171,7 @@ export default function PlaneacionProPage() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-label-lg ml-2 uppercase text-on-surface-variant">
+                  <label className="text-xs font-bold ml-2 uppercase text-on-surface-variant">
                     Enfoque
                   </label>
                   <select
@@ -207,7 +207,7 @@ export default function PlaneacionProPage() {
             {estado === "listo" && (
               <div className="mt-12 space-y-6">
                 <div className="flex items-center justify-between px-4">
-                  <h4 className="font-headline-md">Vista Previa</h4>
+                  <h4 className="font-headline text-lg font-bold">Vista Previa</h4>
                   <div className="flex gap-2">
                     <button
                       onClick={descargar}
@@ -238,7 +238,7 @@ export default function PlaneacionProPage() {
                       }`}
                     >
                       <span
-                        className={`text-label-lg font-black ${
+                        className={`text-xs font-black ${
                           i === 0
                             ? "text-secondary"
                             : i === 1
@@ -248,7 +248,7 @@ export default function PlaneacionProPage() {
                       >
                         {f.etiqueta}
                       </span>
-                      <p className="text-body-md mt-2">{f.texto}</p>
+                      <p className="text-base mt-2">{f.texto}</p>
                     </div>
                   ))}
                 </div>
