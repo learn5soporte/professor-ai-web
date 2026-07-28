@@ -74,10 +74,10 @@ export default function HerramientasHubPage() {
     <AppShell titulo="Herramientas">
       <div className="mx-auto max-w-3xl space-y-gap-lg">
         <div>
-          <span className="font-label-lg text-label-lg uppercase tracking-widest text-secondary">
+          <span className="font-label text-xs font-bold uppercase tracking-widest text-secondary">
             Módulo de creación
           </span>
-          <h1 className="font-headline-lg text-headline-lg-mobile text-on-primary-fixed md:text-headline-lg">
+          <h1 className="font-headline text-3xl text-on-primary-fixed sm:text-4xl">
             Caja de Herramientas
           </h1>
         </div>
@@ -101,8 +101,8 @@ export default function HerramientasHubPage() {
                   <Icon name={h.icono} className="text-3xl" />
                 </div>
                 <div>
-                  <h4 className="font-headline-md text-[18px]">{h.nombre}</h4>
-                  <p className="text-body-sm line-clamp-2 text-on-surface-variant">
+                  <h4 className="font-headline text-lg font-bold text-[18px]">{h.nombre}</h4>
+                  <p className="text-sm line-clamp-2 text-on-surface-variant">
                     {h.descripcion}
                   </p>
                 </div>
