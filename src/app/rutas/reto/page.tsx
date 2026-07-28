@@ -298,14 +298,14 @@ export default function RetoPage() {
             className="relative z-10 text-[160px] text-tertiary-fixed-dim"
           />
         </div>
-        <h2 className="font-display-lg text-display-lg mb-2 text-white">¡EXCELENTE TRABAJO!</h2>
-        <p className="font-headline-md text-headline-md mb-8 text-tertiary-fixed-dim">
+        <h2 className="font-headline text-4xl font-black mb-2 text-white">¡EXCELENTE TRABAJO!</h2>
+        <p className="font-headline text-xl font-bold mb-8 text-tertiary-fixed-dim">
           +{puntosGanados} XP GANADOS
         </p>
         <div className="w-full max-w-xs space-y-4">
           <button
             onClick={() => router.push(hayMasFases ? "/rutas" : "/dashboard")}
-            className="text-label-lg w-full rounded-full bg-tertiary-container py-4 font-bold text-on-tertiary-fixed transition-transform hover:scale-105"
+            className="w-full rounded-full bg-tertiary-container py-4 text-base font-bold text-on-tertiary-fixed transition-transform hover:scale-105"
           >
             {hayMasFases ? "PRÓXIMO RETO" : "IR AL INICIO"}
           </button>
@@ -329,14 +329,14 @@ export default function RetoPage() {
               <span className="text-[12px] font-bold uppercase text-on-tertiary-fixed rounded-full bg-tertiary-fixed px-3 py-1">
                 Reto {indiceActivo + 1} de {fases.length}
               </span>
-              <span className="font-body-sm text-on-surface-variant">
+              <span className="text-sm text-on-surface-variant">
                 Fase: {faseActual.fase}
               </span>
             </div>
-            <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-2 text-primary">
+            <h2 className="font-headline text-3xl font-black sm:text-4xl mb-2 text-primary">
               Revisión del Reto
             </h2>
-            <p className="text-body-lg max-w-2xl text-on-surface-variant">
+            <p className="text-lg max-w-2xl text-on-surface-variant">
               Compara tu propuesta con la retroalimentación de la IA y evalúa tu experiencia
               para avanzar.
             </p>
@@ -348,9 +348,9 @@ export default function RetoPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-surface-container text-primary">
                   <Icon name="edit_note" />
                 </div>
-                <h3 className="font-headline-md text-headline-md">Tu Propuesta</h3>
+                <h3 className="font-headline text-xl font-bold">Tu Propuesta</h3>
               </div>
-              <p className="text-body-md whitespace-pre-wrap leading-relaxed text-on-surface-variant">
+              <p className="text-base whitespace-pre-wrap leading-relaxed text-on-surface-variant">
                 {prompt}
               </p>
             </div>
@@ -360,20 +360,20 @@ export default function RetoPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary-container text-on-secondary-container">
                   <Icon name="auto_awesome" filled />
                 </div>
-                <h3 className="font-headline-md text-headline-md text-white">
+                <h3 className="font-headline text-xl font-bold text-white">
                   Retroalimentación IA
                 </h3>
               </div>
-              <p className="text-body-md leading-relaxed text-blue-100">{feedbackIA}</p>
+              <p className="text-base leading-relaxed text-blue-100">{feedbackIA}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-gap-xl lg:grid-cols-3">
             <div className="lg:col-span-2 rounded-xl bg-surface-container-high p-8">
-              <h4 className="font-headline-md text-headline-md mb-6">Autoevaluación</h4>
+              <h4 className="font-headline text-xl font-bold mb-6">Autoevaluación</h4>
               <div className="flex flex-col justify-between gap-lg md:flex-row md:items-center">
                 <div className="space-y-2">
-                  <p className="font-body-md text-on-surface-variant">
+                  <p className="text-sm text-on-surface-variant">
                     ¿Qué tan útil te ha parecido la retroalimentación de la IA para tu
                     práctica docente?
                   </p>
@@ -409,7 +409,7 @@ export default function RetoPage() {
                     }}
                     className="h-6 w-6 cursor-pointer rounded border-outline-variant text-secondary focus:ring-secondary"
                   />
-                  <span className="text-label-lg font-label-lg cursor-pointer">
+                  <span className="font-label text-xs font-bold cursor-pointer">
                     Marcar como completado
                   </span>
                 </label>
@@ -419,7 +419,7 @@ export default function RetoPage() {
             <div className="flex flex-col justify-center gap-md">
               <button
                 onClick={confirmar}
-                className="font-headline-md group relative overflow-hidden rounded-full bg-primary px-10 py-6 text-on-primary transition-all hover:-translate-y-1 hover:shadow-xl active:scale-95"
+                className="font-headline text-lg font-bold group relative overflow-hidden rounded-full bg-primary px-10 py-6 text-on-primary transition-all hover:-translate-y-1 hover:shadow-xl active:scale-95"
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
                   Confirmar y ganar XP
@@ -495,8 +495,8 @@ export default function RetoPage() {
         </details>
 
         <div className="atmospheric-shadow rounded-xl bg-tertiary-fixed p-6 text-on-tertiary-fixed">
-          <h3 className="font-headline-md text-headline-md mb-2">TU DESAFÍO</h3>
-          <p className="font-body-lg text-body-lg">{faseActual.descripcion}</p>
+          <h3 className="font-headline text-xl font-bold mb-2">TU DESAFÍO</h3>
+          <p className="text-lg">{faseActual.descripcion}</p>
         </div>
 
         <div className="grid h-auto grid-cols-1 gap-lg lg:h-[500px] lg:grid-cols-2">
@@ -509,7 +509,7 @@ export default function RetoPage() {
               onChange={(e) => setPrompt(e.target.value)}
               disabled={estado !== "editando"}
               placeholder="Escribe tu prompt aquí..."
-              className="text-body-sm flex-grow rounded-xl border-none bg-surface-container-lowest p-4 font-mono focus:ring-2 focus:ring-secondary/20"
+              className="text-sm flex-grow rounded-xl border-none bg-surface-container-lowest p-4 font-mono focus:ring-2 focus:ring-secondary/20"
             />
             <button
               onClick={enviar}
@@ -566,14 +566,14 @@ export default function RetoPage() {
                 </span>
               )}
             </div>
-            <p className="text-body-sm mb-3 text-on-surface-variant">{preguntaReflexion}</p>
+            <p className="text-sm mb-3 text-on-surface-variant">{preguntaReflexion}</p>
             <textarea
               value={reflexionTexto}
               onChange={(e) => setReflexionTexto(e.target.value)}
               disabled={!reflexionHidratada}
               placeholder="Escribe tu reflexión aquí..."
               rows={3}
-              className="text-body-sm mb-3 w-full rounded-xl border-none bg-surface-container-lowest p-4 focus:ring-2 focus:ring-secondary/20"
+              className="text-sm mb-3 w-full rounded-xl border-none bg-surface-container-lowest p-4 focus:ring-2 focus:ring-secondary/20"
             />
             <div className="flex items-center gap-3">
               <button
@@ -602,7 +602,7 @@ export default function RetoPage() {
               <Icon name="explore" className="text-[18px]" /> Actividades 3-{2 + recursos.length}{" "}
               · Para complementar este módulo
             </h4>
-            <p className="text-body-sm mb-4 text-on-surface-variant">
+            <p className="text-sm mb-4 text-on-surface-variant">
               Sugerencias de tema, no un link específico -- tú eliges qué video, artículo o
               persona concreta te sirve más. Márcalo cuando lo hagas.
             </p>
@@ -627,7 +627,7 @@ export default function RetoPage() {
                         {ETIQUETA_TIPO_RECURSO[r.tipo] ?? r.tipo}
                         {!hecho && ` · +${XP_ACTIVIDAD_CHICA} XP`}
                       </span>
-                      <p className="text-body-sm mt-1 text-on-surface-variant">{r.sugerencia}</p>
+                      <p className="text-sm mt-1 text-on-surface-variant">{r.sugerencia}</p>
                       <span className="mt-1 block text-[11px] font-bold text-secondary">
                         {hecho ? "Marcado como hecho" : "Marcar como hecho"}
                       </span>
