@@ -94,7 +94,7 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
       <div className="mx-auto max-w-5xl space-y-gap-xl">
         <Link
           href="/rutas"
-          className="text-body-sm inline-flex items-center gap-1 font-bold text-on-primary-fixed"
+          className="text-sm inline-flex items-center gap-1 font-bold text-on-primary-fixed"
         >
           <Icon name="arrow_back" /> Volver a mi ruta
         </Link>
@@ -103,31 +103,31 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
           <div className="space-y-gap-lg lg:col-span-7">
             <div className="inline-flex items-center gap-2 rounded-full bg-tertiary-fixed px-3 py-1 text-on-tertiary-fixed">
               <Icon name={ICONO_POR_FASE[nombreFase]} className="text-[18px]" />
-              <span className="text-label-lg font-label-lg">
+              <span className="font-label text-xs font-bold">
                 MÓDULO · {nombreFase.toUpperCase()}
               </span>
             </div>
-            <h1 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg max-w-2xl text-primary">
+            <h1 className="font-headline text-3xl font-black sm:text-4xl max-w-2xl text-primary">
               Fase: {nombreFase}
             </h1>
-            <p className="text-body-lg leading-relaxed text-on-surface-variant">
+            <p className="text-lg leading-relaxed text-on-surface-variant">
               {fase.descripcion}
             </p>
             <div className="flex flex-wrap gap-gap-md pt-4">
               <div className="atmospheric-shadow flex items-center gap-2 rounded-xl bg-surface-container-lowest px-4 py-3">
                 <Icon name="schedule" className="text-secondary" />
                 <div className="flex flex-col">
-                  <span className="text-label-lg font-label-lg text-primary">
+                  <span className="font-label text-xs font-bold text-primary">
                     TIEMPO ESTIMADO
                   </span>
-                  <span className="text-body-sm text-on-surface-variant">~30 min</span>
+                  <span className="text-sm text-on-surface-variant">~30 min</span>
                 </div>
               </div>
               <div className="atmospheric-shadow flex items-center gap-2 rounded-xl bg-surface-container-lowest px-4 py-3">
                 <Icon name="military_tech" className="text-tertiary" />
                 <div className="flex flex-col">
-                  <span className="text-label-lg font-label-lg text-primary">RECOMPENSA</span>
-                  <span className="text-body-sm text-on-surface-variant">
+                  <span className="font-label text-xs font-bold text-primary">RECOMPENSA</span>
+                  <span className="text-sm text-on-surface-variant">
                     {badgeInfo?.puntos ?? 0} XP disponibles
                   </span>
                 </div>
@@ -136,12 +136,12 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
 
             {fase.recursos && fase.recursos.length > 0 && (
               <div className="space-y-2 pt-2">
-                <span className="text-label-lg font-label-lg text-primary">
+                <span className="font-label text-xs font-bold text-primary">
                   PARA COMPLEMENTAR
                 </span>
                 <ul className="space-y-2">
                   {fase.recursos.map((r, i) => (
-                    <li key={i} className="text-body-sm flex items-start gap-2 text-on-surface-variant">
+                    <li key={i} className="text-sm flex items-start gap-2 text-on-surface-variant">
                       <Icon name="lightbulb" className="mt-0.5 text-[16px] text-secondary" />
                       <span>{r.sugerencia}</span>
                     </li>
@@ -154,10 +154,10 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
           <div className="lg:col-span-5">
             <div className="atmospheric-shadow rounded-3xl bg-surface-container-lowest p-8">
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-label-lg font-label-lg text-primary">
+                <span className="font-label text-xs font-bold text-primary">
                   PROGRESO DEL MÓDULO
                 </span>
-                <span className="text-body-sm font-bold text-secondary">
+                <span className="text-sm font-bold text-secondary">
                   {porcentajeModulo}%
                 </span>
               </div>
@@ -167,7 +167,7 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
                   style={{ width: `${porcentajeModulo}%` }}
                 />
               </div>
-              <p className="text-body-sm mt-2 text-on-surface-variant">
+              <p className="text-sm mt-2 text-on-surface-variant">
                 {actividadesHechas} de {actividadesTotal} actividades completadas
               </p>
             </div>
@@ -175,7 +175,7 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
         </div>
 
         <div className="mt-8">
-          <h3 className="font-headline-md text-headline-md mb-8 text-primary">
+          <h3 className="font-headline text-xl font-bold mb-8 text-primary">
             Tu ruta completa
           </h3>
           <div className="grid grid-cols-1 gap-gap-lg md:grid-cols-3">
@@ -191,14 +191,14 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
                       <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary-container/10 text-secondary">
                         <Icon name="check_circle" filled />
                       </div>
-                      <span className="text-label-lg font-label-lg rounded-full bg-surface-container-high px-3 py-1 text-on-surface-variant">
+                      <span className="font-label text-xs font-bold rounded-full bg-surface-container-high px-3 py-1 text-on-surface-variant">
                         COMPLETADO
                       </span>
                     </div>
-                    <h4 className="font-headline-md text-headline-md mb-3 text-primary">
+                    <h4 className="font-headline text-xl font-bold mb-3 text-primary">
                       {f.fase}
                     </h4>
-                    <p className="text-body-md text-on-surface-variant">{f.descripcion}</p>
+                    <p className="text-base text-on-surface-variant">{f.descripcion}</p>
                   </div>
                 );
               }
@@ -208,24 +208,24 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
                     key={f.fase}
                     className="atmospheric-shadow relative rounded-3xl border-2 border-secondary bg-surface-container-lowest p-8 ring-8 ring-secondary/5"
                   >
-                    <div className="text-label-lg font-label-lg absolute -top-4 left-8 rounded-full bg-secondary px-4 py-1 text-on-secondary shadow-lg">
+                    <div className="font-label text-xs font-bold absolute -top-4 left-8 rounded-full bg-secondary px-4 py-1 text-on-secondary shadow-lg">
                       SIGUIENTE PASO
                     </div>
                     <div className="mb-6 flex items-start justify-between">
                       <div className="glow-node flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-on-secondary">
                         <Icon name={ICONO_POR_FASE[f.fase] ?? "psychology"} />
                       </div>
-                      <span className="text-label-lg font-label-lg rounded-full bg-secondary-container px-3 py-1 text-on-secondary-container">
+                      <span className="font-label text-xs font-bold rounded-full bg-secondary-container px-3 py-1 text-on-secondary-container">
                         ACTIVO
                       </span>
                     </div>
-                    <h4 className="font-headline-md text-headline-md mb-3 text-primary">
+                    <h4 className="font-headline text-xl font-bold mb-3 text-primary">
                       {f.fase}
                     </h4>
-                    <p className="text-body-md mb-8 text-on-surface-variant">{f.descripcion}</p>
+                    <p className="text-base mb-8 text-on-surface-variant">{f.descripcion}</p>
                     <Link
                       href="/rutas/reto"
-                      className="text-label-lg flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 font-bold text-on-primary transition-all hover:opacity-90 active:scale-95"
+                      className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-base font-bold text-on-primary transition-all hover:opacity-90 active:scale-95"
                     >
                       EMPEZAR RETO <Icon name="play_arrow" className="text-[18px]" />
                     </Link>
@@ -241,17 +241,17 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-container-highest text-outline">
                       <Icon name="lock" />
                     </div>
-                    <span className="text-label-lg font-label-lg rounded-full bg-surface-container-highest px-3 py-1 text-on-surface-variant">
+                    <span className="font-label text-xs font-bold rounded-full bg-surface-container-highest px-3 py-1 text-on-surface-variant">
                       BLOQUEADO
                     </span>
                   </div>
-                  <h4 className="font-headline-md text-headline-md mb-3 text-primary">
+                  <h4 className="font-headline text-xl font-bold mb-3 text-primary">
                     {f.fase}
                   </h4>
-                  <p className="text-body-md mb-6 text-on-surface-variant">{f.descripcion}</p>
+                  <p className="text-base mb-6 text-on-surface-variant">{f.descripcion}</p>
                   <div className="flex items-center gap-2 text-outline">
                     <Icon name="info" className="text-[18px]" />
-                    <span className="text-label-lg font-label-lg">
+                    <span className="font-label text-xs font-bold">
                       Requiere completar la fase anterior
                     </span>
                   </div>
