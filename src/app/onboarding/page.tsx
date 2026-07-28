@@ -136,14 +136,14 @@ export default function OnboardingPage() {
             <div className="pulse-ai absolute inset-0 rounded-full bg-secondary opacity-20 blur-3xl" />
             <div className="relative flex h-full w-full items-center justify-center rounded-full border-2 border-tertiary-fixed-dim/30">
               <div className="pulse-ai flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-tr from-secondary to-on-secondary-fixed">
-                <span className="font-headline-lg text-display-lg font-black text-white">
+                <span className="font-headline text-6xl font-black text-white">
                   P
                 </span>
               </div>
             </div>
           </div>
           <div className="flex h-20 flex-col justify-center">
-            <h2 className="font-headline-md animate-pulse text-headline-md text-white">
+            <h2 className="font-headline animate-pulse text-2xl font-bold text-white">
               {MENSAJES_ANALISIS[mensajeIdx]}
             </h2>
           </div>
@@ -153,7 +153,7 @@ export default function OnboardingPage() {
               style={{ width: `${((mensajeIdx + 1) / MENSAJES_ANALISIS.length) * 100}%` }}
             />
           </div>
-          <p className="mt-8 text-body-sm font-bold uppercase tracking-[0.2em] text-white/40">
+          <p className="mt-8 text-sm font-bold uppercase tracking-[0.2em] text-white/40">
             Motor de Inteligencia Educativa Activo
           </p>
         </section>
@@ -178,7 +178,7 @@ export default function OnboardingPage() {
 
         {step === 0 && (
           <>
-            <h2 className="font-headline-lg mb-8 text-headline-lg-mobile font-black md:text-headline-lg">
+            <h2 className="font-headline mb-8 text-3xl font-black sm:text-4xl">
               ¿En qué nivel enseñas?
             </h2>
             <div className="mb-12 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -196,7 +196,7 @@ export default function OnboardingPage() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-surface-container-lowest/10">
                     <Icon name={n.icono} className="text-tertiary-fixed-dim" />
                   </div>
-                  <span className="font-headline-md text-white">{n.valor}</span>
+                  <span className="font-headline text-lg font-bold text-white">{n.valor}</span>
                 </button>
               ))}
             </div>
@@ -205,7 +205,7 @@ export default function OnboardingPage() {
 
         {step === 1 && (
           <>
-            <h2 className="font-headline-lg mb-4 text-headline-lg-mobile font-black md:text-headline-lg">
+            <h2 className="font-headline mb-4 text-3xl font-black sm:text-4xl">
               ¿Qué enseñas?
             </h2>
             <p className="mb-8 text-white/50">
@@ -242,7 +242,7 @@ export default function OnboardingPage() {
 
         {step === 2 && (
           <>
-            <h2 className="font-headline-lg mb-8 text-headline-lg-mobile font-black md:text-headline-lg">
+            <h2 className="font-headline mb-8 text-3xl font-black sm:text-4xl">
               ¿Cómo describes tu relación con la IA?
             </h2>
             <div className="mb-12 space-y-4">
@@ -257,11 +257,11 @@ export default function OnboardingPage() {
                   >
                     <div className="flex items-center gap-6">
                       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-secondary/40 to-transparent">
-                        <Icon name={r.icono} filled className="text-headline-md" />
+                        <Icon name={r.icono} filled className="text-3xl" />
                       </div>
                       <div>
-                        <h4 className="font-headline-md text-white">{r.valor}</h4>
-                        <p className="text-body-sm text-white/50">{r.desc}</p>
+                        <h4 className="font-headline text-lg font-bold text-white">{r.valor}</h4>
+                        <p className="text-sm text-white/50">{r.desc}</p>
                       </div>
                     </div>
                     <div
@@ -274,7 +274,7 @@ export default function OnboardingPage() {
               })}
             </div>
             <div className="mb-12">
-              <h3 className="font-headline-md mb-4">¿Cuál es tu mayor desafío?</h3>
+              <h3 className="font-headline mb-4 text-lg font-bold">¿Cuál es tu mayor desafío?</h3>
               <div className="flex flex-wrap gap-2">
                 {DESAFIOS.map((d) => {
                   const selected = form.mayorDesafio === d;
@@ -283,7 +283,7 @@ export default function OnboardingPage() {
                       key={d}
                       type="button"
                       onClick={() => setForm((f) => ({ ...f, mayorDesafio: d }))}
-                      className={`rounded-full border px-4 py-1 text-body-sm font-bold transition-colors ${
+                      className={`rounded-full border px-4 py-1 text-sm font-bold transition-colors ${
                         selected
                           ? "border-tertiary/30 bg-tertiary/20 text-tertiary-fixed-dim"
                           : "border-white/10 bg-white/5 text-white/40 hover:bg-white/10"
@@ -300,7 +300,7 @@ export default function OnboardingPage() {
 
         {step === 3 && (
           <>
-            <h2 className="font-headline-lg mb-8 text-center text-headline-lg-mobile font-black md:text-headline-lg">
+            <h2 className="font-headline mb-8 text-center text-3xl font-black sm:text-4xl">
               ¿Qué quieres lograr?
             </h2>
             <div className="mb-16 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -316,9 +316,9 @@ export default function OnboardingPage() {
                     }`}
                   >
                     <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary-container/20">
-                      <Icon name={o.icono} filled className="text-headline-lg" />
+                      <Icon name={o.icono} filled className="text-4xl" />
                     </div>
-                    <h4 className="font-headline-md text-white">{o.valor}</h4>
+                    <h4 className="font-headline text-lg font-bold text-white">{o.valor}</h4>
                   </button>
                 );
               })}
@@ -346,7 +346,7 @@ export default function OnboardingPage() {
             <button
               onClick={next}
               disabled={!canContinue}
-              className="btn-accent px-16 py-5 text-headline-md shadow-2xl shadow-secondary/40 hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
+              className="btn-accent px-16 py-5 text-lg shadow-2xl shadow-secondary/40 hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
             >
               Finalizar Configuración
             </button>
