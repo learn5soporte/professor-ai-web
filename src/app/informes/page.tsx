@@ -107,13 +107,13 @@ export default function InformesPage() {
 
         <div className="flex flex-wrap items-start justify-between gap-4 print:hidden">
           <div>
-            <span className="font-label-lg text-label-lg uppercase tracking-widest text-secondary">
+            <span className="font-label text-xs font-bold uppercase tracking-widest text-secondary">
               Reportes
             </span>
-            <h1 className="font-headline-lg text-headline-lg-mobile text-on-primary-fixed md:text-headline-lg">
+            <h1 className="font-headline text-3xl font-black text-on-primary-fixed sm:text-4xl">
               Mi Informe
             </h1>
-            <p className="text-body-sm mt-1 text-on-surface-variant">
+            <p className="text-sm mt-1 text-on-surface-variant">
               Generado el {fechaGeneracion} · datos reales de tu cuenta
             </p>
           </div>
@@ -126,7 +126,7 @@ export default function InformesPage() {
         </div>
 
         <section className="atmospheric-shadow space-y-3 rounded-[2rem] bg-white p-6 print:rounded-none print:border print:border-outline-variant print:shadow-none">
-          <h3 className="font-label-lg text-label-lg uppercase tracking-widest text-on-surface-variant">
+          <h3 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">
             Docente
           </h3>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -139,14 +139,14 @@ export default function InformesPage() {
 
         <section className="atmospheric-shadow space-y-4 rounded-[2rem] bg-white p-6 print:rounded-none print:border print:border-outline-variant print:shadow-none">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="font-label-lg text-label-lg uppercase tracking-widest text-on-surface-variant">
+            <h3 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">
               Diagnóstico TMAID
             </h3>
             <span className="rounded-full bg-tertiary-fixed px-3 py-1 text-xs font-black uppercase text-on-tertiary-fixed">
               Nivel {resultadoTmaid.nivelAsignado}
             </span>
           </div>
-          <p className="text-body-sm text-on-surface-variant">
+          <p className="text-sm text-on-surface-variant">
             Puntaje promedio: <strong>{resultadoTmaid.puntajePromedio.toFixed(1)}/5</strong>
           </p>
           <div className="space-y-2">
@@ -174,7 +174,7 @@ export default function InformesPage() {
             </h4>
             <ul className="space-y-1">
               {resultadoTmaid.mapaBrechas.map((b, i) => (
-                <li key={i} className="text-body-sm flex items-start gap-2 text-on-surface-variant">
+                <li key={i} className="text-sm flex items-start gap-2 text-on-surface-variant">
                   <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" />
                   <span>{b}</span>
                 </li>
@@ -187,10 +187,10 @@ export default function InformesPage() {
 
         <section className="atmospheric-shadow space-y-4 rounded-[2rem] bg-white p-6 print:break-inside-avoid print:rounded-none print:border print:border-outline-variant print:shadow-none">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="font-label-lg text-label-lg uppercase tracking-widest text-on-surface-variant">
+            <h3 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">
               Ruta formativa
             </h3>
-            <span className="text-body-sm text-on-surface-variant">
+            <span className="text-sm text-on-surface-variant">
               {modulosCompletados}/{fases.length} módulos · {actividadesHechas}/{actividadesTotal}{" "}
               actividades
             </span>
@@ -232,7 +232,7 @@ export default function InformesPage() {
         </section>
 
         <section className="atmospheric-shadow space-y-4 rounded-[2rem] bg-white p-6 print:break-inside-avoid print:rounded-none print:border print:border-outline-variant print:shadow-none">
-          <h3 className="font-label-lg text-label-lg uppercase tracking-widest text-on-surface-variant">
+          <h3 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">
             Gamificación
           </h3>
           <div className="grid grid-cols-3 gap-4">
@@ -245,7 +245,7 @@ export default function InformesPage() {
               Insignias obtenidas ({badgesObtenidos.length})
             </h4>
             {badgesObtenidos.length === 0 ? (
-              <p className="text-body-sm text-on-surface-variant">
+              <p className="text-sm text-on-surface-variant">
                 Todavía no has desbloqueado ninguna insignia.
               </p>
             ) : (
@@ -300,10 +300,10 @@ function EvolucionResumen({
   if (!baselineTmaid) {
     return (
       <section className="atmospheric-shadow space-y-2 rounded-[2rem] bg-white p-6 print:rounded-none print:border print:border-outline-variant print:shadow-none">
-        <h3 className="font-label-lg text-label-lg uppercase tracking-widest text-on-surface-variant">
+        <h3 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">
           Evolución
         </h3>
-        <p className="text-body-sm text-on-surface-variant">
+        <p className="text-sm text-on-surface-variant">
           Todavía no hay suficientes datos para comparar. Esto se activa automáticamente después
           del primer diagnóstico TMAID registrado.
         </p>
@@ -318,10 +318,10 @@ function EvolucionResumen({
   if (esUnico) {
     return (
       <section className="atmospheric-shadow space-y-2 rounded-[2rem] bg-white p-6 print:rounded-none print:border print:border-outline-variant print:shadow-none">
-        <h3 className="font-label-lg text-label-lg uppercase tracking-widest text-on-surface-variant">
+        <h3 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">
           Evolución
         </h3>
-        <p className="text-body-sm text-on-surface-variant">
+        <p className="text-sm text-on-surface-variant">
           Único diagnóstico hasta ahora ({resultadoTmaid.nivelAsignado},{" "}
           {resultadoTmaid.puntajePromedio.toFixed(1)}/5). Repite el TMAID desde /progreso para
           poder comparar más adelante.
@@ -337,7 +337,7 @@ function EvolucionResumen({
   return (
     <section className="atmospheric-shadow space-y-3 rounded-[2rem] bg-white p-6 print:break-inside-avoid print:rounded-none print:border print:border-outline-variant print:shadow-none">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="font-label-lg text-label-lg uppercase tracking-widest text-on-surface-variant">
+        <h3 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">
           Evolución
         </h3>
         <span
