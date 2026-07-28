@@ -99,16 +99,16 @@ export default function RestablecerPasswordPage() {
       <section className="flex w-full max-w-md flex-col px-margin-mobile">
         <div className="mb-12 flex flex-col items-center">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container">
-            <span className="font-headline-md font-bold text-white">P</span>
+            <span className="font-headline text-lg font-bold text-white">P</span>
           </div>
-          <h2 className="font-headline-md text-headline-md text-white">
+          <h2 className="font-headline text-2xl font-bold text-white">
             Nueva contraseña
           </h2>
         </div>
 
         {modoDemo ? (
           <div className="glass-card space-y-4 rounded-xl p-8 text-center">
-            <p className="text-body-sm text-white/60">
+            <p className="text-sm text-white/60">
               Prototipo Fase 0 -- sin cuentas reales todavía, no hay contraseña que restablecer.
             </p>
             <Link href="/login" className="font-bold text-tertiary-fixed-dim">
@@ -116,10 +116,10 @@ export default function RestablecerPasswordPage() {
             </Link>
           </div>
         ) : !listo ? (
-          <p className="text-center text-body-sm text-white/40">Verificando enlace...</p>
+          <p className="text-center text-sm text-white/40">Verificando enlace...</p>
         ) : exito ? (
           <div className="glass-card space-y-4 rounded-xl p-8 text-center">
-            <p className="text-body-sm text-white/70">
+            <p className="text-sm text-white/70">
               Tu contraseña se actualizó. Ya puedes iniciar sesión con la nueva.
             </p>
             <Link href="/login" className="font-bold text-tertiary-fixed-dim">
@@ -128,7 +128,7 @@ export default function RestablecerPasswordPage() {
           </div>
         ) : !sesionValida ? (
           <div className="glass-card space-y-4 rounded-xl p-8 text-center">
-            <p className="text-body-sm text-red-300">
+            <p className="text-sm text-red-300">
               Este enlace no es válido o ya expiró. Pide uno nuevo desde &quot;¿Olvidaste tu contraseña?&quot; en el login.
             </p>
             <Link href="/recuperar" className="font-bold text-tertiary-fixed-dim">
@@ -138,7 +138,7 @@ export default function RestablecerPasswordPage() {
         ) : (
           <form onSubmit={handleSubmit} className="glass-card space-y-6 rounded-xl p-8">
             <div className="space-y-2">
-              <label className="text-label-lg font-label-lg text-white/60">
+              <label className="font-label text-sm font-semibold text-white/60">
                 Contraseña nueva
               </label>
               <input
@@ -152,7 +152,7 @@ export default function RestablecerPasswordPage() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-label-lg font-label-lg text-white/60">
+              <label className="font-label text-sm font-semibold text-white/60">
                 Confirmar contraseña
               </label>
               <input
@@ -166,7 +166,7 @@ export default function RestablecerPasswordPage() {
               />
             </div>
             {error && (
-              <p className="text-body-sm rounded-lg bg-red-500/10 px-4 py-3 text-red-300">
+              <p className="text-sm rounded-lg bg-red-500/10 px-4 py-3 text-red-300">
                 {error}
               </p>
             )}
