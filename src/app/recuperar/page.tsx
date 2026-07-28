@@ -40,12 +40,12 @@ export default function RecuperarPage() {
       <section className="flex w-full max-w-md flex-col px-margin-mobile">
         <div className="mb-12 flex flex-col items-center">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container">
-            <span className="font-headline-md font-bold text-white">P</span>
+            <span className="font-headline text-lg font-bold text-white">P</span>
           </div>
-          <h2 className="font-headline-md text-headline-md text-white">
+          <h2 className="font-headline text-2xl font-bold text-white">
             Recuperar contraseña
           </h2>
-          <p className="mt-2 text-center text-body-sm text-white/40">
+          <p className="mt-2 text-center text-sm text-white/40">
             {usarSupabase
               ? "Escribe tu email y te enviamos un enlace para poner una contraseña nueva."
               : "Prototipo Fase 0 -- sin cuentas reales todavía, no hay contraseña que recuperar."}
@@ -54,7 +54,7 @@ export default function RecuperarPage() {
 
         {!usarSupabase ? (
           <div className="glass-card space-y-4 rounded-xl p-8 text-center">
-            <p className="text-body-sm text-white/60">
+            <p className="text-sm text-white/60">
               En este modo de demostración cualquier email / contraseña te deja entrar -- no hace falta recuperar nada.
             </p>
             <Link href="/login" className="font-bold text-tertiary-fixed-dim">
@@ -63,7 +63,7 @@ export default function RecuperarPage() {
           </div>
         ) : enviado ? (
           <div className="glass-card space-y-4 rounded-xl p-8 text-center">
-            <p className="text-body-sm text-white/70">
+            <p className="text-sm text-white/70">
               Si existe una cuenta con ese email, te llegará un correo con el enlace para poner una contraseña nueva. Revisa también spam.
             </p>
             <Link href="/login" className="font-bold text-tertiary-fixed-dim">
@@ -73,7 +73,7 @@ export default function RecuperarPage() {
         ) : (
           <form onSubmit={handleSubmit} className="glass-card space-y-6 rounded-xl p-8">
             <div className="space-y-2">
-              <label className="text-label-lg font-label-lg text-white/60">
+              <label className="font-label text-sm font-semibold text-white/60">
                 Email
               </label>
               <input
@@ -86,7 +86,7 @@ export default function RecuperarPage() {
               />
             </div>
             {error && (
-              <p className="text-body-sm rounded-lg bg-red-500/10 px-4 py-3 text-red-300">
+              <p className="text-sm rounded-lg bg-red-500/10 px-4 py-3 text-red-300">
                 {error}
               </p>
             )}
@@ -97,7 +97,7 @@ export default function RecuperarPage() {
             >
               {enviando ? "Enviando..." : "Enviar enlace de recuperación"} <Icon name="arrow_forward" className="text-[18px]" />
             </button>
-            <p className="text-center text-body-sm text-white/40">
+            <p className="text-center text-sm text-white/40">
               <Link href="/login" className="font-bold text-tertiary-fixed-dim">
                 Volver a iniciar sesión
               </Link>
