@@ -147,10 +147,10 @@ export default function BancoPromptsPage() {
       <BadgeUnlockToast badge={badgeGanado} onClose={() => setBadgeGanado(null)} />
       <div className="mx-auto max-w-5xl space-y-gap-lg">
         <div>
-          <h1 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-2">
+          <h1 className="font-headline text-3xl sm:text-4xl mb-2">
             Banco de Prompts
           </h1>
-          <p className="text-body-lg max-w-2xl text-on-surface-variant">
+          <p className="text-lg max-w-2xl text-on-surface-variant">
             Explora y utiliza prompts pedagógicos listos para copiar y pegar en tu
             asistente de IA favorito.
           </p>
@@ -176,7 +176,7 @@ export default function BancoPromptsPage() {
               <button
                 key={cat}
                 onClick={() => setCategoria(cat)}
-                className={`text-label-lg whitespace-nowrap rounded-full px-6 py-3 font-bold transition-all active:scale-95 ${
+                className={`whitespace-nowrap rounded-full px-6 py-3 text-sm font-bold transition-all active:scale-95 ${
                   categoria === cat
                     ? "bg-primary text-on-primary shadow-lg shadow-primary/10"
                     : "atmospheric-shadow bg-white text-on-surface-variant hover:bg-surface-container-low"
@@ -219,19 +219,19 @@ export default function BancoPromptsPage() {
                     <Icon name="bookmark" filled={guardado} />
                   </button>
                 </div>
-                <h3 className="font-headline-md mb-4 text-[20px] leading-tight">
+                <h3 className="font-headline text-lg font-bold mb-4 text-[20px] leading-tight">
                   {p.titulo}
                 </h3>
-                <p className="text-body-md mb-4 flex-grow text-on-surface-variant">
+                <p className="text-base mb-4 flex-grow text-on-surface-variant">
                   {p.paraQueSirve}
                 </p>
                 {expandido && (
-                  <p className="text-body-sm mb-2 select-all rounded-lg bg-surface-container-low p-3 font-mono text-on-surface">
+                  <p className="text-sm mb-2 select-all rounded-lg bg-surface-container-low p-3 font-mono text-on-surface">
                     {p.prompt}
                   </p>
                 )}
                 {conError && (
-                  <p className="text-body-sm mb-2 rounded-lg bg-error-container/20 p-3 text-error">
+                  <p className="text-sm mb-2 rounded-lg bg-error-container/20 p-3 text-error">
                     No pudimos copiar automáticamente en este navegador. Selecciona el
                     texto de arriba y cópialo con el gesto de copiar de tu teléfono o
                     computador.
