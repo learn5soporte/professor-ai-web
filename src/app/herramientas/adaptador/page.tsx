@@ -196,7 +196,7 @@ export default function AdaptadorContenidoPage() {
       <div className="mx-auto max-w-2xl">
         <Link
           href="/herramientas"
-          className="text-body-sm mb-4 inline-flex items-center gap-1 font-bold text-on-primary-fixed"
+          className="text-sm mb-4 inline-flex items-center gap-1 font-bold text-on-primary-fixed"
         >
           <Icon name="arrow_back" /> Herramientas
         </Link>
@@ -204,14 +204,14 @@ export default function AdaptadorContenidoPage() {
         <div className="rounded-[2.5rem] bg-surface-container-low p-8 md:p-12">
           <div className="space-y-gap-lg mx-auto max-w-2xl">
             <div className="text-center">
-              <h1 className="font-headline-lg text-headline-lg">Adaptador de Contenido</h1>
-              <p className="text-body-lg mt-2 text-on-surface-variant">
+              <h1 className="font-headline text-3xl font-black">Adaptador de Contenido</h1>
+              <p className="text-lg mt-2 text-on-surface-variant">
                 Pega tu contenido y obtén pasos concretos para adaptarlo a NEE, otro nivel de
                 lectura o nivel de idioma.
               </p>
             </div>
 
-            <div className="rounded-xl bg-tertiary-container/10 p-4 text-body-sm text-on-surface-variant">
+            <div className="rounded-xl bg-tertiary-container/10 p-4 text-sm text-on-surface-variant">
               <Icon name="info" className="mr-1 align-text-bottom text-[16px] text-tertiary" />
               Todavía no hay IA generativa conectada en esta versión, así que esta herramienta no
               reescribe tu texto palabra por palabra -- te da una guía real y accionable de cómo
@@ -220,7 +220,7 @@ export default function AdaptadorContenidoPage() {
 
             <div className="space-y-6">
               <div className="space-y-2">
-                <label className="text-label-lg ml-2 uppercase text-on-surface-variant">
+                <label className="text-xs font-bold ml-2 uppercase text-on-surface-variant">
                   Contenido original (pega o escribe el texto/actividad)
                 </label>
                 <textarea
@@ -228,7 +228,7 @@ export default function AdaptadorContenidoPage() {
                   onChange={(e) => setContenido(e.target.value)}
                   placeholder="Pega aquí el texto, actividad o guía que quieres adaptar..."
                   rows={6}
-                  className="text-body-sm w-full rounded-xl border-none bg-white p-4 shadow-sm outline-none transition-all focus:ring-2 focus:ring-secondary/20"
+                  className="text-sm w-full rounded-xl border-none bg-white p-4 shadow-sm outline-none transition-all focus:ring-2 focus:ring-secondary/20"
                 />
                 <p className="ml-2 text-[12px] text-on-surface-variant">
                   {palabras} palabras{palabras > 0 ? ` · ~${minutosLectura} min de lectura` : ""}
@@ -237,7 +237,7 @@ export default function AdaptadorContenidoPage() {
 
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-label-lg ml-2 uppercase text-on-surface-variant">
+                  <label className="text-xs font-bold ml-2 uppercase text-on-surface-variant">
                     Tipo de adaptación
                   </label>
                   <select
@@ -251,7 +251,7 @@ export default function AdaptadorContenidoPage() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-label-lg ml-2 uppercase text-on-surface-variant">
+                  <label className="text-xs font-bold ml-2 uppercase text-on-surface-variant">
                     Para
                   </label>
                   <select
@@ -290,7 +290,7 @@ export default function AdaptadorContenidoPage() {
             {estado === "listo" && (
               <div className="mt-12 space-y-6">
                 <div className="flex items-center justify-between px-4">
-                  <h4 className="font-headline-md">
+                  <h4 className="font-headline text-lg font-bold">
                     Guía para {subopcion.toLowerCase()}
                   </h4>
                   <div className="flex gap-2">
@@ -311,10 +311,10 @@ export default function AdaptadorContenidoPage() {
                   </div>
                 </div>
                 <div className="rounded-r-2xl border-l-4 border-secondary bg-secondary-fixed/20 p-6">
-                  <span className="text-label-lg font-black text-secondary">
+                  <span className="text-xs font-black text-secondary">
                     TU CONTENIDO
                   </span>
-                  <p className="text-body-md mt-2 text-on-surface-variant">
+                  <p className="text-base mt-2 text-on-surface-variant">
                     {palabras} palabras · ~{minutosLectura} min de lectura estimados
                   </p>
                 </div>
@@ -327,7 +327,7 @@ export default function AdaptadorContenidoPage() {
                       <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-secondary text-[12px] font-black text-on-secondary">
                         {i + 1}
                       </span>
-                      <p className="text-body-md">{e}</p>
+                      <p className="text-base">{e}</p>
                     </li>
                   ))}
                 </ol>
