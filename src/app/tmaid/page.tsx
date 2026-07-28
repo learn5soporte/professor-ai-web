@@ -127,14 +127,14 @@ export default function TmaidPage() {
             <div className="absolute inset-0 animate-pulse rounded-full bg-secondary-container/30 blur-xl" />
             <Icon name="psychology" filled className="text-[64px] text-tertiary-fixed-dim" />
           </div>
-          <h1 className="font-headline-lg mb-6 text-headline-lg-mobile text-white md:text-headline-lg">
+          <h1 className="font-headline mb-6 text-3xl font-black text-white sm:text-4xl">
             Tu Diagnóstico Docente IA
           </h1>
           <div className="mb-12 flex flex-wrap justify-center gap-3">
             {["CONOCIMIENTO", "HERRAMIENTAS", "INTEGRACIÓN", "ACTITUD"].map((d) => (
               <span
                 key={d}
-                className="text-label-lg font-label-lg rounded-full border border-white/10 bg-white/10 px-4 py-1.5 text-white"
+                className="font-label rounded-full border border-white/10 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-white"
               >
                 {d}
               </span>
@@ -142,7 +142,7 @@ export default function TmaidPage() {
           </div>
           <button
             onClick={siguiente}
-            className="group inline-flex items-center gap-4 rounded-full bg-secondary px-8 py-4 font-headline-md text-body-lg text-on-secondary transition-all hover:bg-secondary-container"
+            className="group inline-flex items-center gap-4 rounded-full bg-secondary px-8 py-4 font-headline text-lg font-bold text-on-secondary transition-all hover:bg-secondary-container"
           >
             Comenzar Diagnóstico
             <Icon name="arrow_forward" className="transition-transform group-hover:translate-x-1" />
@@ -168,8 +168,8 @@ export default function TmaidPage() {
           </div>
         </div>
         <div className="relative z-10 text-center">
-          <h3 className="font-headline-md mb-4 text-white">Procesando tu perfil...</h3>
-          <p className="font-body-md animate-pulse text-white/60">
+          <h3 className="font-headline mb-4 text-xl font-bold text-white">Procesando tu perfil...</h3>
+          <p className="animate-pulse text-base text-white/60">
             Nuestra IA está analizando tus respuestas para generar tu ruta personalizada.
           </p>
         </div>
@@ -184,7 +184,7 @@ export default function TmaidPage() {
         <BadgeUnlockToast badge={badgeGanado} onClose={() => setBadgeGanado(null)} />
         <HeaderProgreso dimensionLabel="Integración Curricular" paso={TOTAL_PASOS} total={TOTAL_PASOS} />
         <div className="mx-auto flex w-full max-w-3xl flex-col px-margin-mobile">
-          <h2 className="font-headline-md mb-8 text-headline-md text-primary">
+          <h2 className="font-headline mb-8 text-2xl font-bold text-primary">
             {PREGUNTA_ABIERTA.texto}
           </h2>
           <div className="relative">
@@ -193,9 +193,9 @@ export default function TmaidPage() {
               onChange={(e) => setMiedos(e.target.value.slice(0, 500))}
               maxLength={500}
               placeholder={PREGUNTA_ABIERTA.placeholder}
-              className="atmospheric-shadow h-64 w-full rounded-xl border-none bg-white/40 p-8 text-body-lg backdrop-blur-md transition-all placeholder:text-outline focus:bg-white/60 focus:ring-2 focus:ring-secondary/20"
+              className="atmospheric-shadow h-64 w-full rounded-xl border-none bg-white/40 p-8 text-lg backdrop-blur-md transition-all placeholder:text-outline focus:bg-white/60 focus:ring-2 focus:ring-secondary/20"
             />
-            <div className="font-label-lg absolute bottom-6 right-8 font-bold text-tertiary">
+            <div className="font-label absolute bottom-6 right-8 text-sm font-bold text-tertiary">
               {miedos.length} / 500
             </div>
           </div>
@@ -205,7 +205,7 @@ export default function TmaidPage() {
             </button>
             <button
               onClick={siguiente}
-              className="font-label-lg inline-flex items-center gap-4 rounded-full bg-primary px-10 py-4 text-on-primary transition-all hover:bg-on-primary-fixed-variant"
+              className="font-label inline-flex items-center gap-4 rounded-full bg-primary px-10 py-4 text-base font-bold text-on-primary transition-all hover:bg-on-primary-fixed-variant"
             >
               Finalizar Diagnóstico
               <Icon name="auto_awesome" />
@@ -231,7 +231,7 @@ export default function TmaidPage() {
             <Icon name="auto_stories" className="text-[14px]" /> Escenario
           </span>
         )}
-        <h2 className="font-headline-md mb-16 px-4 text-center text-headline-md text-primary">
+        <h2 className="font-headline mb-16 px-4 text-center text-2xl font-bold text-primary">
           {pregunta?.texto}
         </h2>
         <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-5">
@@ -245,7 +245,7 @@ export default function TmaidPage() {
                   selected ? "border-secondary bg-secondary-fixed" : "border-transparent bg-white hover:bg-secondary-fixed"
                 }`}
               >
-                <span className="font-body-sm text-on-surface-variant">{opcion.etiqueta}</span>
+                <span className="text-sm text-on-surface-variant">{opcion.etiqueta}</span>
                 <div
                   className={`flex h-12 w-12 items-center justify-center rounded-full border-2 ${
                     selected ? "border-secondary" : "border-outline-variant group-hover:border-secondary"
@@ -289,7 +289,7 @@ function HeaderProgreso({
 }) {
   return (
     <header className="glass-card fixed left-0 top-0 z-50 flex w-full flex-col gap-2 px-margin-mobile py-4">
-      <div className="font-label-lg text-label-lg flex items-center justify-between text-on-surface-variant">
+      <div className="font-label flex items-center justify-between text-xs font-bold text-on-surface-variant">
         <span>
           DIMENSIÓN:{" "}
           <span className="font-bold uppercase tracking-wider text-tertiary">
