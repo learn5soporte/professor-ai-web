@@ -61,12 +61,12 @@ export default function LoginPage() {
       <section className="flex w-full max-w-md flex-col px-margin-mobile">
         <div className="mb-12 flex flex-col items-center">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container">
-            <span className="font-headline-md font-bold text-white">P</span>
+            <span className="font-headline text-lg font-bold text-white">P</span>
           </div>
-          <h2 className="font-headline-md text-headline-md text-white">
+          <h2 className="font-headline text-2xl font-bold text-white">
             Iniciar Sesión
           </h2>
-          <p className="mt-2 text-center text-body-sm text-white/40">
+          <p className="mt-2 text-center text-sm text-white/40">
             {usarSupabase
               ? "Ingresa con el email y contraseña de tu cuenta."
               : "Prototipo Fase 0 -- sin cuenta real todavía. Cualquier email / contraseña te lleva al flujo completo."}
@@ -75,7 +75,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="glass-card space-y-6 rounded-xl p-8">
           <div className="space-y-2">
-            <label className="text-label-lg font-label-lg text-white/60">
+            <label className="font-label text-sm font-semibold text-white/60">
               Email
             </label>
             <input
@@ -88,7 +88,7 @@ export default function LoginPage() {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-label-lg font-label-lg text-white/60">
+            <label className="font-label text-sm font-semibold text-white/60">
               Contraseña
             </label>
             <input
@@ -100,7 +100,7 @@ export default function LoginPage() {
               className="w-full rounded-xl border-none bg-white/5 px-4 py-4 text-white placeholder:text-white/20 focus:ring-2 focus:ring-secondary-container"
             />
             {usarSupabase && (
-              <p className="text-right text-body-sm">
+              <p className="text-right text-sm">
                 <Link href="/recuperar" className="text-white/40 underline hover:text-white/70">
                   ¿Olvidaste tu contraseña?
                 </Link>
@@ -109,13 +109,13 @@ export default function LoginPage() {
           </div>
           {error && (
             <div className="space-y-2 rounded-lg bg-red-500/10 px-4 py-3">
-              <p className="text-body-sm text-red-300">{error}</p>
+              <p className="text-sm text-red-300">{error}</p>
               {requiereConfirmacion && (
                 <button
                   type="button"
                   onClick={reenviarCorreo}
                   disabled={reenviando || !email}
-                  className="text-body-sm font-bold text-tertiary-fixed-dim underline disabled:opacity-60"
+                  className="text-sm font-bold text-tertiary-fixed-dim underline disabled:opacity-60"
                 >
                   {reenviando ? "Reenviando..." : "Reenviar correo de confirmación"}
                 </button>
@@ -123,7 +123,7 @@ export default function LoginPage() {
             </div>
           )}
           {reenvioMensaje && (
-            <p className="text-body-sm rounded-lg bg-white/5 px-4 py-3 text-white/70">
+            <p className="text-sm rounded-lg bg-white/5 px-4 py-3 text-white/70">
               {reenvioMensaje}
             </p>
           )}
@@ -138,7 +138,7 @@ export default function LoginPage() {
             <>
               <div className="flex items-center gap-4 py-2">
                 <div className="h-px flex-1 bg-tertiary-fixed-dim/20" />
-                <span className="text-body-sm font-bold uppercase tracking-widest text-tertiary-fixed-dim">
+                <span className="text-sm font-bold uppercase tracking-widest text-tertiary-fixed-dim">
                   o
                 </span>
                 <div className="h-px flex-1 bg-tertiary-fixed-dim/20" />
@@ -149,7 +149,7 @@ export default function LoginPage() {
               </button>
             </>
           )}
-          <p className="text-center text-body-sm text-white/40">
+          <p className="text-center text-sm text-white/40">
             ¿No tienes cuenta?{" "}
             <Link href="/registro" className="font-bold text-tertiary-fixed-dim">
               Registrarse
