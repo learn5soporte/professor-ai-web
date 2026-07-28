@@ -98,7 +98,7 @@ export default function AnalisisDetalladoPage() {
       <div className="mx-auto max-w-5xl space-y-gap-xl">
         <Link
           href="/tmaid/resultado"
-          className="text-body-sm inline-flex items-center gap-1 font-bold text-on-primary-fixed"
+          className="text-sm inline-flex items-center gap-1 font-bold text-on-primary-fixed"
         >
           <Icon name="arrow_back" /> Volver a mi perfil
         </Link>
@@ -107,20 +107,20 @@ export default function AnalisisDetalladoPage() {
           <span className="gold-chip inline-block rounded-full px-4 py-1 text-xs font-bold uppercase">
             Diagnóstico TMAID
           </span>
-          <h1 className="font-headline-lg text-headline-lg mb-4 mt-4 text-primary">
+          <h1 className="font-headline mb-4 mt-4 text-3xl font-black text-primary sm:text-4xl">
             Análisis detallado
           </h1>
-          <p className="text-body-lg max-w-2xl leading-relaxed text-on-surface-variant">
+          <p className="text-lg max-w-2xl leading-relaxed text-on-surface-variant">
             {resultadoTmaid.perfilPedagogicoIA}
           </p>
         </section>
 
         <div className="grid grid-cols-1 gap-gap-xl md:grid-cols-12">
           <div className="atmospheric-shadow relative overflow-hidden rounded-xl bg-surface-container-lowest p-8 md:col-span-7 lg:col-span-8">
-            <h3 className="font-headline-md text-headline-md mb-1 text-primary">
+            <h3 className="font-headline text-xl font-bold mb-1 text-primary">
               Dimensiones IA
             </h3>
-            <p className="text-body-sm mb-8 text-on-surface-variant">
+            <p className="text-sm mb-8 text-on-surface-variant">
               Análisis comparativo de tus competencias digitales
             </p>
             <div className="flex flex-col items-center gap-12 lg:flex-row">
@@ -139,7 +139,7 @@ export default function AnalisisDetalladoPage() {
                   const pct = Math.round((dimensiones[d] / 5) * 100);
                   return (
                     <div key={d} className="space-y-2">
-                      <div className="text-label-lg flex justify-between">
+                      <div className="font-label flex justify-between text-sm">
                         <span className="flex items-center gap-2">
                           <Icon name={ICONO_DIMENSION[d]} className="text-outline-variant" />
                           {ETIQUETA_DIMENSION[d]}
@@ -163,22 +163,22 @@ export default function AnalisisDetalladoPage() {
             <div className="atmospheric-shadow flex flex-1 flex-col justify-between rounded-xl bg-primary-container p-8 text-on-primary-container">
               <div>
                 <Icon name="star" filled className="mb-4 text-4xl" />
-                <h4 className="font-headline-md text-headline-md mb-2">Fortaleza principal</h4>
-                <p className="text-body-md opacity-80">{ETIQUETA_DIMENSION[masFuerte]}</p>
+                <h4 className="font-headline text-xl font-bold mb-2">Fortaleza principal</h4>
+                <p className="text-base opacity-80">{ETIQUETA_DIMENSION[masFuerte]}</p>
               </div>
-              <p className="text-body-sm mt-6 border-t border-white/10 pt-6 italic">
+              <p className="text-sm mt-6 border-t border-white/10 pt-6 italic">
                 Es tu dimensión más sólida hoy -- apóyate en ella al probar cosas nuevas.
               </p>
             </div>
             <div className="atmospheric-shadow flex flex-1 flex-col justify-between rounded-xl bg-secondary-container p-8 text-on-secondary-container">
               <div>
                 <Icon name="psychology" className="mb-4 text-4xl" />
-                <h4 className="font-headline-md text-headline-md mb-2">Área de crecimiento</h4>
-                <p className="text-body-md opacity-80">{ETIQUETA_DIMENSION[masDebil]}</p>
+                <h4 className="font-headline text-xl font-bold mb-2">Área de crecimiento</h4>
+                <p className="text-base opacity-80">{ETIQUETA_DIMENSION[masDebil]}</p>
               </div>
               <Link
                 href="/rutas"
-                className="text-label-lg mt-6 inline-flex items-center gap-2 font-bold hover:underline"
+                className="font-label mt-6 inline-flex items-center gap-2 text-sm font-bold hover:underline"
               >
                 Ver ruta recomendada <Icon name="arrow_forward" className="text-sm" />
               </Link>
@@ -186,7 +186,7 @@ export default function AnalisisDetalladoPage() {
           </div>
 
           <div className="md:col-span-12">
-            <h3 className="font-headline-md text-headline-md mb-8 text-primary">
+            <h3 className="font-headline text-xl font-bold mb-8 text-primary">
               Plan de acción recomendado
             </h3>
             <div className="grid grid-cols-1 gap-gap-lg md:grid-cols-3">
@@ -208,15 +208,15 @@ export default function AnalisisDetalladoPage() {
                     >
                       <Icon name={completado ? "check" : colores.icono} />
                     </div>
-                    <h5 className="font-headline-md mb-4 text-[20px] text-primary">
+                    <h5 className="font-headline mb-4 text-[20px] text-primary">
                       {f.fase}
                     </h5>
-                    <p className="text-body-md mb-6 text-on-surface-variant">
+                    <p className="text-base mb-6 text-on-surface-variant">
                       {f.descripcion}
                     </p>
                     <Link
                       href={completado ? "/rutas" : "/rutas/reto"}
-                      className="text-label-lg block w-full rounded-full bg-primary py-3 text-center font-bold text-on-primary transition-colors hover:bg-secondary"
+                      className="font-label block w-full rounded-full bg-primary py-3 text-center text-sm font-bold text-on-primary transition-colors hover:bg-secondary"
                     >
                       {completado ? "Completado" : "Empezar ahora"}
                     </Link>
@@ -230,13 +230,13 @@ export default function AnalisisDetalladoPage() {
         <div className="atmospheric-shadow relative flex flex-col items-start gap-6 overflow-hidden rounded-2xl bg-primary-container p-12 text-on-primary-container md:flex-row md:items-center md:justify-between">
           <div className="max-w-md">
             <h3 className="mb-4 text-[28px] font-bold">Tu afinidad actual con IA</h3>
-            <p className="text-body-lg mb-6 opacity-90">
+            <p className="text-lg mb-6 opacity-90">
               Hoy tu puntaje promedio equivale a un {afinidadIA}% de afinidad con el uso
               pedagógico de IA. Sigue tu ruta formativa para seguir subiéndolo.
             </p>
             <button
               onClick={descargarResumen}
-              className="text-label-lg flex items-center gap-2 rounded-full bg-secondary-container px-8 py-3 font-bold text-on-secondary-container transition-all hover:opacity-90"
+              className="font-label flex items-center gap-2 rounded-full bg-secondary-container px-8 py-3 text-sm font-bold text-on-secondary-container transition-all hover:opacity-90"
             >
               Descargar resumen (.txt) <Icon name="download" />
             </button>
