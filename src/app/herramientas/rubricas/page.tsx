@@ -231,14 +231,14 @@ export default function CreadorRubricasPage() {
           <div className="flex-1">
             <div className="mb-4 flex items-center gap-md text-secondary">
               <Icon name="auto_awesome" />
-              <span className="text-label-lg font-label-lg uppercase tracking-widest">
+              <span className="font-label text-xs font-bold uppercase tracking-widest">
                 Creador de Rúbricas Inteligente
               </span>
             </div>
-            <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-2 text-primary">
+            <h2 className="font-headline text-3xl sm:text-4xl mb-2 text-primary">
               {paso === 1 ? "Configuración Inicial" : paso === 2 ? "Criterios de Evaluación" : "Tu Rúbrica"}
             </h2>
-            <p className="text-body-lg max-w-2xl text-on-surface-variant">
+            <p className="text-lg max-w-2xl text-on-surface-variant">
               {paso === 1
                 ? "Define los parámetros básicos de tu actividad para generar una propuesta de evaluación alineada con tus objetivos pedagógicos."
                 : paso === 2
@@ -260,7 +260,7 @@ export default function CreadorRubricasPage() {
                   >
                     {paso > n ? <Icon name="check" className="text-[16px]" /> : n}
                   </div>
-                  <span className="text-label-lg font-label-lg text-primary">
+                  <span className="font-label text-xs font-bold text-primary">
                     {n === 1 ? "Configuración" : n === 2 ? "Criterios" : "Generación"}
                   </span>
                 </div>
@@ -278,17 +278,17 @@ export default function CreadorRubricasPage() {
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
                     <Icon name="edit_note" />
                   </div>
-                  <h3 className="font-headline-md text-headline-md">Detalles de la Actividad</h3>
+                  <h3 className="font-headline text-xl font-bold">Detalles de la Actividad</h3>
                 </div>
                 <div className="grid grid-cols-1 gap-gap-lg md:grid-cols-2">
                   <div className="flex flex-col gap-2">
-                    <label className="text-label-lg font-label-lg text-on-surface-variant">
+                    <label className="font-label text-xs font-bold text-on-surface-variant">
                       Tipo de Actividad
                     </label>
                     <select
                       value={tipoActividad}
                       onChange={(e) => setTipoActividad(e.target.value)}
-                      className="h-14 w-full cursor-pointer appearance-none rounded-xl border-none bg-surface-container-low px-4 font-body-md transition-all focus:ring-2 focus:ring-secondary/20"
+                      className="h-14 w-full cursor-pointer appearance-none rounded-xl border-none bg-surface-container-low px-4 text-sm transition-all focus:ring-2 focus:ring-secondary/20"
                     >
                       {TIPOS_ACTIVIDAD.map((t) => (
                         <option key={t}>{t}</option>
@@ -296,13 +296,13 @@ export default function CreadorRubricasPage() {
                     </select>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-label-lg font-label-lg text-on-surface-variant">
+                    <label className="font-label text-xs font-bold text-on-surface-variant">
                       Nivel Académico
                     </label>
                     <select
                       value={nivelAcademico}
                       onChange={(e) => setNivelAcademico(e.target.value)}
-                      className="h-14 w-full cursor-pointer appearance-none rounded-xl border-none bg-surface-container-low px-4 font-body-md transition-all focus:ring-2 focus:ring-secondary/20"
+                      className="h-14 w-full cursor-pointer appearance-none rounded-xl border-none bg-surface-container-low px-4 text-sm transition-all focus:ring-2 focus:ring-secondary/20"
                     >
                       {NIVELES_ACADEMICOS.map((n) => (
                         <option key={n}>{n}</option>
@@ -310,14 +310,14 @@ export default function CreadorRubricasPage() {
                     </select>
                   </div>
                   <div className="flex flex-col gap-2 md:col-span-2">
-                    <label className="text-label-lg font-label-lg text-on-surface-variant">
+                    <label className="font-label text-xs font-bold text-on-surface-variant">
                       Descripción Breve (Opcional)
                     </label>
                     <textarea
                       value={descripcion}
                       onChange={(e) => setDescripcion(e.target.value)}
                       placeholder="Describe el contexto o los objetivos específicos..."
-                      className="min-h-[120px] w-full resize-none rounded-xl border-none bg-surface-container-low p-4 font-body-md transition-all focus:ring-2 focus:ring-secondary/20"
+                      className="min-h-[120px] w-full resize-none rounded-xl border-none bg-surface-container-low p-4 text-sm transition-all focus:ring-2 focus:ring-secondary/20"
                     />
                   </div>
                 </div>
@@ -328,15 +328,15 @@ export default function CreadorRubricasPage() {
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-tertiary-container/20 text-tertiary">
                     <Icon name="analytics" />
                   </div>
-                  <h3 className="font-headline-md text-headline-md">Escala y Estilo</h3>
+                  <h3 className="font-headline text-xl font-bold">Escala y Estilo</h3>
                 </div>
                 <div className="flex flex-col gap-gap-lg">
                   <div className="flex flex-col gap-4 rounded-xl bg-surface-container-low p-4 md:flex-row md:items-center md:justify-between">
                     <div>
-                      <h4 className="text-label-lg font-label-lg text-primary">
+                      <h4 className="font-label text-xs font-bold text-primary">
                         Número de Niveles de Desempeño
                       </h4>
-                      <p className="text-body-sm text-on-surface-variant">
+                      <p className="text-sm text-on-surface-variant">
                         Define cuántas columnas tendrá tu rúbrica.
                       </p>
                     </div>
@@ -345,7 +345,7 @@ export default function CreadorRubricasPage() {
                         <button
                           key={n}
                           onClick={() => setNiveles(n)}
-                          className={`text-label-lg font-label-lg rounded-full px-6 py-2 transition-all ${
+                          className={`font-label text-xs font-bold rounded-full px-6 py-2 transition-all ${
                             niveles === n
                               ? "bg-primary-container text-on-primary-container"
                               : "text-on-surface-variant hover:bg-surface-container-high"
@@ -358,13 +358,13 @@ export default function CreadorRubricasPage() {
                   </div>
                   <div className="grid grid-cols-1 gap-gap-lg md:grid-cols-2">
                     <div className="flex flex-col gap-2">
-                      <label className="text-label-lg font-label-lg text-on-surface-variant">
+                      <label className="font-label text-xs font-bold text-on-surface-variant">
                         Tono de Retroalimentación
                       </label>
                       <select
                         value={tono}
                         onChange={(e) => setTono(e.target.value)}
-                        className="h-14 w-full cursor-pointer rounded-xl border-none bg-surface-container-low px-4 font-body-md transition-all focus:ring-2 focus:ring-secondary/20"
+                        className="h-14 w-full cursor-pointer rounded-xl border-none bg-surface-container-low px-4 text-sm transition-all focus:ring-2 focus:ring-secondary/20"
                       >
                         {TONOS.map((t) => (
                           <option key={t}>{t}</option>
@@ -372,13 +372,13 @@ export default function CreadorRubricasPage() {
                       </select>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label className="text-label-lg font-label-lg text-on-surface-variant">
+                      <label className="font-label text-xs font-bold text-on-surface-variant">
                         Idioma de Salida
                       </label>
                       <select
                         value={idioma}
                         onChange={(e) => setIdioma(e.target.value)}
-                        className="h-14 w-full cursor-pointer rounded-xl border-none bg-surface-container-low px-4 font-body-md transition-all focus:ring-2 focus:ring-secondary/20"
+                        className="h-14 w-full cursor-pointer rounded-xl border-none bg-surface-container-low px-4 text-sm transition-all focus:ring-2 focus:ring-secondary/20"
                       >
                         {IDIOMAS.map((i) => (
                           <option key={i}>{i}</option>
@@ -396,20 +396,20 @@ export default function CreadorRubricasPage() {
                 <div className="relative z-10">
                   <div className="mb-6 flex items-center gap-2">
                     <Icon name="tips_and_updates" filled className="text-secondary-fixed" />
-                    <span className="text-label-lg font-label-lg uppercase text-secondary-fixed">
+                    <span className="font-label text-xs font-bold uppercase text-secondary-fixed">
                       IA Sugiere
                     </span>
                   </div>
-                  <p className="text-body-md mb-6 leading-relaxed">{sugerenciaIA}</p>
+                  <p className="text-base mb-6 leading-relaxed">{sugerenciaIA}</p>
                 </div>
               </div>
 
               <div className="flex min-h-[220px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-outline-variant/30 bg-surface-container-highest/30 p-8 text-center">
                 <Icon name="dashboard_customize" className="mb-4 text-[56px] text-outline-variant" />
-                <h4 className="font-headline-md text-headline-md text-on-surface-variant/60">
+                <h4 className="font-headline text-xl font-bold text-on-surface-variant/60">
                   Vista Previa
                 </h4>
-                <p className="text-body-sm mt-2 max-w-[220px] text-on-surface-variant/50">
+                <p className="text-sm mt-2 max-w-[220px] text-on-surface-variant/50">
                   {niveles} niveles de desempeño · {tono.toLowerCase()} · {idioma}
                 </p>
               </div>
@@ -420,7 +420,7 @@ export default function CreadorRubricasPage() {
         {paso === 2 && (
           <div className="atmospheric-shadow space-y-gap-lg rounded-xl bg-surface-container-lowest p-8">
             <div className="flex items-center justify-between">
-              <p className="text-body-sm text-on-surface-variant">
+              <p className="text-sm text-on-surface-variant">
                 Suma de pesos:{" "}
                 <span className={pesoTotal === 100 ? "font-bold text-secondary" : "font-bold text-error"}>
                   {pesoTotal}%
@@ -433,7 +433,7 @@ export default function CreadorRubricasPage() {
                   key={i}
                   className="flex flex-col gap-3 rounded-xl bg-surface-container-low p-4 md:flex-row md:items-center md:justify-between"
                 >
-                  <span className="font-label-lg text-label-lg text-primary">{c.nombre}</span>
+                  <span className="font-label text-xs font-bold text-primary">{c.nombre}</span>
                   <div className="flex items-center gap-3">
                     <input
                       type="number"
@@ -441,9 +441,9 @@ export default function CreadorRubricasPage() {
                       min={0}
                       max={100}
                       onChange={(e) => actualizarPeso(i, Number(e.target.value))}
-                      className="h-10 w-20 rounded-lg border-none bg-white px-3 text-center font-body-md focus:ring-2 focus:ring-secondary/20"
+                      className="h-10 w-20 rounded-lg border-none bg-white px-3 text-center text-sm focus:ring-2 focus:ring-secondary/20"
                     />
-                    <span className="text-body-sm text-on-surface-variant">%</span>
+                    <span className="text-sm text-on-surface-variant">%</span>
                     <button
                       onClick={() => quitarCriterio(i)}
                       className="flex h-9 w-9 items-center justify-center rounded-full text-outline transition-colors hover:bg-error-container hover:text-error"
@@ -460,11 +460,11 @@ export default function CreadorRubricasPage() {
                 value={nuevoCriterio}
                 onChange={(e) => setNuevoCriterio(e.target.value)}
                 placeholder="Agregar otro criterio (ej. Creatividad)"
-                className="h-12 flex-1 rounded-xl border-none bg-surface-container-low px-4 font-body-md focus:ring-2 focus:ring-secondary/20"
+                className="h-12 flex-1 rounded-xl border-none bg-surface-container-low px-4 text-sm focus:ring-2 focus:ring-secondary/20"
               />
               <button
                 onClick={agregarCriterio}
-                className="text-label-lg flex items-center justify-center gap-2 rounded-full bg-secondary-fixed px-6 py-3 font-bold text-on-secondary-fixed transition-all hover:opacity-90"
+                className="flex items-center justify-center gap-2 rounded-full bg-secondary-fixed px-6 py-3 text-sm font-bold text-on-secondary-fixed transition-all hover:opacity-90"
               >
                 <Icon name="add" className="text-[18px]" /> Agregar
               </button>
@@ -477,7 +477,7 @@ export default function CreadorRubricasPage() {
             {generando ? (
               <div className="atmospheric-shadow flex flex-col items-center justify-center gap-4 rounded-xl bg-surface-container-lowest p-16 text-center">
                 <Icon name="autorenew" className="animate-spin text-[48px] text-secondary" />
-                <p className="font-body-lg text-body-lg text-on-surface-variant">
+                <p className="text-lg text-on-surface-variant">
                   Generando tu rúbrica de {tipoActividad.toLowerCase()}...
                 </p>
               </div>
@@ -500,13 +500,13 @@ export default function CreadorRubricasPage() {
                   <table className="w-full min-w-[640px] border-separate border-spacing-2">
                     <thead>
                       <tr>
-                        <th className="text-label-lg font-label-lg p-3 text-left text-on-surface-variant">
+                        <th className="font-label text-xs font-bold p-3 text-left text-on-surface-variant">
                           Criterio
                         </th>
                         {etiquetasNivel.map((e) => (
                           <th
                             key={e}
-                            className="text-label-lg font-label-lg rounded-lg bg-primary-container p-3 text-left text-on-primary-container"
+                            className="font-label text-xs font-bold rounded-lg bg-primary-container p-3 text-left text-on-primary-container"
                           >
                             {e}
                           </th>
@@ -516,7 +516,7 @@ export default function CreadorRubricasPage() {
                     <tbody>
                       {criterios.map((c) => (
                         <tr key={c.nombre}>
-                          <td className="font-label-lg text-label-lg rounded-lg bg-surface-container-low p-3 align-top text-primary">
+                          <td className="font-label text-xs font-bold rounded-lg bg-surface-container-low p-3 align-top text-primary">
                             {c.nombre}
                             <div className="mt-1 text-[11px] font-bold uppercase text-secondary">
                               peso {c.peso}%
@@ -525,7 +525,7 @@ export default function CreadorRubricasPage() {
                           {etiquetasNivel.map((e) => (
                             <td
                               key={e}
-                              className="text-body-sm rounded-lg bg-white p-3 align-top text-on-surface-variant"
+                              className="text-sm rounded-lg bg-white p-3 align-top text-on-surface-variant"
                             >
                               {descriptorCelda(c.nombre, e)}
                             </td>
@@ -539,13 +539,13 @@ export default function CreadorRubricasPage() {
                 <div className="flex flex-wrap gap-4">
                   <button
                     onClick={descargarRubrica}
-                    className="text-label-lg flex items-center gap-2 rounded-full bg-primary px-8 py-4 font-bold text-on-primary transition-all hover:opacity-90 active:scale-95"
+                    className="flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-bold text-on-primary transition-all hover:opacity-90 active:scale-95"
                   >
                     <Icon name="download" /> Descargar rúbrica (.txt)
                   </button>
                   <button
                     onClick={nuevaRubrica}
-                    className="text-label-lg rounded-full bg-surface-container-low px-8 py-4 font-bold text-on-surface-variant transition-all hover:bg-surface-container-high"
+                    className="rounded-full bg-surface-container-low px-8 py-4 text-base font-bold text-on-surface-variant transition-all hover:bg-surface-container-high"
                   >
                     Crear otra rúbrica
                   </button>
@@ -563,7 +563,7 @@ export default function CreadorRubricasPage() {
             className="group flex items-center gap-2 text-on-surface-variant transition-colors hover:text-primary"
           >
             <Icon name="arrow_back" className="transition-transform group-hover:-translate-x-1" />
-            <span className="text-label-lg font-label-lg">Volver a Herramientas</span>
+            <span className="font-label text-xs font-bold">Volver a Herramientas</span>
           </Link>
         ) : (
           <button
@@ -571,24 +571,24 @@ export default function CreadorRubricasPage() {
             className="group flex items-center gap-2 text-on-surface-variant transition-colors hover:text-primary"
           >
             <Icon name="arrow_back" className="transition-transform group-hover:-translate-x-1" />
-            <span className="text-label-lg font-label-lg">Atrás</span>
+            <span className="font-label text-xs font-bold">Atrás</span>
           </button>
         )}
         <div className="flex items-center gap-lg">
           {mensajeBorrador && (
-            <span className="text-body-sm hidden text-secondary md:inline">{mensajeBorrador}</span>
+            <span className="text-sm hidden text-secondary md:inline">{mensajeBorrador}</span>
           )}
           {paso === 1 && (
             <>
               <button
                 onClick={guardarBorrador}
-                className="text-label-lg hidden rounded-full px-8 py-3 font-bold text-on-surface-variant transition-all hover:bg-surface-container-low md:block"
+                className="hidden rounded-full px-8 py-3 text-sm font-bold text-on-surface-variant transition-all hover:bg-surface-container-low md:block"
               >
                 Guardar Borrador
               </button>
               <button
                 onClick={irACriterios}
-                className="text-label-lg flex items-center gap-2 rounded-full bg-primary px-10 py-4 font-bold text-on-primary transition-all hover:opacity-90"
+                className="flex items-center gap-2 rounded-full bg-primary px-10 py-4 text-base font-bold text-on-primary transition-all hover:opacity-90"
               >
                 <span>Continuar a Criterios</span>
                 <Icon name="arrow_forward" className="text-[16px]" />
@@ -599,7 +599,7 @@ export default function CreadorRubricasPage() {
             <button
               onClick={irAGeneracion}
               disabled={criterios.length === 0}
-              className="text-label-lg flex items-center gap-2 rounded-full bg-primary px-10 py-4 font-bold text-on-primary transition-all hover:opacity-90 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-full bg-primary px-10 py-4 text-base font-bold text-on-primary transition-all hover:opacity-90 disabled:opacity-50"
             >
               <span>Continuar a Generación</span>
               <Icon name="arrow_forward" className="text-[16px]" />
