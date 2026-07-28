@@ -63,10 +63,10 @@ export default function RegistroPage() {
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container">
               <Icon name="mail" className="text-[28px] text-white" />
             </div>
-            <h2 className="font-headline-md text-headline-md text-white">
+            <h2 className="font-headline text-2xl font-bold text-white">
               Confirma tu correo
             </h2>
-            <p className="mt-3 text-body-md text-white/60">
+            <p className="mt-3 text-base text-white/60">
               Creamos tu cuenta. Revisa tu bandeja de entrada (o la carpeta de spam) en{" "}
               <span className="font-bold text-white">{email}</span> y haz clic en el enlace de
               confirmación antes de iniciar sesión.
@@ -85,13 +85,13 @@ export default function RegistroPage() {
       <section className="flex w-full max-w-md flex-col px-margin-mobile">
         <div className="mb-8 flex flex-col items-center">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container">
-            <span className="font-headline-md font-bold text-white">P</span>
+            <span className="font-headline text-lg font-bold text-white">P</span>
           </div>
-          <h2 className="font-headline-md text-headline-md text-white">
+          <h2 className="font-headline text-2xl font-bold text-white">
             Crea tu cuenta
           </h2>
           {usarSupabase && (
-            <p className="mt-2 text-center text-body-sm text-white/40">
+            <p className="mt-2 text-center text-sm text-white/40">
               Usa un email y contraseña reales -- vas a necesitarlos para volver a entrar.
             </p>
           )}
@@ -99,7 +99,7 @@ export default function RegistroPage() {
 
         <form onSubmit={handleSubmit} className="glass-card space-y-5 rounded-xl p-8">
           <div className="space-y-2">
-            <label className="text-label-lg font-label-lg text-white/60">
+            <label className="font-label text-sm font-semibold text-white/60">
               Nombre completo
             </label>
             <input
@@ -112,7 +112,7 @@ export default function RegistroPage() {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-label-lg font-label-lg text-white/60">
+            <label className="font-label text-sm font-semibold text-white/60">
               Email
             </label>
             <input
@@ -125,7 +125,7 @@ export default function RegistroPage() {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-label-lg font-label-lg text-white/60">
+            <label className="font-label text-sm font-semibold text-white/60">
               Contraseña
             </label>
             <input
@@ -146,15 +146,15 @@ export default function RegistroPage() {
               onChange={(e) => setAceptaTerminos(e.target.checked)}
               className="h-5 w-5 rounded border-white/20 bg-transparent text-tertiary focus:ring-0"
             />
-            <span className="text-body-sm text-white/60 transition-colors group-hover:text-white">
+            <span className="text-sm text-white/60 transition-colors group-hover:text-white">
               Acepto los términos y condiciones
             </span>
           </label>
           {error && (
             <div className="space-y-2 rounded-lg bg-red-500/10 px-4 py-3">
-              <p className="text-body-sm text-red-300">{error}</p>
+              <p className="text-sm text-red-300">{error}</p>
               {yaExiste && (
-                <Link href="/login" className="text-body-sm font-bold text-tertiary-fixed-dim underline">
+                <Link href="/login" className="text-sm font-bold text-tertiary-fixed-dim underline">
                   Ir a iniciar sesión
                 </Link>
               )}
