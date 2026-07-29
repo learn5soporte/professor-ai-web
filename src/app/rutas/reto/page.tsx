@@ -148,6 +148,34 @@ const REFLEXION_POR_FASE: Record<string, string> = {
     "¿Qué uso de IA en tu materia todavía te parece arriesgado o poco probado? ¿Qué necesitarías ver para confiar en él?",
 };
 
+/**
+ * Ejemplo de prompt concreto y listo para adaptar, por fase -- pedido
+ * explícito del usuario (2026-07-28): "crea un prompt y no sé" -- sin un
+ * punto de partida concreto, el área de trabajo era una caja en blanco
+ * con el mismo placeholder genérico ("Escribe tu prompt aquí...") en
+ * cualquier fase, lo que hacía que la actividad se sintiera igual módulo
+ * tras módulo aunque la teoría/reflexión/recursos sí variaran. Cada
+ * ejemplo usa la materia real del docente y es específico del objetivo
+ * de esa fase (no intercambiable con otra), y se puede insertar con un
+ * click ("Usar este ejemplo") en vez de forzar a escribir desde cero.
+ */
+const EJEMPLO_PROMPT_POR_FASE: Record<string, (materia: string) => string> = {
+  Fundamentos: (materia) =>
+    `Actúa como un asistente educativo. Explícame en lenguaje simple qué es un modelo de lenguaje como tú, y dame un ejemplo de un error ("alucinación") que podrías cometer si te pregunto algo sobre ${materia}.`,
+  Explorar: (materia) =>
+    `Actúa como un especialista en ${materia}. Dame 3 ideas breves para explicar el tema de mi próxima clase a mis estudiantes, en un tono cercano y con un ejemplo cotidiano en cada una.`,
+  Aplicar: (materia) =>
+    `Actúa como un psicopedagogo especializado en ${materia}. Adapta el siguiente texto para un estudiante con [describe la necesidad -- ej. dificultad de lectura]: "[pega aquí tu texto]". Usa lenguaje simple y formato de lista corta.`,
+  Integrar: (materia) =>
+    `Actúa como mi asistente de planeación semanal para ${materia}. Con estos 3 temas de la semana: [tema 1, tema 2, tema 3], dame un borrador corto de actividad para cada uno.`,
+  Evaluar: (materia) =>
+    `Actúa como un especialista en evaluación educativa. Dame primero una rúbrica de 4 criterios para calificar un trabajo de ${materia} sobre [tema], y en un segundo momento úsala para dar retroalimentación a este trabajo: "[pega aquí el trabajo]".`,
+  Liderar: (materia) =>
+    `Ayúdame a explicarle a un/a colega de ${materia} que nunca usó IA cómo escribir su primer prompt, paso a paso y con un ejemplo simple, sin jerga técnica.`,
+  Innovar: (materia) =>
+    `Actúa como diseñador de evaluaciones para ${materia}. Genera un caso o escenario poco común (no un examen tradicional) donde un estudiante tenga que aplicar lo aprendido, con 2 variantes del mismo caso.`,
+};
+
 /** XP que se otorga (una sola vez por actividad) al completar la reflexión o marcar un recurso como hecho. */
 const XP_ACTIVIDAD_CHICA = 5;
 
@@ -223,6 +251,9 @@ export default function RetoPage() {
   const badge = badgeId ? BADGES[badgeId] : null;
   const xpDisponible = badge?.puntos ?? 10;
   const feedbackIA = generarFeedbackIA(prompt, faseActual.fase, teoria.tips);
+  const promptEjemplo = (
+    EJEMPLO_PROMPT_POR_FASE[faseActual.fase] ?? EJEMPLO_PROMPT_POR_FASE.Explorar
+  )(perfil.materia);
 
   const preguntaReflexion = REFLEXION_POR_FASE[faseActual.fase];
   const claveReflexion = `${faseActual.fase}::reflexion`;
@@ -504,6 +535,21 @@ export default function RetoPage() {
             <div className="flex items-center justify-between">
               <span className="font-bold text-secondary">Actividad 1 · Área de Trabajo</span>
             </div>
+            {estado === "editando" && !prompt.trim() && (
+              <div className="rounded-xl bg-tertiary-fixed/40 p-4">
+                <p className="text-xs mb-2 font-bold uppercase tracking-widest text-on-tertiary-fixed">
+                  💡 ¿No sabes por dónde empezar? Un ejemplo para esta fase:
+                </p>
+                <p className="text-sm mb-3 italic text-on-tertiary-fixed">{promptEjemplo}</p>
+                <button
+                  type="button"
+                  onClick={() => setPrompt(promptEjemplo)}
+                  className="text-xs font-bold uppercase tracking-widest text-secondary underline"
+                >
+                  Usar este ejemplo
+                </button>
+              </div>
+            )}
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
