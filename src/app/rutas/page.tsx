@@ -132,7 +132,7 @@ export default function RutasPage() {
                         />
                       </div>
                       <button
-                        onClick={() => router.push("/rutas/reto")}
+                        onClick={() => router.push(`/rutas/modulo/${f.fase.toLowerCase()}`)}
                         className="w-full rounded-full bg-secondary py-3 font-bold text-on-secondary transition-shadow hover:shadow-lg"
                       >
                         VER RETOS
