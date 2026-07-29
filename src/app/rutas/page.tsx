@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, perfilCompleto } from "@/lib/store/session";
 import { AppShell } from "@/components/AppShell";
@@ -35,6 +35,19 @@ export default function RutasPage() {
   } = useSession();
   const [faseSeleccionada, setFaseSeleccionada] = useState<string | null>(null);
   const [badgeGanado] = useState<null | (typeof BADGES)[string]>(null);
+  // Bug real reportado por el usuario (2026-07-28): el selector de fase de
+  // arriba solo cambiaba el resaltado del boton, sin afectar en nada al
+  // roadmap de abajo -- seleccionar "Evaluar" seguia mostrando la tarjeta
+  // expandida de "Integrar" (la fase activa real), lo cual confundia. El
+  // roadmap sigue reflejando el progreso REAL (no se puede "adelantar"
+  // fases bloqueadas), pero ahora el selector al menos desplaza la vista
+  // hasta el nodo de la fase elegida y lo resalta, en vez de no hacer nada.
+  const nodeRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  function seleccionarFase(fase: string) {
+    setFaseSeleccionada(fase);
+    nodeRefs.current[fase]?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
 
   useEffect(() => {
     if (cargando) return;
@@ -86,7 +99,7 @@ export default function RutasPage() {
             {fases.map((f) => (
               <button
                 key={f.fase}
-                onClick={() => setFaseSeleccionada(f.fase)}
+                onClick={() => seleccionarFase(f.fase)}
                 className={`whitespace-nowrap rounded-full px-4 py-2 font-bold uppercase transition-all sm:px-8 ${
                   (faseSeleccionada ?? fases[Math.max(indiceActivo, 0)]?.fase) === f.fase
                     ? "bg-white text-secondary shadow-sm"
@@ -114,11 +127,21 @@ export default function RutasPage() {
               const estado = estadoDe(i);
               if (estado === "activo") {
                 return (
-                  <div key={f.fase} className="relative flex flex-col items-center">
+                  <div
+                    key={f.fase}
+                    ref={(el) => {
+                      nodeRefs.current[f.fase] = el;
+                    }}
+                    className="relative flex flex-col items-center scroll-mt-24"
+                  >
                     <div className="glow-node relative z-10 flex h-16 w-16 animate-pulse-subtle items-center justify-center rounded-full border-4 border-white bg-secondary">
                       <Icon name={ICONO_NODO[estado]} className="text-3xl text-white" />
                     </div>
-                    <div className="atmospheric-shadow mt-4 w-full max-w-xs rounded-xl border-2 border-secondary/20 bg-white p-6 text-center">
+                    <div
+                      className={`atmospheric-shadow mt-4 w-full max-w-xs rounded-xl border-2 bg-white p-6 text-center transition-all ${
+                        faseSeleccionada === f.fase ? "border-secondary ring-4 ring-secondary/20" : "border-secondary/20"
+                      }`}
+                    >
                       <h4 className="font-headline text-xl font-bold text-secondary">
                         Fase: {f.fase}
                       </h4>
@@ -144,14 +167,17 @@ export default function RutasPage() {
               return (
                 <div
                   key={f.fase}
-                  className={`relative flex items-center justify-center ${
+                  ref={(el) => {
+                    nodeRefs.current[f.fase] = el;
+                  }}
+                  className={`relative flex items-center justify-center scroll-mt-24 ${
                     estado === "bloqueado" ? "opacity-30" : estado === "proximo" ? "opacity-50" : ""
                   }`}
                 >
                   <div
-                    className={`z-10 flex h-12 w-12 items-center justify-center rounded-full border-4 border-white shadow-lg ${
+                    className={`z-10 flex h-12 w-12 items-center justify-center rounded-full border-4 shadow-lg transition-all ${
                       estado === "completado" ? "bg-tertiary-container" : "bg-surface-container-highest"
-                    }`}
+                    } ${faseSeleccionada === f.fase ? "border-secondary ring-4 ring-secondary/30" : "border-white"}`}
                   >
                     <Icon
                       name={ICONO_NODO[estado]}
