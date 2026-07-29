@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useSession, perfilCompleto } from "@/lib/store/session";
 import { PROMPTS } from "@/lib/herramientas/prompts";
 import { AppShell } from "@/components/AppShell";
@@ -146,6 +147,13 @@ export default function BancoPromptsPage() {
     <AppShell titulo="Banco de Prompts">
       <BadgeUnlockToast badge={badgeGanado} onClose={() => setBadgeGanado(null)} />
       <div className="mx-auto max-w-5xl space-y-gap-lg">
+        <Link
+          href="/herramientas"
+          className="text-sm mb-4 inline-flex items-center gap-1 font-bold text-on-primary-fixed"
+        >
+          <Icon name="arrow_back" /> Herramientas
+        </Link>
+
         <div>
           <h1 className="font-headline text-3xl sm:text-4xl mb-2">
             Banco de Prompts
