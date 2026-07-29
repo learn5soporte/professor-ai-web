@@ -167,6 +167,12 @@ export default function RegistroPage() {
           >
             {cargando ? "Creando..." : "Crear mi cuenta"} <Icon name="arrow_forward" className="text-[18px]" />
           </button>
+          <p className="text-center text-sm text-white/40">
+            ¿Ya tienes cuenta?{" "}
+            <Link href="/login" className="font-bold text-tertiary-fixed-dim">
+              Inicia sesión
+            </Link>
+          </p>
         </form>
       </section>
     </DarkScreen>
