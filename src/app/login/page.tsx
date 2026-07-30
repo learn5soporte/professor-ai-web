@@ -16,6 +16,10 @@ import { Icon } from "@/components/Icon";
  * verdad). Si no (como en todo deploy hasta ahora), sigue funcionando
  * exactamente igual que en Fase 0: cualquier email/password te deja entrar
  * -- comportamiento sin cambios para no romper la demo actual.
+ *
+ * v2 (2026-07-30): el CTA principal pasa de .btn-accent a .btn-gold-glow,
+ * mismo tratamiento dorado aprobado en Claude Design que ya se aplico en
+ * el Splash (tarea de rediseno visual, screens compartidas via DarkScreen).
  */
 export default function LoginPage() {
   const router = useRouter();
@@ -130,7 +134,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={cargando}
-            className="btn-accent flex w-full items-center justify-center gap-2 disabled:opacity-60"
+            className="btn-gold-glow w-full disabled:opacity-60"
           >
             {cargando ? "Entrando..." : "Entrar"} <Icon name="arrow_forward" className="text-[18px]" />
           </button>
