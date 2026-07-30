@@ -15,11 +15,19 @@ const DIMENSIONES: Dimension[] = [
   "actitudCambio",
 ];
 
+/**
+ * Nombres de dimensiones actualizados (jul 2026), a partir del rediseño
+ * visual del diagnostico en Claude Design: los nombres genericos de una
+ * sola palabra (Conocimiento/Herramientas/Integracion/Actitud) se sentian
+ * poco descriptivos en los chips del TMAID. Este es el marco propio de
+ * Learn5 (no un framework externo tipo DigCompEdu/SAMR/TPACK) -- ver
+ * memoria del proyecto para el detalle de esta decision.
+ */
 const ETIQUETA_DIMENSION: Record<Dimension, string> = {
-  conocimientoIA: "Conocimiento de IA",
-  usoHerramientas: "Uso de herramientas",
-  integracionAula: "Integración al aula",
-  actitudCambio: "Actitud ante el cambio",
+  conocimientoIA: "Conocimiento IA",
+  usoHerramientas: "Dominio Práctico",
+  integracionAula: "Integración Pedagógica",
+  actitudCambio: "Apertura al Cambio",
 };
 
 /**
