@@ -15,11 +15,24 @@ import { CargandoPantalla } from "@/components/CargandoPantalla";
  * onboarding-1..4 y screen-analysis).
  */
 
-const NIVELES = [
-  { valor: "Primaria", icono: "child_care" },
-  { valor: "Secundaria", icono: "school" },
-  { valor: "Universidad", icono: "account_balance" },
-  { valor: "Corporativa", icono: "business" },
+/**
+ * Taxonomia completa de niveles de ensenanza (jul 2026): el negocio es
+ * B2B y B2C, asi que el onboarding debe mostrar todo el alcance real del
+ * producto (6 niveles), no solo los que estan activos para este demo/
+ * piloto. Secundaria y Educacion Superior son los unicos "activo: true"
+ * -- los otros 4 se muestran con la etiqueta "Proximamente" y no son
+ * seleccionables, para que el docente vea el panorama completo sin que
+ * parezca un gate de pago (por eso "Proximamente" y no "Modo Pro": no hay
+ * un tier pago real todavia). Ver memoria del proyecto para el detalle
+ * de esta decision.
+ */
+const NIVELES: { valor: string; icono: string; activo: boolean }[] = [
+  { valor: "Educación Inicial", icono: "child_care", activo: false },
+  { valor: "Primaria", icono: "auto_stories", activo: false },
+  { valor: "Secundaria", icono: "school", activo: true },
+  { valor: "Educación Superior", icono: "account_balance", activo: true },
+  { valor: "Formación Corporativa", icono: "business", activo: false },
+  { valor: "Independiente / Cursos propios", icono: "person", activo: false },
 ];
 
 const MATERIAS_SUGERIDAS = [
@@ -182,23 +195,34 @@ export default function OnboardingPage() {
               ¿En qué nivel enseñas?
             </h2>
             <div className="mb-12 grid grid-cols-1 gap-4 md:grid-cols-2">
-              {NIVELES.map((n) => (
-                <button
-                  key={n.valor}
-                  type="button"
-                  onClick={() => setForm((f) => ({ ...f, nivelEducativo: n.valor }))}
-                  className={`glass-card flex items-center gap-4 rounded-xl border p-6 text-left transition-all ${
-                    form.nivelEducativo === n.valor
-                      ? "border-tertiary-fixed-dim/50 bg-white/10"
-                      : "border-white/5 hover:bg-white/10"
-                  }`}
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-surface-container-lowest/10">
-                    <Icon name={n.icono} className="text-tertiary-fixed-dim" />
-                  </div>
-                  <span className="font-headline text-lg font-bold text-white">{n.valor}</span>
-                </button>
-              ))}
+              {NIVELES.map((n) => {
+                const selected = form.nivelEducativo === n.valor;
+                return (
+                  <button
+                    key={n.valor}
+                    type="button"
+                    disabled={!n.activo}
+                    onClick={() => n.activo && setForm((f) => ({ ...f, nivelEducativo: n.valor }))}
+                    className={`glass-card relative flex items-center gap-4 rounded-xl border p-6 text-left transition-all ${
+                      !n.activo
+                        ? "cursor-not-allowed border-white/5 opacity-50"
+                        : selected
+                        ? "border-tertiary-fixed-dim/50 bg-white/10"
+                        : "border-white/5 hover:bg-white/10"
+                    }`}
+                  >
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-surface-container-lowest/10">
+                      <Icon name={n.icono} className="text-tertiary-fixed-dim" />
+                    </div>
+                    <span className="font-headline text-lg font-bold text-white">{n.valor}</span>
+                    {!n.activo && (
+                      <span className="font-label absolute right-3 top-3 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white/50">
+                        Próximamente
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </>
         )}
