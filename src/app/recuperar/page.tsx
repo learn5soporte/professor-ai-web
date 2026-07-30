@@ -13,6 +13,10 @@ import { Icon } from "@/components/Icon";
  * en datos.ts). En modo Fase 0 (sin Supabase configurado) no tiene sentido
  * -- se muestra un aviso y un link de vuelta a /login, ya que cualquier
  * email/contraseña ya deja entrar en ese modo.
+ *
+ * v2 (2026-07-30): CTA principal pasa de .btn-accent a .btn-gold-glow,
+ * mismo tratamiento dorado aprobado en Claude Design ya aplicado en
+ * Splash, Login y Registro.
  */
 export default function RecuperarPage() {
   const { usarSupabase } = useSession();
@@ -93,7 +97,7 @@ export default function RecuperarPage() {
             <button
               type="submit"
               disabled={enviando}
-              className="btn-accent flex w-full items-center justify-center gap-2 disabled:opacity-60"
+              className="btn-gold-glow w-full disabled:opacity-60"
             >
               {enviando ? "Enviando..." : "Enviar enlace de recuperación"} <Icon name="arrow_forward" className="text-[18px]" />
             </button>
