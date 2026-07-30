@@ -27,12 +27,55 @@ import { CargandoPantalla } from "@/components/CargandoPantalla";
  * pasaba a calcularResultadoTmaid() -- se descartaba por completo, aunque
  * la pantalla de "procesando" dice literalmente que la IA está
  * "analizando tus respuestas". Ahora sí se pasa (ver scoring.ts).
+ *
+ * Rediseño de la intro (jul 2026, aprobado en Claude Design): el ícono
+ * genérico "psychology" (cabeza + engranaje) se reemplazó por "radar"
+ * (evoca diagnóstico/medición, no "IA leyendo tu mente"). Los 4 chips de
+ * dimensión pasaron de una fila horizontal con nombres genéricos a una
+ * pila vertical con ícono + color propio por dimensión, usando los
+ * nombres descriptivos de ETIQUETA_DIMENSION. Se agregó un párrafo corto
+ * debajo explicando que las 4 dimensiones son el marco propio de Learn5
+ * (no un framework externo tipo DigCompEdu/SAMR/TPACK) -- ver memoria del
+ * proyecto para el detalle de esta decisión.
  */
 
 const TOTAL_LIKERT = PREGUNTAS_LIKERT.length;
 const TOTAL_PASOS = TOTAL_LIKERT + 1; // + pregunta abierta
 
 const ICONOS_PROCESANDO = ["insights", "school", "precision_manufacturing"];
+
+const ORDEN_DIMENSIONES: Dimension[] = [
+  "conocimientoIA",
+  "usoHerramientas",
+  "integracionAula",
+  "actitudCambio",
+];
+
+const DIMENSION_VISUAL: Record<
+  Dimension,
+  { icon: string; badgeClass: string; iconClass: string }
+> = {
+  conocimientoIA: {
+    icon: "lightbulb",
+    badgeClass: "bg-tertiary-fixed-dim/20",
+    iconClass: "text-tertiary-fixed-dim",
+  },
+  usoHerramientas: {
+    icon: "build",
+    badgeClass: "bg-secondary-fixed-dim/20",
+    iconClass: "text-secondary-fixed-dim",
+  },
+  integracionAula: {
+    icon: "hub",
+    badgeClass: "bg-emerald-400/20",
+    iconClass: "text-emerald-400",
+  },
+  actitudCambio: {
+    icon: "rocket_launch",
+    badgeClass: "bg-pink-400/20",
+    iconClass: "text-pink-400",
+  },
+};
 
 type Paso = "intro" | number | "procesando";
 
@@ -125,21 +168,34 @@ export default function TmaidPage() {
         <section className="relative z-10 max-w-2xl px-margin-mobile text-center">
           <div className="relative mx-auto mb-8 flex h-24 w-24 items-center justify-center">
             <div className="absolute inset-0 animate-pulse rounded-full bg-secondary-container/30 blur-xl" />
-            <Icon name="psychology" filled className="text-[64px] text-tertiary-fixed-dim" />
+            <Icon name="radar" filled className="text-[64px] text-tertiary-fixed-dim" />
           </div>
           <h1 className="font-headline mb-6 text-3xl font-black text-white sm:text-4xl">
             Tu Diagnóstico Docente IA
           </h1>
-          <div className="mb-12 flex flex-wrap justify-center gap-3">
-            {["CONOCIMIENTO", "HERRAMIENTAS", "INTEGRACIÓN", "ACTITUD"].map((d) => (
-              <span
-                key={d}
-                className="font-label rounded-full border border-white/10 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-white"
-              >
-                {d}
-              </span>
-            ))}
+          <div className="mb-6 flex flex-col items-center gap-3">
+            {ORDEN_DIMENSIONES.map((dim) => {
+              const visual = DIMENSION_VISUAL[dim];
+              return (
+                <div
+                  key={dim}
+                  className="atmospheric-shadow flex w-full max-w-xs items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 backdrop-blur-sm"
+                >
+                  <span
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${visual.badgeClass}`}
+                  >
+                    <Icon name={visual.icon} filled className={`text-[18px] ${visual.iconClass}`} />
+                  </span>
+                  <span className="font-label text-xs font-bold uppercase tracking-wide text-white">
+                    {ETIQUETA_DIMENSION[dim]}
+                  </span>
+                </div>
+              );
+            })}
           </div>
+          <p className="mx-auto mb-12 max-w-md text-sm leading-relaxed text-white/60">
+            Estas 4 dimensiones son el marco propio de Learn5 para medir tu preparación real frente a la IA en el aula: qué sabes, qué tanto lo usas, qué tanto lo integras a tu enseñanza y qué tan abierto estás a seguir aprendiendo.
+          </p>
           <button
             onClick={siguiente}
             className="group inline-flex items-center gap-4 rounded-full bg-secondary px-8 py-4 font-headline text-lg font-bold text-on-secondary transition-all hover:bg-secondary-container"
