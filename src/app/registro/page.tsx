@@ -15,6 +15,11 @@ import { Icon } from "@/components/Icon";
  * este formulario crea una cuenta real (Supabase Auth). Si no (como en
  * todo deploy hasta ahora), sigue funcionando exactamente igual que en
  * Fase 0: crea la sesión mock directamente, sin cambios de comportamiento.
+ *
+ * v2 (2026-07-30): ambos CTA (pantalla de confirmacion pendiente y el
+ * boton principal del formulario) pasan de .btn-accent a .btn-gold-glow,
+ * mismo tratamiento dorado aprobado en Claude Design ya aplicado en
+ * Splash y Login.
  */
 export default function RegistroPage() {
   const router = useRouter();
@@ -72,7 +77,7 @@ export default function RegistroPage() {
               confirmación antes de iniciar sesión.
             </p>
           </div>
-          <Link href="/login" className="btn-accent flex w-full items-center justify-center gap-2">
+          <Link href="/login" className="btn-gold-glow w-full">
             Ir a iniciar sesión
           </Link>
         </section>
@@ -163,7 +168,7 @@ export default function RegistroPage() {
           <button
             type="submit"
             disabled={cargando}
-            className="btn-accent flex w-full items-center justify-center gap-2 disabled:opacity-60"
+            className="btn-gold-glow w-full disabled:opacity-60"
           >
             {cargando ? "Creando..." : "Crear mi cuenta"} <Icon name="arrow_forward" className="text-[18px]" />
           </button>
