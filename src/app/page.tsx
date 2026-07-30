@@ -12,6 +12,12 @@ import { Icon } from "@/components/Icon";
  * .splash-orbit, .float-card*) que viven solo en este archivo, así las
  * otras pantallas inmersivas no cambian.
  *
+ * v3 (2026-07-29): copy del badge y del subtítulo ajustado al texto
+ * aprobado en Claude Design ("Hecho para educadores" / "...transforma tu
+ * forma de enseñar"), y el CTA principal pasa de .btn-accent a
+ * .btn-gold-glow (utilidad nueva en globals.css con el degradé y el
+ * glow exactos del diseño aprobado).
+ *
  * El mockup "Tu Perfil IA" de la derecha reutiliza el mismo radar SVG que
  * /tmaid/resultado, con valores de ejemplo fijos (no reales) -- es una
  * vista previa honesta del producto, no una estadística inventada sobre
@@ -42,7 +48,7 @@ export default function SplashPage() {
         <section className="flex w-full max-w-xl flex-col items-center text-center lg:items-start lg:text-left">
           <span className="glass-card mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-tertiary-fixed-dim">
             <span className="glow-node pulse-ai h-2 w-2 rounded-full bg-tertiary-fixed-dim" />
-            Hecho para docentes
+            Hecho para educadores
           </span>
 
           <h1 className="font-headline mb-4 text-5xl font-black leading-[1.05] tracking-tighter sm:text-6xl md:text-7xl">
@@ -53,13 +59,13 @@ export default function SplashPage() {
 
           <p className="mx-auto mb-8 max-w-md text-lg text-white/60 lg:mx-0">
             Tu asistente de IA para el aula. Diagnostica tu nivel, arma tu
-            ruta y crea material en minutos, no en horas.
+            ruta y transforma tu forma de enseñar.
           </p>
 
           <div className="mb-6 flex flex-col items-center gap-4 sm:flex-row lg:items-start">
             <Link
               href="/registro"
-              className="btn-accent inline-flex items-center gap-2"
+              className="btn-gold-glow px-7 py-3.5 text-base"
             >
               Comenzar gratis
               <Icon name="arrow_forward" />
