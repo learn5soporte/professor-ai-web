@@ -38,6 +38,13 @@ import { CargandoPantalla } from "@/components/CargandoPantalla";
  * src/modules/tmaid/README.md) en vez de decir solo "marco propio de
  * Learn5" -- TMAID sí es un modelo con nombre propio, no un framework
  * externo tipo DigCompEdu/SAMR/TPACK. Ver memoria del proyecto.
+ *
+ * v2 (2026-07-30): el CTA de la intro ("Comenzar Diagnóstico") pasa de un
+ * pill azul (bg-secondary) a .btn-gold-glow, mismo tratamiento dorado
+ * aprobado en Claude Design ya aplicado en las otras pantallas oscuras
+ * (Splash/Login/Registro/Recuperar/Onboarding). Las pantallas de Likert y
+ * pregunta abierta usan un sistema visual claro distinto (btn-primary
+ * sobre fondo claro) y quedan fuera de este cambio a propósito.
  */
 
 const TOTAL_LIKERT = PREGUNTAS_LIKERT.length;
@@ -199,7 +206,7 @@ export default function TmaidPage() {
           </p>
           <button
             onClick={siguiente}
-            className="group inline-flex items-center gap-4 rounded-full bg-secondary px-8 py-4 font-headline text-lg font-bold text-on-secondary transition-all hover:bg-secondary-container"
+            className="group btn-gold-glow px-8 py-4 text-lg"
           >
             Comenzar Diagnóstico
             <Icon name="arrow_forward" className="transition-transform group-hover:translate-x-1" />
