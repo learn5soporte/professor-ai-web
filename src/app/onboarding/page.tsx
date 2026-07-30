@@ -13,6 +13,13 @@ import { CargandoPantalla } from "@/components/CargandoPantalla";
  * Onboarding (4 pasos) + transicion "Analizando tu perfil" -- base literal:
  * code.html real de Stitch (bloque_1_y_2_acceso_y_onboarding, screens
  * onboarding-1..4 y screen-analysis).
+ *
+ * v2 (2026-07-30): el CTA final ("Finalizar Configuracion") pasa de
+ * .btn-accent a .btn-gold-glow, mismo tratamiento dorado aprobado en
+ * Claude Design ya aplicado en Splash/Login/Registro/Recuperar. El boton
+ * "Continuar" de los pasos intermedios se deja igual (bg-secondary azul)
+ * a proposito: en el diseno aprobado el dorado se reserva para la accion
+ * final de cada flujo, no para pasos intermedios.
  */
 
 /**
@@ -370,7 +377,7 @@ export default function OnboardingPage() {
             <button
               onClick={next}
               disabled={!canContinue}
-              className="btn-accent px-16 py-5 text-lg shadow-2xl shadow-secondary/40 hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
+              className="btn-gold-glow px-16 py-5 text-lg disabled:opacity-40"
             >
               Finalizar Configuración
             </button>
