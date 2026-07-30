@@ -16,7 +16,10 @@ usan `.dark-screen` + `.glass-card`: fondo navy #00113a, blobs de luz
 fijos (ver componente GlobalBlobs), tarjetas de vidrio
 rgba(255,255,255,0.07) + blur 20px -- exactamente como en code.html.
 4. Botones: `.btn-primary` (negro/navy, pill) sobre fondo claro;
-`.btn-accent` (azul rey degradado, pill) sobre fondo oscuro.
+`.btn-accent` (azul rey degradado, pill) sobre fondo oscuro. Desde jul
+2026, `.btn-gold-glow` (dorado con resplandor) es el CTA principal
+aprobado en el rediseño de Claude Design para pantallas especializadas
+-- ver bloque al final del archivo.
 */
 
 @layer base {
@@ -190,5 +193,40 @@ siguen usando <DarkScreen> tal cual) no cambian.
     50% {
       transform: translateY(10px);
     }
+  }
+}
+
+/*
+Rediseño visual aprobado en Claude Design (jul 2026) -- utilidades
+reusables extraídas del prototipo real (panel "Code" del elemento,
+valores exactos, no aproximados) para ir portando el mismo tratamiento
+a todas las pantallas del rollout (splash, login, registro, recuperar,
+onboarding, TMAID, dashboard, rutas, progreso, insignias, informe,
+herramientas). Dos piezas reusables:
+
+1. .btn-gold-glow: el CTA principal nuevo para pantallas oscuras --
+reemplaza el degradado azul de .btn-accent en esos contextos. Valores
+tomados 1:1 del botón "Comenzar gratis" aprobado en el Splash.
+2. El mesh de fondo (blobs difuminados sobre navy) YA existe como
+.dark-screen + los 2 divs blur del componente DarkScreen -- no se
+duplica aquí, solo se documenta que ese es el patrón "mesh bg" a
+reutilizar en cada pantalla del rollout, no una clase nueva.
+*/
+@layer components {
+  .btn-gold-glow {
+    @apply relative inline-flex items-center justify-center gap-2.5 rounded-full border font-headline font-extrabold transition-transform duration-200;
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #00164e;
+    background: linear-gradient(100deg, #ffe9ad, #e9c349 45%, #cba82f);
+    box-shadow:
+      0 0 0 5px rgba(233, 195, 73, 0.12),
+      0 24px 50px -12px rgba(233, 195, 73, 0.55);
+  }
+
+  .btn-gold-glow:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow:
+      0 0 0 6px rgba(233, 195, 73, 0.16),
+      0 30px 60px -10px rgba(233, 195, 73, 0.7);
   }
 }
