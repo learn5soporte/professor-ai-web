@@ -34,9 +34,10 @@ import { CargandoPantalla } from "@/components/CargandoPantalla";
  * dimensión pasaron de una fila horizontal con nombres genéricos a una
  * pila vertical con ícono + color propio por dimensión, usando los
  * nombres descriptivos de ETIQUETA_DIMENSION. Se agregó un párrafo corto
- * debajo explicando que las 4 dimensiones son el marco propio de Learn5
- * (no un framework externo tipo DigCompEdu/SAMR/TPACK) -- ver memoria del
- * proyecto para el detalle de esta decisión.
+ * debajo nombrando el modelo TMAID (Test de Madurez IA Docente, ver
+ * src/modules/tmaid/README.md) en vez de decir solo "marco propio de
+ * Learn5" -- TMAID sí es un modelo con nombre propio, no un framework
+ * externo tipo DigCompEdu/SAMR/TPACK. Ver memoria del proyecto.
  */
 
 const TOTAL_LIKERT = PREGUNTAS_LIKERT.length;
@@ -194,7 +195,7 @@ export default function TmaidPage() {
             })}
           </div>
           <p className="mx-auto mb-12 max-w-md text-sm leading-relaxed text-white/60">
-            Estas 4 dimensiones son el marco propio de Learn5 para medir tu preparación real frente a la IA en el aula: qué sabes, qué tanto lo usas, qué tanto lo integras a tu enseñanza y qué tan abierto estás a seguir aprendiendo.
+            Estas 4 dimensiones son el modelo TMAID (Test de Madurez IA Docente) de Learn5: miden qué sabes, qué tanto lo usas, qué tanto lo integras a tu enseñanza y qué tan abierto estás a seguir aprendiendo.
           </p>
           <button
             onClick={siguiente}
