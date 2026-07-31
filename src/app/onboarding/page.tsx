@@ -8,18 +8,18 @@ import { BADGES } from "@/lib/gamification/badges";
 import { DarkScreen } from "@/components/DarkScreen";
 import { Icon } from "@/components/Icon";
 import { CargandoPantalla } from "@/components/CargandoPantalla";
+import { useIdioma } from "@/lib/i18n";
+import { localizarValorPerfil } from "@/lib/i18n/valores";
 
 /**
  * Onboarding (4 pasos) + transicion "Analizando tu perfil" -- base literal:
  * code.html real de Stitch (bloque_1_y_2_acceso_y_onboarding, screens
  * onboarding-1..4 y screen-analysis).
  *
- * v2 (2026-07-30): el CTA final ("Finalizar Configuracion") pasa de
- * .btn-accent a .btn-gold-glow, mismo tratamiento dorado aprobado en
- * Claude Design ya aplicado en Splash/Login/Registro/Recuperar. El boton
- * "Continuar" de los pasos intermedios se deja igual (bg-secondary azul)
- * a proposito: en el diseno aprobado el dorado se reserva para la accion
- * final de cada flujo, no para pasos intermedios.
+ * Fase i18n: los VALORES que se guardan en el perfil (nivelEducativo,
+ * materia, usoPrevioIA, mayorDesafio, objetivoPrincipal) se mantienen en
+ * español como clave canónica; solo la etiqueta visible se traduce con
+ * localizarValorPerfil() según el idioma activo (ver lib/i18n/valores.ts).
  */
 
 /**
@@ -51,22 +51,10 @@ const MATERIAS_SUGERIDAS = [
   "Programación",
 ];
 
-const RELACION_IA = [
-  {
-    valor: "Explorador",
-    icono: "explore",
-    desc: "Sé que existe pero no sé por dónde empezar.",
-  },
-  {
-    valor: "Curioso",
-    icono: "psychology",
-    desc: "He probado herramientas como ChatGPT.",
-  },
-  {
-    valor: "Aplicador",
-    icono: "rocket_launch",
-    desc: "Ya la uso para crear mis contenidos.",
-  },
+const RELACION_IA: { valor: string; icono: string; descKey: "relacionExploradorDesc" | "relacionCuriosoDesc" | "relacionAplicadorDesc" }[] = [
+  { valor: "Explorador", icono: "explore", descKey: "relacionExploradorDesc" },
+  { valor: "Curioso", icono: "psychology", descKey: "relacionCuriosoDesc" },
+  { valor: "Aplicador", icono: "rocket_launch", descKey: "relacionAplicadorDesc" },
 ];
 
 const DESAFIOS = ["Falta de tiempo", "Engagement alumnos", "Evaluación rápida"];
@@ -78,17 +66,10 @@ const OBJETIVOS = [
   { valor: "Ser referente", icono: "workspace_premium" },
 ];
 
-const MENSAJES_ANALISIS = [
-  "Analizando tu perfil...",
-  "Construyendo tu ruta...",
-  "Identificando desafíos...",
-  "Sincronizando modelos de IA...",
-  "¡Casi listo!",
-];
-
 export default function OnboardingPage() {
   const router = useRouter();
   const { perfil, guardarPerfil, otorgarBadge, cargando } = useSession();
+  const { idioma, t } = useIdioma();
   const [step, setStep] = useState(0);
   const [badgeGanado, setBadgeGanado] = useState<null | (typeof BADGES)[string]>(
     null
@@ -103,6 +84,14 @@ export default function OnboardingPage() {
   });
   const [mensajeIdx, setMensajeIdx] = useState(0);
 
+  const mensajesAnalisis = [
+    t.onboarding.analisis1,
+    t.onboarding.analisis2,
+    t.onboarding.analisis3,
+    t.onboarding.analisis4,
+    t.onboarding.analisis5,
+  ];
+
   useEffect(() => {
     if (cargando) return;
     if (!perfil) router.replace("/login");
@@ -114,7 +103,7 @@ export default function OnboardingPage() {
     if (step !== 4) return;
     setMensajeIdx(0);
     const rotacion = setInterval(() => {
-      setMensajeIdx((i) => Math.min(i + 1, MENSAJES_ANALISIS.length - 1));
+      setMensajeIdx((i) => Math.min(i + 1, mensajesAnalisis.length - 1));
     }, 900);
     const salida = setTimeout(() => {
       guardarPerfil({ nombre: perfil?.nombre ?? "Docente", ...form });
@@ -164,17 +153,17 @@ export default function OnboardingPage() {
           </div>
           <div className="flex h-20 flex-col justify-center">
             <h2 className="font-headline animate-pulse text-2xl font-bold text-white">
-              {MENSAJES_ANALISIS[mensajeIdx]}
+              {mensajesAnalisis[mensajeIdx]}
             </h2>
           </div>
           <div className="mx-auto mt-8 h-1 w-full max-w-sm overflow-hidden rounded-full bg-white/10">
             <div
               className="h-full rounded-full bg-tertiary-fixed-dim transition-all duration-500"
-              style={{ width: `${((mensajeIdx + 1) / MENSAJES_ANALISIS.length) * 100}%` }}
+              style={{ width: `${((mensajeIdx + 1) / mensajesAnalisis.length) * 100}%` }}
             />
           </div>
           <p className="mt-8 text-sm font-bold uppercase tracking-[0.2em] text-white/40">
-            Motor de Inteligencia Educativa Activo
+            {t.onboarding.motorActivo}
           </p>
         </section>
       </DarkScreen>
@@ -199,7 +188,7 @@ export default function OnboardingPage() {
         {step === 0 && (
           <>
             <h2 className="font-headline mb-8 text-3xl font-black sm:text-4xl">
-              ¿En qué nivel enseñas?
+              {t.onboarding.pasoNivel}
             </h2>
             <div className="mb-12 grid grid-cols-1 gap-4 md:grid-cols-2">
               {NIVELES.map((n) => {
@@ -221,10 +210,12 @@ export default function OnboardingPage() {
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-surface-container-lowest/10">
                       <Icon name={n.icono} className="text-tertiary-fixed-dim" />
                     </div>
-                    <span className="font-headline text-lg font-bold text-white">{n.valor}</span>
+                    <span className="font-headline text-lg font-bold text-white">
+                      {localizarValorPerfil(n.valor, idioma)}
+                    </span>
                     {!n.activo && (
                       <span className="font-label absolute right-3 top-3 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white/50">
-                        Próximamente
+                        {t.comun.proximamente}
                       </span>
                     )}
                   </button>
@@ -237,18 +228,16 @@ export default function OnboardingPage() {
         {step === 1 && (
           <>
             <h2 className="font-headline mb-4 text-3xl font-black sm:text-4xl">
-              ¿Qué enseñas?
+              {t.onboarding.pasoMateria}
             </h2>
-            <p className="mb-8 text-white/50">
-              Escribe tu materia o selecciona de las sugerencias.
-            </p>
+            <p className="mb-8 text-white/50">{t.onboarding.pasoMateriaSub}</p>
             <div className="glass-card mb-8 flex items-center rounded-xl p-4">
               <Icon name="search" className="mr-3 text-white/30" />
               <input
                 type="text"
                 value={form.materia}
                 onChange={(e) => setForm((f) => ({ ...f, materia: e.target.value }))}
-                placeholder="Ej: Biología Molecular..."
+                placeholder={t.onboarding.materiaPlaceholder}
                 className="flex-1 border-none bg-transparent text-white placeholder:text-white/20 focus:ring-0"
               />
             </div>
@@ -264,7 +253,7 @@ export default function OnboardingPage() {
                       : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10"
                   }`}
                 >
-                  {m}
+                  {localizarValorPerfil(m, idioma)}
                 </button>
               ))}
             </div>
@@ -274,7 +263,7 @@ export default function OnboardingPage() {
         {step === 2 && (
           <>
             <h2 className="font-headline mb-8 text-3xl font-black sm:text-4xl">
-              ¿Cómo describes tu relación con la IA?
+              {t.onboarding.pasoRelacion}
             </h2>
             <div className="mb-12 space-y-4">
               {RELACION_IA.map((r) => {
@@ -291,8 +280,10 @@ export default function OnboardingPage() {
                         <Icon name={r.icono} filled className="text-3xl" />
                       </div>
                       <div>
-                        <h4 className="font-headline text-lg font-bold text-white">{r.valor}</h4>
-                        <p className="text-sm text-white/50">{r.desc}</p>
+                        <h4 className="font-headline text-lg font-bold text-white">
+                          {localizarValorPerfil(r.valor, idioma)}
+                        </h4>
+                        <p className="text-sm text-white/50">{t.onboarding[r.descKey]}</p>
                       </div>
                     </div>
                     <div
@@ -305,7 +296,7 @@ export default function OnboardingPage() {
               })}
             </div>
             <div className="mb-12">
-              <h3 className="font-headline mb-4 text-lg font-bold">¿Cuál es tu mayor desafío?</h3>
+              <h3 className="font-headline mb-4 text-lg font-bold">{t.onboarding.pasoDesafio}</h3>
               <div className="flex flex-wrap gap-2">
                 {DESAFIOS.map((d) => {
                   const selected = form.mayorDesafio === d;
@@ -320,7 +311,7 @@ export default function OnboardingPage() {
                           : "border-white/10 bg-white/5 text-white/40 hover:bg-white/10"
                       }`}
                     >
-                      {d}
+                      {localizarValorPerfil(d, idioma)}
                     </button>
                   );
                 })}
@@ -332,7 +323,7 @@ export default function OnboardingPage() {
         {step === 3 && (
           <>
             <h2 className="font-headline mb-8 text-center text-3xl font-black sm:text-4xl">
-              ¿Qué quieres lograr?
+              {t.onboarding.pasoObjetivo}
             </h2>
             <div className="mb-16 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
               {OBJETIVOS.map((o) => {
@@ -349,7 +340,9 @@ export default function OnboardingPage() {
                     <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary-container/20">
                       <Icon name={o.icono} filled className="text-4xl" />
                     </div>
-                    <h4 className="font-headline text-lg font-bold text-white">{o.valor}</h4>
+                    <h4 className="font-headline text-lg font-bold text-white">
+                      {localizarValorPerfil(o.valor, idioma)}
+                    </h4>
                   </button>
                 );
               })}
@@ -363,7 +356,7 @@ export default function OnboardingPage() {
             disabled={step === 0}
             className="rounded-full px-5 py-2 text-sm font-semibold text-white/50 disabled:opacity-0"
           >
-            Atrás
+            {t.comun.atras}
           </button>
           {step < 3 ? (
             <button
@@ -371,15 +364,15 @@ export default function OnboardingPage() {
               disabled={!canContinue}
               className="flex items-center gap-2 rounded-full bg-secondary px-10 py-4 font-bold shadow-lg hover:shadow-secondary/20 disabled:opacity-40"
             >
-              Continuar <Icon name="arrow_forward" />
+              {t.comun.continuar} <Icon name="arrow_forward" />
             </button>
           ) : (
             <button
               onClick={next}
               disabled={!canContinue}
-              className="btn-gold-glow px-16 py-5 text-lg disabled:opacity-40"
+              className="btn-accent px-16 py-5 text-lg shadow-2xl shadow-secondary/40 hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
             >
-              Finalizar Configuración
+              {t.onboarding.finalizar}
             </button>
           )}
         </div>
