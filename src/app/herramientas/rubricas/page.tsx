@@ -7,20 +7,21 @@ import { useSession, perfilCompleto } from "@/lib/store/session";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
 import { CargandoPantalla } from "@/components/CargandoPantalla";
+import { useIdioma } from "@/lib/i18n";
+import { tpl, type Idioma } from "@/lib/i18n/traducciones";
 
 /**
  * Creador de Rúbricas -- base literal: code.html real de Stitch
  * (creador_de_r_bricas_configuraci_n). El export de Stitch solo diseñó el
- * paso 1 ("Configuración") de un wizard de 3 pasos; los botones "Continuar
- * a Criterios" y "Vista Previa" eran no funcionales (solo un
- * `console.log("Navigating to step 2...")`). Aquí los 3 pasos son reales
- * y funcionales: paso 1 configura tipo/nivel/escala/tono (igual al diseño
- * de Stitch), paso 2 genera criterios de evaluación reales y editables
- * según el tipo de actividad elegido, y paso 3 genera una rúbrica completa
- * de verdad (tabla criterios x niveles con descriptores generados a
- * partir de tus datos reales) descargable como .txt -- sin inventar
- * porcentajes ni resultados falsos como el "95%" u otras cifras de
- * relleno que Stitch suele usar en otras pantallas.
+ * paso 1 ("Configuración") de un wizard de 3 pasos; aquí los 3 pasos son
+ * reales y funcionales, con la rúbrica final descargable como .txt.
+ *
+ * Fase i18n: los valores de los selects (tipo de actividad, nivel
+ * académico, tono) se mantienen en español como clave canónica (también
+ * la del borrador guardado en localStorage); las etiquetas visibles, los
+ * criterios sugeridos y los descriptores generados salen del idioma
+ * activo. "Idioma de Salida" (Español/English/...) se muestra tal cual:
+ * son autónimos de idioma, no texto de UI.
  */
 
 const TIPOS_ACTIVIDAD = [
@@ -32,6 +33,15 @@ const TIPOS_ACTIVIDAD = [
   "Resolución de Problemas",
 ];
 
+const TIPO_LABEL_EN: Record<string, string> = {
+  "Ensayo Crítico": "Critical Essay",
+  "Presentación Oral": "Oral Presentation",
+  "Proyecto de Investigación": "Research Project",
+  "Debate en Clase": "Class Debate",
+  "Mapa Mental / Conceptual": "Mind / Concept Map",
+  "Resolución de Problemas": "Problem Solving",
+};
+
 const NIVELES_ACADEMICOS = [
   "Primaria Superior",
   "Educación Secundaria (ESO)",
@@ -40,52 +50,114 @@ const NIVELES_ACADEMICOS = [
   "Postgrado / Master",
 ];
 
-const TONOS = ["Constructivo y Motivador", "Formal y Académico", "Directo y Técnico"];
-const IDIOMAS = ["Español", "English", "Français", "Català"];
-
-const CRITERIOS_SUGERIDOS: Record<string, string[]> = {
-  "Ensayo Crítico": [
-    "Coherencia argumentativa",
-    "Uso de fuentes y evidencia",
-    "Estructura y redacción",
-    "Pensamiento crítico",
-  ],
-  "Presentación Oral": [
-    "Claridad de exposición",
-    "Dominio del tema",
-    "Uso de apoyos visuales",
-    "Manejo del tiempo",
-  ],
-  "Proyecto de Investigación": [
-    "Metodología",
-    "Análisis de datos",
-    "Originalidad",
-    "Conclusiones fundamentadas",
-  ],
-  "Debate en Clase": [
-    "Solidez de argumentos",
-    "Escucha activa y réplica",
-    "Respeto y forma",
-    "Uso de evidencia",
-  ],
-  "Mapa Mental / Conceptual": [
-    "Jerarquización de ideas",
-    "Conexiones conceptuales",
-    "Claridad visual",
-    "Cobertura del tema",
-  ],
-  "Resolución de Problemas": [
-    "Comprensión del problema",
-    "Estrategia utilizada",
-    "Precisión en el procedimiento",
-    "Justificación del proceso",
-  ],
+const NIVEL_LABEL_EN: Record<string, string> = {
+  "Primaria Superior": "Upper Primary",
+  "Educación Secundaria (ESO)": "Secondary Education",
+  Bachillerato: "High School",
+  "Grado Universitario": "Undergraduate",
+  "Postgrado / Master": "Postgraduate / Master's",
 };
 
-const ETIQUETAS_NIVEL: Record<number, string[]> = {
-  3: ["En desarrollo", "Logrado", "Destacado"],
-  4: ["Inicial", "En desarrollo", "Logrado", "Destacado"],
-  5: ["Inicial", "En desarrollo", "Logrado", "Sobresaliente", "Excelente"],
+const TONOS = ["Constructivo y Motivador", "Formal y Académico", "Directo y Técnico"];
+
+const TONO_LABEL_EN: Record<string, string> = {
+  "Constructivo y Motivador": "Constructive & Motivating",
+  "Formal y Académico": "Formal & Academic",
+  "Directo y Técnico": "Direct & Technical",
+};
+
+const IDIOMAS = ["Español", "English", "Français", "Català"];
+
+const CRITERIOS_SUGERIDOS: Record<Idioma, Record<string, string[]>> = {
+  es: {
+    "Ensayo Crítico": [
+      "Coherencia argumentativa",
+      "Uso de fuentes y evidencia",
+      "Estructura y redacción",
+      "Pensamiento crítico",
+    ],
+    "Presentación Oral": [
+      "Claridad de exposición",
+      "Dominio del tema",
+      "Uso de apoyos visuales",
+      "Manejo del tiempo",
+    ],
+    "Proyecto de Investigación": [
+      "Metodología",
+      "Análisis de datos",
+      "Originalidad",
+      "Conclusiones fundamentadas",
+    ],
+    "Debate en Clase": [
+      "Solidez de argumentos",
+      "Escucha activa y réplica",
+      "Respeto y forma",
+      "Uso de evidencia",
+    ],
+    "Mapa Mental / Conceptual": [
+      "Jerarquización de ideas",
+      "Conexiones conceptuales",
+      "Claridad visual",
+      "Cobertura del tema",
+    ],
+    "Resolución de Problemas": [
+      "Comprensión del problema",
+      "Estrategia utilizada",
+      "Precisión en el procedimiento",
+      "Justificación del proceso",
+    ],
+  },
+  en: {
+    "Ensayo Crítico": [
+      "Argumentative coherence",
+      "Use of sources and evidence",
+      "Structure and writing",
+      "Critical thinking",
+    ],
+    "Presentación Oral": [
+      "Clarity of delivery",
+      "Command of the topic",
+      "Use of visual aids",
+      "Time management",
+    ],
+    "Proyecto de Investigación": [
+      "Methodology",
+      "Data analysis",
+      "Originality",
+      "Well-founded conclusions",
+    ],
+    "Debate en Clase": [
+      "Strength of arguments",
+      "Active listening and rebuttal",
+      "Respect and form",
+      "Use of evidence",
+    ],
+    "Mapa Mental / Conceptual": [
+      "Hierarchy of ideas",
+      "Conceptual connections",
+      "Visual clarity",
+      "Topic coverage",
+    ],
+    "Resolución de Problemas": [
+      "Understanding of the problem",
+      "Strategy used",
+      "Accuracy of the procedure",
+      "Justification of the process",
+    ],
+  },
+};
+
+const ETIQUETAS_NIVEL: Record<Idioma, Record<number, string[]>> = {
+  es: {
+    3: ["En desarrollo", "Logrado", "Destacado"],
+    4: ["Inicial", "En desarrollo", "Logrado", "Destacado"],
+    5: ["Inicial", "En desarrollo", "Logrado", "Sobresaliente", "Excelente"],
+  },
+  en: {
+    3: ["Developing", "Achieved", "Outstanding"],
+    4: ["Beginning", "Developing", "Achieved", "Outstanding"],
+    5: ["Beginning", "Developing", "Achieved", "Exceeding", "Excellent"],
+  },
 };
 
 type Criterio = { nombre: string; peso: number };
@@ -104,6 +176,7 @@ const BORRADOR_KEY = "professor-ai:rubrica-borrador";
 export default function CreadorRubricasPage() {
   const router = useRouter();
   const { perfil, cargando } = useSession();
+  const { idioma, t } = useIdioma();
 
   useEffect(() => {
     if (cargando) return;
@@ -117,11 +190,11 @@ export default function CreadorRubricasPage() {
   const [descripcion, setDescripcion] = useState("");
   const [niveles, setNiveles] = useState(3);
   const [tono, setTono] = useState(TONOS[0]);
-  const [idioma, setIdioma] = useState(IDIOMAS[0]);
+  const [idiomaSalida, setIdiomaSalida] = useState(IDIOMAS[0]);
   const [criterios, setCriterios] = useState<Criterio[]>([]);
   const [nuevoCriterio, setNuevoCriterio] = useState("");
   const [generando, setGenerando] = useState(false);
-  const [mensajeBorrador, setMensajeBorrador] = useState<string | null>(null);
+  const [mensajeBorrador, setMensajeBorrador] = useState(false);
 
   // "Guardar borrador" solo tenia sentido si el docente encontraba su
   // configuracion al volver -- antes se escribia en localStorage pero
@@ -137,7 +210,7 @@ export default function CreadorRubricasPage() {
       if (typeof borrador.descripcion === "string") setDescripcion(borrador.descripcion);
       if (borrador.niveles) setNiveles(borrador.niveles);
       if (borrador.tono) setTono(borrador.tono);
-      if (borrador.idioma) setIdioma(borrador.idioma);
+      if (borrador.idioma) setIdiomaSalida(borrador.idioma);
     } catch {
       // borrador corrupto o de otra version: ignorar
     }
@@ -146,8 +219,14 @@ export default function CreadorRubricasPage() {
   if (cargando) return <CargandoPantalla />;
   if (!perfil || !perfilCompleto(perfil)) return null;
 
+  const tipoLabel = (x: string) => (idioma === "en" ? TIPO_LABEL_EN[x] ?? x : x);
+  const nivelLabel = (x: string) => (idioma === "en" ? NIVEL_LABEL_EN[x] ?? x : x);
+  const tonoLabel = (x: string) => (idioma === "en" ? TONO_LABEL_EN[x] ?? x : x);
+
   function irACriterios() {
-    const base = CRITERIOS_SUGERIDOS[tipoActividad] ?? CRITERIOS_SUGERIDOS["Ensayo Crítico"];
+    const base =
+      CRITERIOS_SUGERIDOS[idioma][tipoActividad] ??
+      CRITERIOS_SUGERIDOS[idioma]["Ensayo Crítico"];
     const pesoIgual = Math.round(100 / base.length);
     setCriterios(base.map((nombre) => ({ nombre, peso: pesoIgual })));
     setPaso(2);
@@ -179,28 +258,43 @@ export default function CreadorRubricasPage() {
   }
 
   function guardarBorrador() {
-    const borrador: Borrador = { tipoActividad, nivelAcademico, descripcion, niveles, tono, idioma };
+    const borrador: Borrador = {
+      tipoActividad,
+      nivelAcademico,
+      descripcion,
+      niveles,
+      tono,
+      idioma: idiomaSalida,
+    };
     window.localStorage.setItem(BORRADOR_KEY, JSON.stringify(borrador));
-    setMensajeBorrador("Borrador guardado.");
-    setTimeout(() => setMensajeBorrador(null), 2500);
+    setMensajeBorrador(true);
+    setTimeout(() => setMensajeBorrador(false), 2500);
   }
 
   const pesoTotal = criterios.reduce((acc, c) => acc + c.peso, 0);
-  const etiquetasNivel = ETIQUETAS_NIVEL[niveles] ?? ETIQUETAS_NIVEL[3];
+  const etiquetasNivel = ETIQUETAS_NIVEL[idioma][niveles] ?? ETIQUETAS_NIVEL[idioma][3];
 
   function descriptorCelda(criterio: string, etiqueta: string) {
-    return `Desempeño "${etiqueta.toLowerCase()}" en ${criterio.toLowerCase()}, acorde a ${nivelAcademico.toLowerCase()}.`;
+    return idioma === "en"
+      ? `"${etiqueta}" performance in ${criterio.toLowerCase()}, appropriate for ${nivelLabel(nivelAcademico).toLowerCase()}.`
+      : `Desempeño "${etiqueta.toLowerCase()}" en ${criterio.toLowerCase()}, acorde a ${nivelAcademico.toLowerCase()}.`;
   }
 
   function descargarRubrica() {
     const lineas: string[] = [];
-    lineas.push(`RÚBRICA DE EVALUACIÓN — ${tipoActividad}`);
-    lineas.push(`Nivel académico: ${nivelAcademico}`);
-    if (descripcion.trim()) lineas.push(`Contexto: ${descripcion.trim()}`);
-    lineas.push(`Tono de retroalimentación: ${tono} · Idioma: ${idioma}`);
+    lineas.push(`${t.herramientas.rubricaTxtTitulo} — ${tipoLabel(tipoActividad)}`);
+    lineas.push(`${t.herramientas.rubricaTxtNivel}: ${nivelLabel(nivelAcademico)}`);
+    if (descripcion.trim()) {
+      lineas.push(`${t.herramientas.rubricaTxtContexto}: ${descripcion.trim()}`);
+    }
+    lineas.push(
+      `${t.herramientas.rubricaTxtTono}: ${tonoLabel(tono)} · ${t.herramientas.rubricaTxtIdioma}: ${idiomaSalida}`
+    );
     lineas.push("");
     criterios.forEach((c) => {
-      lineas.push(`CRITERIO: ${c.nombre} (peso ${c.peso}%)`);
+      lineas.push(
+        `${t.herramientas.rubricaTxtCriterio}: ${c.nombre} (${t.herramientas.rubricaTxtPeso} ${c.peso}%)`
+      );
       etiquetasNivel.forEach((etiqueta) => {
         lineas.push(`  - ${etiqueta}: ${descriptorCelda(c.nombre, etiqueta)}`);
       });
@@ -220,30 +314,40 @@ export default function CreadorRubricasPage() {
     setCriterios([]);
   }
 
-  const sugerenciaIA = `Para ${tipoActividad.toLowerCase() === tipoActividad ? tipoActividad : tipoActividad} en nivel de ${nivelAcademico}, te recomendamos incluir criterios como "${
-    (CRITERIOS_SUGERIDOS[tipoActividad] ?? CRITERIOS_SUGERIDOS["Ensayo Crítico"])[0]
-  }" y "${(CRITERIOS_SUGERIDOS[tipoActividad] ?? CRITERIOS_SUGERIDOS["Ensayo Crítico"])[1]}".`;
+  const criteriosBase =
+    CRITERIOS_SUGERIDOS[idioma][tipoActividad] ??
+    CRITERIOS_SUGERIDOS[idioma]["Ensayo Crítico"];
+  const sugerenciaIA = tpl(t.herramientas.iaSugerencia, {
+    tipo: tipoLabel(tipoActividad),
+    nivel: nivelLabel(nivelAcademico),
+    c1: criteriosBase[0],
+    c2: criteriosBase[1],
+  });
 
   return (
-    <AppShell titulo="Creador de Rúbricas">
+    <AppShell titulo={t.herramientas.rubricasNombre}>
       <div className="mx-auto max-w-4xl space-y-gap-xl pb-16">
         <section className="flex flex-col items-start justify-between gap-lg md:flex-row md:items-end">
           <div className="flex-1">
             <div className="mb-4 flex items-center gap-md text-secondary">
               <Icon name="auto_awesome" />
               <span className="font-label text-xs font-bold uppercase tracking-widest">
-                Creador de Rúbricas Inteligente
+                {t.herramientas.creadorInteligente}
               </span>
             </div>
             <h2 className="font-headline text-3xl sm:text-4xl mb-2 text-primary">
-              {paso === 1 ? "Configuración Inicial" : paso === 2 ? "Criterios de Evaluación" : "Tu Rúbrica"}
+              {paso === 1
+                ? t.herramientas.configuracionInicial
+                : paso === 2
+                ? t.herramientas.criteriosEvaluacion
+                : t.herramientas.tuRubrica}
             </h2>
             <p className="text-lg max-w-2xl text-on-surface-variant">
               {paso === 1
-                ? "Define los parámetros básicos de tu actividad para generar una propuesta de evaluación alineada con tus objetivos pedagógicos."
+                ? t.herramientas.paso1Desc
                 : paso === 2
-                ? "Ajusta o agrega los criterios que realmente quieres evaluar y su peso relativo."
-                : "Rúbrica generada a partir de tus criterios y niveles de desempeño reales."}
+                ? t.herramientas.paso2Desc
+                : t.herramientas.paso3Desc}
             </p>
           </div>
 
@@ -261,7 +365,11 @@ export default function CreadorRubricasPage() {
                     {paso > n ? <Icon name="check" className="text-[16px]" /> : n}
                   </div>
                   <span className="font-label text-xs font-bold text-primary">
-                    {n === 1 ? "Configuración" : n === 2 ? "Criterios" : "Generación"}
+                    {n === 1
+                      ? t.herramientas.pasoConfiguracion
+                      : n === 2
+                      ? t.herramientas.pasoCriterios
+                      : t.herramientas.pasoGeneracion}
                   </span>
                 </div>
                 {i < 2 && <div className="h-px w-8 bg-outline-variant" />}
@@ -278,26 +386,30 @@ export default function CreadorRubricasPage() {
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
                     <Icon name="edit_note" />
                   </div>
-                  <h3 className="font-headline text-xl font-bold">Detalles de la Actividad</h3>
+                  <h3 className="font-headline text-xl font-bold">
+                    {t.herramientas.detallesActividad}
+                  </h3>
                 </div>
                 <div className="grid grid-cols-1 gap-gap-lg md:grid-cols-2">
                   <div className="flex flex-col gap-2">
                     <label className="font-label text-xs font-bold text-on-surface-variant">
-                      Tipo de Actividad
+                      {t.herramientas.tipoActividad}
                     </label>
                     <select
                       value={tipoActividad}
                       onChange={(e) => setTipoActividad(e.target.value)}
                       className="h-14 w-full cursor-pointer appearance-none rounded-xl border-none bg-surface-container-low px-4 text-sm transition-all focus:ring-2 focus:ring-secondary/20"
                     >
-                      {TIPOS_ACTIVIDAD.map((t) => (
-                        <option key={t}>{t}</option>
+                      {TIPOS_ACTIVIDAD.map((x) => (
+                        <option key={x} value={x}>
+                          {tipoLabel(x)}
+                        </option>
                       ))}
                     </select>
                   </div>
                   <div className="flex flex-col gap-2">
                     <label className="font-label text-xs font-bold text-on-surface-variant">
-                      Nivel Académico
+                      {t.herramientas.nivelAcademico}
                     </label>
                     <select
                       value={nivelAcademico}
@@ -305,18 +417,20 @@ export default function CreadorRubricasPage() {
                       className="h-14 w-full cursor-pointer appearance-none rounded-xl border-none bg-surface-container-low px-4 text-sm transition-all focus:ring-2 focus:ring-secondary/20"
                     >
                       {NIVELES_ACADEMICOS.map((n) => (
-                        <option key={n}>{n}</option>
+                        <option key={n} value={n}>
+                          {nivelLabel(n)}
+                        </option>
                       ))}
                     </select>
                   </div>
                   <div className="flex flex-col gap-2 md:col-span-2">
                     <label className="font-label text-xs font-bold text-on-surface-variant">
-                      Descripción Breve (Opcional)
+                      {t.herramientas.descripcionBreve}
                     </label>
                     <textarea
                       value={descripcion}
                       onChange={(e) => setDescripcion(e.target.value)}
-                      placeholder="Describe el contexto o los objetivos específicos..."
+                      placeholder={t.herramientas.descPlaceholder}
                       className="min-h-[120px] w-full resize-none rounded-xl border-none bg-surface-container-low p-4 text-sm transition-all focus:ring-2 focus:ring-secondary/20"
                     />
                   </div>
@@ -328,16 +442,18 @@ export default function CreadorRubricasPage() {
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-tertiary-container/20 text-tertiary">
                     <Icon name="analytics" />
                   </div>
-                  <h3 className="font-headline text-xl font-bold">Escala y Estilo</h3>
+                  <h3 className="font-headline text-xl font-bold">
+                    {t.herramientas.escalaEstilo}
+                  </h3>
                 </div>
                 <div className="flex flex-col gap-gap-lg">
                   <div className="flex flex-col gap-4 rounded-xl bg-surface-container-low p-4 md:flex-row md:items-center md:justify-between">
                     <div>
                       <h4 className="font-label text-xs font-bold text-primary">
-                        Número de Niveles de Desempeño
+                        {t.herramientas.numNiveles}
                       </h4>
                       <p className="text-sm text-on-surface-variant">
-                        Define cuántas columnas tendrá tu rúbrica.
+                        {t.herramientas.numNivelesDesc}
                       </p>
                     </div>
                     <div className="flex rounded-full bg-white p-1 shadow-sm">
@@ -359,25 +475,27 @@ export default function CreadorRubricasPage() {
                   <div className="grid grid-cols-1 gap-gap-lg md:grid-cols-2">
                     <div className="flex flex-col gap-2">
                       <label className="font-label text-xs font-bold text-on-surface-variant">
-                        Tono de Retroalimentación
+                        {t.herramientas.tonoRetro}
                       </label>
                       <select
                         value={tono}
                         onChange={(e) => setTono(e.target.value)}
                         className="h-14 w-full cursor-pointer rounded-xl border-none bg-surface-container-low px-4 text-sm transition-all focus:ring-2 focus:ring-secondary/20"
                       >
-                        {TONOS.map((t) => (
-                          <option key={t}>{t}</option>
+                        {TONOS.map((x) => (
+                          <option key={x} value={x}>
+                            {tonoLabel(x)}
+                          </option>
                         ))}
                       </select>
                     </div>
                     <div className="flex flex-col gap-2">
                       <label className="font-label text-xs font-bold text-on-surface-variant">
-                        Idioma de Salida
+                        {t.herramientas.idiomaSalida}
                       </label>
                       <select
-                        value={idioma}
-                        onChange={(e) => setIdioma(e.target.value)}
+                        value={idiomaSalida}
+                        onChange={(e) => setIdiomaSalida(e.target.value)}
                         className="h-14 w-full cursor-pointer rounded-xl border-none bg-surface-container-low px-4 text-sm transition-all focus:ring-2 focus:ring-secondary/20"
                       >
                         {IDIOMAS.map((i) => (
@@ -397,7 +515,7 @@ export default function CreadorRubricasPage() {
                   <div className="mb-6 flex items-center gap-2">
                     <Icon name="tips_and_updates" filled className="text-secondary-fixed" />
                     <span className="font-label text-xs font-bold uppercase text-secondary-fixed">
-                      IA Sugiere
+                      {t.herramientas.iaSugiere}
                     </span>
                   </div>
                   <p className="text-base mb-6 leading-relaxed">{sugerenciaIA}</p>
@@ -407,10 +525,14 @@ export default function CreadorRubricasPage() {
               <div className="flex min-h-[220px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-outline-variant/30 bg-surface-container-highest/30 p-8 text-center">
                 <Icon name="dashboard_customize" className="mb-4 text-[56px] text-outline-variant" />
                 <h4 className="font-headline text-xl font-bold text-on-surface-variant/60">
-                  Vista Previa
+                  {t.herramientas.vistaPrevia}
                 </h4>
                 <p className="text-sm mt-2 max-w-[220px] text-on-surface-variant/50">
-                  {niveles} niveles de desempeño · {tono.toLowerCase()} · {idioma}
+                  {tpl(t.herramientas.vistaPreviaDesc, {
+                    n: niveles,
+                    tono: tonoLabel(tono).toLowerCase(),
+                    idioma: idiomaSalida,
+                  })}
                 </p>
               </div>
             </aside>
@@ -421,7 +543,7 @@ export default function CreadorRubricasPage() {
           <div className="atmospheric-shadow space-y-gap-lg rounded-xl bg-surface-container-lowest p-8">
             <div className="flex items-center justify-between">
               <p className="text-sm text-on-surface-variant">
-                Suma de pesos:{" "}
+                {t.herramientas.sumaPesos}{" "}
                 <span className={pesoTotal === 100 ? "font-bold text-secondary" : "font-bold text-error"}>
                   {pesoTotal}%
                 </span>
@@ -447,7 +569,7 @@ export default function CreadorRubricasPage() {
                     <button
                       onClick={() => quitarCriterio(i)}
                       className="flex h-9 w-9 items-center justify-center rounded-full text-outline transition-colors hover:bg-error-container hover:text-error"
-                      aria-label="Quitar criterio"
+                      aria-label={t.herramientas.quitarCriterio}
                     >
                       <Icon name="delete" className="text-[18px]" />
                     </button>
@@ -459,14 +581,14 @@ export default function CreadorRubricasPage() {
               <input
                 value={nuevoCriterio}
                 onChange={(e) => setNuevoCriterio(e.target.value)}
-                placeholder="Agregar otro criterio (ej. Creatividad)"
+                placeholder={t.herramientas.agregarPlaceholder}
                 className="h-12 flex-1 rounded-xl border-none bg-surface-container-low px-4 text-sm focus:ring-2 focus:ring-secondary/20"
               />
               <button
                 onClick={agregarCriterio}
                 className="flex items-center justify-center gap-2 rounded-full bg-secondary-fixed px-6 py-3 text-sm font-bold text-on-secondary-fixed transition-all hover:opacity-90"
               >
-                <Icon name="add" className="text-[18px]" /> Agregar
+                <Icon name="add" className="text-[18px]" /> {t.herramientas.agregar}
               </button>
             </div>
           </div>
@@ -478,30 +600,28 @@ export default function CreadorRubricasPage() {
               <div className="atmospheric-shadow flex flex-col items-center justify-center gap-4 rounded-xl bg-surface-container-lowest p-16 text-center">
                 <Icon name="autorenew" className="animate-spin text-[48px] text-secondary" />
                 <p className="text-lg text-on-surface-variant">
-                  Generando tu rúbrica de {tipoActividad.toLowerCase()}...
+                  {tpl(t.herramientas.generandoRubrica, {
+                    tipo: tipoLabel(tipoActividad).toLowerCase(),
+                  })}
                 </p>
               </div>
             ) : (
               <>
                 {/* Feedback real (docente probando el prototipo, 2026-07-23,
                     via WhatsApp): "en movil algunos cuadros no se ven
-                    completos, hay que hacer scroll". La tabla ya tenia
-                    overflow-x-auto (nada se corta ni se rompe), pero nada
-                    avisaba que el scroll horizontal era intencional -- en
-                    una pantalla angosta el docente veia una tabla "cortada"
-                    sin saber que debia deslizar. Este aviso solo aparece
+                    completos, hay que hacer scroll". Este aviso solo aparece
                     por debajo de md (en desktop la tabla ya entra
                     completa). */}
                 <p className="mb-2 flex items-center gap-2 text-[12px] font-bold uppercase tracking-wide text-on-surface-variant md:hidden">
                   <Icon name="swipe" className="text-[16px]" />
-                  Desliza para ver todos los niveles
+                  {t.herramientas.deslizaNiveles}
                 </p>
                 <div className="atmospheric-shadow overflow-x-auto rounded-xl bg-surface-container-lowest p-6">
                   <table className="w-full min-w-[640px] border-separate border-spacing-2">
                     <thead>
                       <tr>
                         <th className="font-label text-xs font-bold p-3 text-left text-on-surface-variant">
-                          Criterio
+                          {t.herramientas.criterioCol}
                         </th>
                         {etiquetasNivel.map((e) => (
                           <th
@@ -519,7 +639,7 @@ export default function CreadorRubricasPage() {
                           <td className="font-label text-xs font-bold rounded-lg bg-surface-container-low p-3 align-top text-primary">
                             {c.nombre}
                             <div className="mt-1 text-[11px] font-bold uppercase text-secondary">
-                              peso {c.peso}%
+                              {tpl(t.herramientas.pesoLabel, { n: c.peso })}
                             </div>
                           </td>
                           {etiquetasNivel.map((e) => (
@@ -541,13 +661,13 @@ export default function CreadorRubricasPage() {
                     onClick={descargarRubrica}
                     className="flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-bold text-on-primary transition-all hover:opacity-90 active:scale-95"
                   >
-                    <Icon name="download" /> Descargar rúbrica (.txt)
+                    <Icon name="download" /> {t.herramientas.descargarRubrica}
                   </button>
                   <button
                     onClick={nuevaRubrica}
                     className="rounded-full bg-surface-container-low px-8 py-4 text-base font-bold text-on-surface-variant transition-all hover:bg-surface-container-high"
                   >
-                    Crear otra rúbrica
+                    {t.herramientas.crearOtra}
                   </button>
                 </div>
               </>
@@ -563,7 +683,9 @@ export default function CreadorRubricasPage() {
             className="group flex items-center gap-2 text-on-surface-variant transition-colors hover:text-primary"
           >
             <Icon name="arrow_back" className="transition-transform group-hover:-translate-x-1" />
-            <span className="font-label text-xs font-bold">Volver a Herramientas</span>
+            <span className="font-label text-xs font-bold">
+              {t.herramientas.volverHerramientas}
+            </span>
           </Link>
         ) : (
           <button
@@ -571,12 +693,14 @@ export default function CreadorRubricasPage() {
             className="group flex items-center gap-2 text-on-surface-variant transition-colors hover:text-primary"
           >
             <Icon name="arrow_back" className="transition-transform group-hover:-translate-x-1" />
-            <span className="font-label text-xs font-bold">Atrás</span>
+            <span className="font-label text-xs font-bold">{t.comun.atras}</span>
           </button>
         )}
         <div className="flex items-center gap-lg">
           {mensajeBorrador && (
-            <span className="text-sm hidden text-secondary md:inline">{mensajeBorrador}</span>
+            <span className="text-sm hidden text-secondary md:inline">
+              {t.herramientas.borradorGuardado}
+            </span>
           )}
           {paso === 1 && (
             <>
@@ -584,13 +708,13 @@ export default function CreadorRubricasPage() {
                 onClick={guardarBorrador}
                 className="hidden rounded-full px-8 py-3 text-sm font-bold text-on-surface-variant transition-all hover:bg-surface-container-low md:block"
               >
-                Guardar Borrador
+                {t.herramientas.guardarBorrador}
               </button>
               <button
                 onClick={irACriterios}
                 className="flex items-center gap-2 rounded-full bg-primary px-10 py-4 text-base font-bold text-on-primary transition-all hover:opacity-90"
               >
-                <span>Continuar a Criterios</span>
+                <span>{t.herramientas.continuarCriterios}</span>
                 <Icon name="arrow_forward" className="text-[16px]" />
               </button>
             </>
@@ -601,7 +725,7 @@ export default function CreadorRubricasPage() {
               disabled={criterios.length === 0}
               className="flex items-center gap-2 rounded-full bg-primary px-10 py-4 text-base font-bold text-on-primary transition-all hover:opacity-90 disabled:opacity-50"
             >
-              <span>Continuar a Generación</span>
+              <span>{t.herramientas.continuarGeneracion}</span>
               <Icon name="arrow_forward" className="text-[16px]" />
             </button>
           )}
