@@ -7,6 +7,8 @@ import { useSession, perfilCompleto } from "@/lib/store/session";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
 import { CargandoPantalla } from "@/components/CargandoPantalla";
+import { useIdioma } from "@/lib/i18n";
+import type { Traducciones } from "@/lib/i18n/traducciones";
 
 /**
  * Caja de Herramientas -- base literal: code.html real de Stitch
@@ -19,8 +21,8 @@ import { CargandoPantalla } from "@/components/CargandoPantalla";
  */
 
 type Herramienta = {
-  nombre: string;
-  descripcion: string;
+  nombreKey: keyof Traducciones["herramientas"];
+  descKey: keyof Traducciones["herramientas"];
   icono: string;
   href: string;
   estado: "disponible" | "proximamente";
@@ -28,29 +30,29 @@ type Herramienta = {
 
 const HERRAMIENTAS: Herramienta[] = [
   {
-    nombre: "Planeación Pro",
-    descripcion: "Genera secuencias didácticas completas en segundos.",
+    nombreKey: "planeacionNombre",
+    descKey: "planeacionDesc",
     icono: "auto_awesome",
     href: "/herramientas/planeacion",
     estado: "disponible",
   },
   {
-    nombre: "Banco de Prompts",
-    descripcion: "Prompts pedagógicos listos para copiar y usar.",
+    nombreKey: "promptsNombre",
+    descKey: "promptsDesc",
     icono: "chat_bubble",
     href: "/herramientas/prompts",
     estado: "disponible",
   },
   {
-    nombre: "Creador de Rúbricas",
-    descripcion: "Crea criterios de evaluación alineados a competencias.",
+    nombreKey: "rubricasNombre",
+    descKey: "rubricasDesc",
     icono: "table_chart",
     href: "/herramientas/rubricas",
     estado: "disponible",
   },
   {
-    nombre: "Adaptador de Contenido",
-    descripcion: "Guía real para adaptar tu material a NEE, nivel de lectura o idioma.",
+    nombreKey: "adaptadorNombre",
+    descKey: "adaptadorDesc",
     icono: "translate",
     href: "/herramientas/adaptador",
     estado: "disponible",
@@ -60,6 +62,7 @@ const HERRAMIENTAS: Herramienta[] = [
 export default function HerramientasHubPage() {
   const router = useRouter();
   const { perfil, cargando } = useSession();
+  const { t } = useIdioma();
 
   useEffect(() => {
     if (cargando) return;
@@ -71,14 +74,14 @@ export default function HerramientasHubPage() {
   if (!perfil || !perfilCompleto(perfil)) return null;
 
   return (
-    <AppShell titulo="Herramientas">
+    <AppShell titulo={t.comun.herramientas}>
       <div className="mx-auto max-w-3xl space-y-gap-lg">
         <div>
           <span className="font-label text-xs font-bold uppercase tracking-widest text-secondary">
-            Módulo de creación
+            {t.herramientas.moduloCreacion}
           </span>
           <h1 className="font-headline text-3xl text-on-primary-fixed sm:text-4xl">
-            Caja de Herramientas
+            {t.herramientas.cajaHerramientas}
           </h1>
         </div>
 
@@ -101,9 +104,11 @@ export default function HerramientasHubPage() {
                   <Icon name={h.icono} className="text-3xl" />
                 </div>
                 <div>
-                  <h4 className="font-headline text-lg font-bold text-[18px]">{h.nombre}</h4>
+                  <h4 className="font-headline text-lg font-bold text-[18px]">
+                    {t.herramientas[h.nombreKey]}
+                  </h4>
                   <p className="text-sm line-clamp-2 text-on-surface-variant">
-                    {h.descripcion}
+                    {t.herramientas[h.descKey]}
                   </p>
                 </div>
                 <span
@@ -113,16 +118,16 @@ export default function HerramientasHubPage() {
                       : "bg-surface-container-low text-outline"
                   }`}
                 >
-                  {disponible ? "Disponible" : "Próximamente"}
+                  {disponible ? t.comun.disponible : t.comun.proximamente}
                 </span>
               </div>
             );
             return disponible ? (
-              <Link key={h.nombre} href={h.href}>
+              <Link key={h.nombreKey} href={h.href}>
                 {contenido}
               </Link>
             ) : (
-              <div key={h.nombre}>{contenido}</div>
+              <div key={h.nombreKey}>{contenido}</div>
             );
           })}
         </div>
