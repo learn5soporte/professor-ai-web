@@ -4,10 +4,12 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession, perfilCompleto } from "@/lib/store/session";
-import { BADGES } from "@/lib/gamification/badges";
+import { BADGES, textoBadge } from "@/lib/gamification/badges";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
 import { CargandoPantalla } from "@/components/CargandoPantalla";
+import { useIdioma } from "@/lib/i18n";
+import type { Traducciones } from "@/lib/i18n/traducciones";
 
 /**
  * Insignias -- base literal: code.html real de Stitch
@@ -24,6 +26,16 @@ function rarezaDe(puntos: number): Rareza {
   if (puntos >= 25) return "Epica";
   if (puntos >= 15) return "Rara";
   return "Comun";
+}
+
+function rarezaLabel(t: Traducciones, rareza: Rareza): string {
+  const mapa: Record<Rareza, string> = {
+    Comun: t.insignias.rarezaComun,
+    Rara: t.insignias.rarezaRara,
+    Epica: t.insignias.rarezaEpica,
+    Legendaria: t.insignias.rarezaLegendaria,
+  };
+  return mapa[rareza];
 }
 
 const ESTILO_RAREZA: Record<Rareza, { chip: string; circulo: string }> = {
@@ -48,6 +60,7 @@ const ESTILO_RAREZA: Record<Rareza, { chip: string; circulo: string }> = {
 export default function InsigniasPage() {
   const router = useRouter();
   const { perfil, resultadoTmaid, badges, puntos, cargando } = useSession();
+  const { idioma, t } = useIdioma();
 
   useEffect(() => {
     if (cargando) return;
@@ -67,15 +80,15 @@ export default function InsigniasPage() {
   const rarezaDestacada = destacada ? rarezaDe(destacada.puntos) : null;
 
   return (
-    <AppShell titulo="Insignias">
+    <AppShell titulo={t.progreso.insignias}>
       <div className="mx-auto max-w-3xl space-y-gap-xl">
         <div className="flex items-end justify-between">
           <div>
             <span className="font-label text-xs font-bold uppercase tracking-widest text-secondary">
-              Reconocimiento
+              {t.insignias.reconocimiento}
             </span>
             <h1 className="font-headline text-3xl font-black tracking-tight text-on-primary-fixed sm:text-4xl md:text-5xl">
-              Tus Insignias
+              {t.insignias.tusInsignias}
             </h1>
           </div>
           <span className="flex items-center gap-2 rounded-full bg-tertiary-fixed px-4 py-2 text-on-tertiary-fixed">
@@ -104,9 +117,9 @@ export default function InsigniasPage() {
                       : "bg-outline-variant text-on-surface-variant opacity-60"
                   }`}
                 >
-                  {rareza}
+                  {rarezaLabel(t, rareza)}
                 </span>
-                <p className="text-sm text-center font-bold">{badge.nombre}</p>
+                <p className="text-sm text-center font-bold">{textoBadge(badge, idioma).nombre}</p>
               </div>
             );
           })}
@@ -123,15 +136,19 @@ export default function InsigniasPage() {
               <div className="space-y-gap-lg w-full">
                 <div>
                   <span className="font-label text-xs font-bold uppercase tracking-widest text-tertiary-fixed">
-                    Insignia Destacada
+                    {t.insignias.insigniaDestacada}
                   </span>
-                  <h3 className="font-headline mt-2 text-3xl font-black tracking-tight">{destacada.nombre}</h3>
-                  <p className="mt-4 text-base text-white/80 sm:text-lg">{destacada.descripcion}</p>
+                  <h3 className="font-headline mt-2 text-3xl font-black tracking-tight">
+                    {textoBadge(destacada, idioma).nombre}
+                  </h3>
+                  <p className="mt-4 text-base text-white/80 sm:text-lg">
+                    {textoBadge(destacada, idioma).descripcion}
+                  </p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2 rounded-xl bg-white/5 p-6 backdrop-blur-md">
                     <span className="font-label text-xs font-bold block text-white/50">
-                      COLECCIÓN
+                      {t.insignias.coleccion}
                     </span>
                     <div className="flex items-end gap-2">
                       <span className="font-headline text-xl font-bold text-tertiary-fixed">
@@ -147,15 +164,15 @@ export default function InsigniasPage() {
                   </div>
                   <div className="rounded-xl bg-white/5 p-6 backdrop-blur-md">
                     <span className="font-label text-xs font-bold block text-white/50">
-                      RAREZA
+                      {t.insignias.rarezaLabel}
                     </span>
                     <span className="font-headline text-xl font-bold">
-                      {rarezaDestacada}
+                      {rarezaDestacada ? rarezaLabel(t, rarezaDestacada) : ""}
                     </span>
                   </div>
                   <div className="col-span-2 rounded-xl bg-white/5 p-6 backdrop-blur-md">
                     <span className="font-label text-xs font-bold block text-white/50">
-                      VALOR
+                      {t.insignias.valorLabel}
                     </span>
                     <span className="font-headline text-xl font-bold text-tertiary-fixed">
                       +{destacada.puntos} XP
@@ -168,15 +185,15 @@ export default function InsigniasPage() {
         ) : (
           <div className="atmospheric-shadow rounded-3xl bg-white p-8 text-center">
             <Icon name="emoji_events" className="text-4xl text-outline-variant" />
-            <p className="font-headline mt-2 text-lg font-bold">Aún no tienes insignias desbloqueadas</p>
+            <p className="font-headline mt-2 text-lg font-bold">{t.insignias.sinDesbloqueadas}</p>
             <p className="text-sm mt-1 text-on-surface-variant">
-              Completa retos en tu ruta formativa para ganar tu primera.
+              {t.insignias.completaRetos}
             </p>
             <Link
               href="/rutas"
               className="text-sm mt-4 inline-block font-bold text-secondary hover:underline"
             >
-              Ir a mi ruta →
+              {t.insignias.irRuta}
             </Link>
           </div>
         )}
