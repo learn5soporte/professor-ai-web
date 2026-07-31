@@ -8,6 +8,9 @@ import { BadgeUnlockToast } from "@/components/BadgeUnlockToast";
 import { BADGES } from "@/lib/gamification/badges";
 import { Icon } from "@/components/Icon";
 import { CargandoPantalla } from "@/components/CargandoPantalla";
+import { useIdioma } from "@/lib/i18n";
+import { etiquetaFase } from "@/lib/i18n/valores";
+import { localizarResultadoTmaid } from "@/lib/tmaid/scoring";
 
 /**
  * Mi Ruta Formativa -- base literal: code.html real de Stitch
@@ -33,6 +36,7 @@ export default function RutasPage() {
     progresoRutas,
     cargando,
   } = useSession();
+  const { idioma, t } = useIdioma();
   const [faseSeleccionada, setFaseSeleccionada] = useState<string | null>(null);
   const [badgeGanado] = useState<null | (typeof BADGES)[string]>(null);
   // Bug real reportado por el usuario (2026-07-28): el selector de fase de
@@ -59,7 +63,8 @@ export default function RutasPage() {
   if (cargando) return <CargandoPantalla />;
   if (!perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
 
-  const fases = resultadoTmaid.rutaPersonalizada;
+  const resultado = localizarResultadoTmaid(resultadoTmaid, perfil, idioma);
+  const fases = resultado.rutaPersonalizada;
   const indiceActivo = fases.findIndex((f) => progresoRutas[f.fase] !== "completado");
   const rutaCompleta = indiceActivo === -1;
 
@@ -71,15 +76,15 @@ export default function RutasPage() {
   }
 
   return (
-    <AppShell titulo="Rutas">
+    <AppShell titulo={t.shell.rutas}>
       <BadgeUnlockToast badge={badgeGanado} onClose={() => {}} />
       <div className="mx-auto max-w-2xl space-y-gap-xl">
         <div className="flex flex-col items-center gap-4 text-center">
           <span className="font-label rounded-full bg-tertiary-fixed px-4 py-1 text-xs font-bold uppercase tracking-widest text-on-tertiary-fixed">
-            Tu Viaje de Aprendizaje
+            {t.rutas.viaje}
           </span>
           <h2 className="font-headline text-3xl font-black tracking-tight text-on-primary-fixed sm:text-4xl">
-            Ruta Formativa
+            {t.rutas.rutaFormativa}
           </h2>
         </div>
 
@@ -91,7 +96,7 @@ export default function RutasPage() {
             tabla de la rubrica). */}
         <div className="flex justify-center">
           <p className="no-scrollbar mb-1 text-center text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/70 sm:hidden">
-            Desliza para ver todos los módulos
+            {t.rutas.desliza}
           </p>
         </div>
         <div className="no-scrollbar -mx-margin-mobile overflow-x-auto px-margin-mobile">
@@ -106,7 +111,7 @@ export default function RutasPage() {
                     : "text-on-surface-variant hover:text-on-surface"
                 }`}
               >
-                {f.fase}
+                {etiquetaFase(f.fase, idioma)}
               </button>
             ))}
           </div>
@@ -115,7 +120,7 @@ export default function RutasPage() {
         {rutaCompleta && (
           <div className="atmospheric-shadow rounded-xl bg-tertiary-fixed p-6 text-center text-on-tertiary-fixed">
             <Icon name="emoji_events" filled className="text-4xl" />
-            <p className="font-headline mt-2 text-lg font-bold">¡Completaste toda tu ruta formativa!</p>
+            <p className="font-headline mt-2 text-lg font-bold">{t.rutas.completasteRuta}</p>
           </div>
         )}
 
@@ -143,7 +148,7 @@ export default function RutasPage() {
                       }`}
                     >
                       <h4 className="font-headline text-xl font-bold text-secondary">
-                        Fase: {f.fase}
+                        {t.rutas.faseLabel} {etiquetaFase(f.fase, idioma)}
                       </h4>
                       <p className="my-2 text-on-surface-variant">{f.descripcion}</p>
                       <div className="mb-4 h-1.5 w-full rounded-full bg-surface-container-highest">
@@ -158,7 +163,7 @@ export default function RutasPage() {
                         onClick={() => router.push(`/rutas/modulo/${f.fase.toLowerCase()}`)}
                         className="w-full rounded-full bg-secondary py-3 font-bold text-on-secondary transition-shadow hover:shadow-lg"
                       >
-                        VER RETOS
+                        {t.rutas.verRetos}
                       </button>
                     </div>
                   </div>
@@ -186,9 +191,11 @@ export default function RutasPage() {
                   </div>
                   {estado === "completado" && (
                     <div className="absolute left-20 hidden w-48 rounded-xl border-l-4 border-tertiary-container bg-white p-4 shadow-md md:block">
-                      <p className="text-sm font-bold">Fase: {f.fase}</p>
+                      <p className="text-sm font-bold">
+                        {t.rutas.faseLabel} {etiquetaFase(f.fase, idioma)}
+                      </p>
                       <span className="text-[12px] font-black text-tertiary-container">
-                        COMPLETADO
+                        {t.rutas.completadoMayus}
                       </span>
                     </div>
                   )}
