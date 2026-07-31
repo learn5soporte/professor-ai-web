@@ -7,6 +7,7 @@ import { supabaseConfigurado, actualizarContrasena } from "@/lib/supabase/datos"
 import { createClient } from "@/lib/supabase/client";
 import { DarkScreen } from "@/components/DarkScreen";
 import { Icon } from "@/components/Icon";
+import { useIdioma } from "@/lib/i18n";
 
 /**
  * Pantalla a la que Supabase redirige desde el enlace del correo de
@@ -18,12 +19,14 @@ import { Icon } from "@/components/Icon";
  * es un flujo de auth aislado, no depende del estado normal de la app.
  */
 export default function RestablecerPasswordPage() {
+  const { t } = useIdioma();
   const [listo, setListo] = useState(false);
   const [modoDemo, setModoDemo] = useState(false);
   const [sesionValida, setSesionValida] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmacion, setConfirmacion] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [errorLocal, setErrorLocal] = useState<null | "min" | "coinciden">(null);
   const [guardando, setGuardando] = useState(false);
   const [exito, setExito] = useState(false);
 
@@ -76,13 +79,14 @@ export default function RestablecerPasswordPage() {
     e.preventDefault();
     setError(null);
     if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres.");
+      setErrorLocal("min");
       return;
     }
     if (password !== confirmacion) {
-      setError("Las contraseñas no coinciden.");
+      setErrorLocal("coinciden");
       return;
     }
+    setErrorLocal(null);
     setGuardando(true);
     try {
       await actualizarContrasena(password);
@@ -94,6 +98,14 @@ export default function RestablecerPasswordPage() {
     }
   }
 
+  const mensajeErrorVisible =
+    error ??
+    (errorLocal === "min"
+      ? t.recuperar.errorMin
+      : errorLocal === "coinciden"
+      ? t.recuperar.errorNoCoinciden
+      : null);
+
   return (
     <DarkScreen>
       <section className="flex w-full max-w-md flex-col px-margin-mobile">
@@ -102,44 +114,38 @@ export default function RestablecerPasswordPage() {
             <span className="font-headline text-lg font-bold text-white">P</span>
           </div>
           <h2 className="font-headline text-2xl font-bold text-white">
-            Nueva contraseña
+            {t.recuperar.nuevaContrasena}
           </h2>
         </div>
 
         {modoDemo ? (
           <div className="glass-card space-y-4 rounded-xl p-8 text-center">
-            <p className="text-sm text-white/60">
-              Prototipo Fase 0 -- sin cuentas reales todavía, no hay contraseña que restablecer.
-            </p>
+            <p className="text-sm text-white/60">{t.recuperar.demoAviso2}</p>
             <Link href="/login" className="font-bold text-tertiary-fixed-dim">
-              Volver a iniciar sesión
+              {t.recuperar.volverLogin}
             </Link>
           </div>
         ) : !listo ? (
-          <p className="text-center text-sm text-white/40">Verificando enlace...</p>
+          <p className="text-center text-sm text-white/40">{t.recuperar.verificando}</p>
         ) : exito ? (
           <div className="glass-card space-y-4 rounded-xl p-8 text-center">
-            <p className="text-sm text-white/70">
-              Tu contraseña se actualizó. Ya puedes iniciar sesión con la nueva.
-            </p>
+            <p className="text-sm text-white/70">{t.recuperar.exitoTexto}</p>
             <Link href="/login" className="font-bold text-tertiary-fixed-dim">
-              Ir a iniciar sesión
+              {t.recuperar.irLogin}
             </Link>
           </div>
         ) : !sesionValida ? (
           <div className="glass-card space-y-4 rounded-xl p-8 text-center">
-            <p className="text-sm text-red-300">
-              Este enlace no es válido o ya expiró. Pide uno nuevo desde &quot;¿Olvidaste tu contraseña?&quot; en el login.
-            </p>
+            <p className="text-sm text-red-300">{t.recuperar.enlaceInvalido}</p>
             <Link href="/recuperar" className="font-bold text-tertiary-fixed-dim">
-              Pedir un enlace nuevo
+              {t.recuperar.pedirNuevo}
             </Link>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="glass-card space-y-6 rounded-xl p-8">
             <div className="space-y-2">
               <label className="font-label text-sm font-semibold text-white/60">
-                Contraseña nueva
+                {t.recuperar.passNueva}
               </label>
               <input
                 type="password"
@@ -153,7 +159,7 @@ export default function RestablecerPasswordPage() {
             </div>
             <div className="space-y-2">
               <label className="font-label text-sm font-semibold text-white/60">
-                Confirmar contraseña
+                {t.recuperar.confirmarPass}
               </label>
               <input
                 type="password"
@@ -165,9 +171,9 @@ export default function RestablecerPasswordPage() {
                 className="w-full rounded-xl border-none bg-white/5 px-4 py-4 text-white placeholder:text-white/20 focus:ring-2 focus:ring-secondary-container"
               />
             </div>
-            {error && (
+            {mensajeErrorVisible && (
               <p className="text-sm rounded-lg bg-red-500/10 px-4 py-3 text-red-300">
-                {error}
+                {mensajeErrorVisible}
               </p>
             )}
             <button
@@ -175,7 +181,8 @@ export default function RestablecerPasswordPage() {
               disabled={guardando}
               className="btn-accent flex w-full items-center justify-center gap-2 disabled:opacity-60"
             >
-              {guardando ? "Guardando..." : "Guardar contraseña"} <Icon name="arrow_forward" className="text-[18px]" />
+              {guardando ? t.recuperar.guardando : t.recuperar.guardarPass}{" "}
+              <Icon name="arrow_forward" className="text-[18px]" />
             </button>
           </form>
         )}
