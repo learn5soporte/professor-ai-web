@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { Icon } from "@/components/Icon";
+import { useIdioma } from "@/lib/i18n";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 /**
  * SCREEN 1: SPLASH -- v2 (2026-07-23): pantalla de inicio rediseñada a
@@ -12,12 +16,6 @@ import { Icon } from "@/components/Icon";
  * .splash-orbit, .float-card*) que viven solo en este archivo, así las
  * otras pantallas inmersivas no cambian.
  *
- * v3 (2026-07-29): copy del badge y del subtítulo ajustado al texto
- * aprobado en Claude Design ("Hecho para educadores" / "...transforma tu
- * forma de enseñar"), y el CTA principal pasa de .btn-accent a
- * .btn-gold-glow (utilidad nueva en globals.css con el degradé y el
- * glow exactos del diseño aprobado).
- *
  * El mockup "Tu Perfil IA" de la derecha reutiliza el mismo radar SVG que
  * /tmaid/resultado, con valores de ejemplo fijos (no reales) -- es una
  * vista previa honesta del producto, no una estadística inventada sobre
@@ -27,15 +25,20 @@ import { Icon } from "@/components/Icon";
  * compleja ahí hasta auditar ese problema por separado.
  */
 
-const VALOR_PROPUESTA: { icono: string; texto: string }[] = [
-  { icono: "psychology", texto: "Diagnóstico IA" },
-  { icono: "route", texto: "Rutas personalizadas" },
-  { icono: "handyman", texto: "Herramientas para el aula" },
-];
-
 export default function SplashPage() {
+  const { t } = useIdioma();
+
+  const valorPropuesta: { icono: string; texto: string }[] = [
+    { icono: "psychology", texto: t.splash.valor1 },
+    { icono: "route", texto: t.splash.valor2 },
+    { icono: "handyman", texto: t.splash.valor3 },
+  ];
+
   return (
     <div className="dark-screen">
+      <div className="fixed right-4 top-4 z-50">
+        <LanguageToggle variante="oscuro" />
+      </div>
       <div className="dot-grid pointer-events-none fixed inset-0 z-0 opacity-[0.15]" />
       <div className="pointer-events-none fixed inset-0 z-0">
         <div className="absolute right-0 top-0 h-[500px] w-[500px] translate-x-1/3 -translate-y-1/3 rounded-full bg-tertiary-fixed-dim/20 blur-[120px]" />
@@ -48,7 +51,7 @@ export default function SplashPage() {
         <section className="flex w-full max-w-xl flex-col items-center text-center lg:items-start lg:text-left">
           <span className="glass-card mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-tertiary-fixed-dim">
             <span className="glow-node pulse-ai h-2 w-2 rounded-full bg-tertiary-fixed-dim" />
-            Hecho para educadores
+            {t.splash.badge}
           </span>
 
           <h1 className="font-headline mb-4 text-5xl font-black leading-[1.05] tracking-tighter sm:text-6xl md:text-7xl">
@@ -58,32 +61,31 @@ export default function SplashPage() {
           </h1>
 
           <p className="mx-auto mb-8 max-w-md text-lg text-white/60 lg:mx-0">
-            Tu asistente de IA para el aula. Diagnostica tu nivel, arma tu
-            ruta y transforma tu forma de enseñar.
+            {t.splash.descripcion}
           </p>
 
           <div className="mb-6 flex flex-col items-center gap-4 sm:flex-row lg:items-start">
             <Link
               href="/registro"
-              className="btn-gold-glow px-7 py-3.5 text-base"
+              className="btn-accent inline-flex items-center gap-2"
             >
-              Comenzar gratis
+              {t.splash.comenzar}
               <Icon name="arrow_forward" />
             </Link>
             <Link
               href="/login"
               className="text-sm font-bold text-white/50 transition-colors hover:text-white"
             >
-              Ya tengo cuenta →
+              {t.splash.yaTengoCuenta}
             </Link>
           </div>
 
           <p className="mb-6 text-sm font-bold text-tertiary-fixed-dim">
-            Ej.: una rúbrica que toma 30 min a mano, aquí toma 5.
+            {t.splash.ejemplo}
           </p>
 
           <div className="flex flex-wrap justify-center gap-2 lg:justify-start">
-            {VALOR_PROPUESTA.map((v) => (
+            {valorPropuesta.map((v) => (
               <span
                 key={v.texto}
                 className="glass-card flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold text-white/70"
@@ -103,9 +105,9 @@ export default function SplashPage() {
           <div className="float-card glass-card relative rounded-3xl p-6 shadow-atmospheric">
             <div className="mb-4 flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-widest text-white/40">
-                Tu Perfil IA
+                {t.splash.perfilIa}
               </span>
-              <span className="gold-chip">Avanzado</span>
+              <span className="gold-chip">{t.splash.avanzado}</span>
             </div>
             <svg
               className="mx-auto h-auto w-full max-w-[220px]"
@@ -153,7 +155,7 @@ export default function SplashPage() {
               />
             </svg>
             <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-4">
-              <span className="text-xs text-white/50">Puntaje promedio</span>
+              <span className="text-xs text-white/50">{t.splash.puntajePromedio}</span>
               <span className="text-sm font-bold text-white">78%</span>
             </div>
           </div>
@@ -162,7 +164,7 @@ export default function SplashPage() {
             <Icon name="military_tech" className="text-tertiary-fixed-dim" />
             <div>
               <p className="text-xs font-bold text-white">+30 XP</p>
-              <p className="text-[10px] text-white/40">Reto completado</p>
+              <p className="text-[10px] text-white/40">{t.splash.retoCompletado}</p>
             </div>
           </div>
         </section>

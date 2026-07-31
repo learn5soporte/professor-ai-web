@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Epilogue, Manrope } from "next/font/google";
 import { SessionProvider } from "@/lib/store/session";
+import { IdiomaProvider } from "@/lib/i18n";
 import { DemoBanner } from "@/components/DemoBanner";
 import "./globals.css";
 
@@ -40,7 +41,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <SessionProvider>{children}</SessionProvider>
+        <IdiomaProvider>
+          <SessionProvider>{children}</SessionProvider>
+        </IdiomaProvider>
         <DemoBanner />
       </body>
     </html>
