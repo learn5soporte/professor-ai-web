@@ -9,12 +9,13 @@ import {
   ESCALA_LIKERT,
   type Dimension,
 } from "@/lib/tmaid/preguntas";
-import { calcularResultadoTmaid, ETIQUETA_DIMENSION } from "@/lib/tmaid/scoring";
+import { calcularResultadoTmaid, etiquetaDimension } from "@/lib/tmaid/scoring";
 import { BadgeUnlockToast } from "@/components/BadgeUnlockToast";
 import { BADGES } from "@/lib/gamification/badges";
 import { DarkScreen } from "@/components/DarkScreen";
 import { Icon } from "@/components/Icon";
 import { CargandoPantalla } from "@/components/CargandoPantalla";
+import { useIdioma } from "@/lib/i18n";
 
 /**
  * Diagnostico TMAID -- base literal: code.html real de Stitch
@@ -39,12 +40,10 @@ import { CargandoPantalla } from "@/components/CargandoPantalla";
  * Learn5" -- TMAID sí es un modelo con nombre propio, no un framework
  * externo tipo DigCompEdu/SAMR/TPACK. Ver memoria del proyecto.
  *
- * v2 (2026-07-30): el CTA de la intro ("Comenzar Diagnóstico") pasa de un
- * pill azul (bg-secondary) a .btn-gold-glow, mismo tratamiento dorado
- * aprobado en Claude Design ya aplicado en las otras pantallas oscuras
- * (Splash/Login/Registro/Recuperar/Onboarding). Las pantallas de Likert y
- * pregunta abierta usan un sistema visual claro distinto (btn-primary
- * sobre fondo claro) y quedan fuera de este cambio a propósito.
+ * Fase i18n: preguntas/escala vienen bilingües de preguntas.ts y el
+ * resultado se genera en el idioma activo (calcularResultadoTmaid recibe
+ * `idioma`); si el docente cambia de idioma después, las pantallas que
+ * muestran el resultado lo re-localizan con localizarResultadoTmaid().
  */
 
 const TOTAL_LIKERT = PREGUNTAS_LIKERT.length;
@@ -90,6 +89,7 @@ type Paso = "intro" | number | "procesando";
 export default function TmaidPage() {
   const router = useRouter();
   const { perfil, guardarResultadoTmaid, otorgarBadge, cargando } = useSession();
+  const { idioma, t } = useIdioma();
   const [paso, setPaso] = useState<Paso>("intro");
   const [respuestas, setRespuestas] = useState<Record<string, number>>({});
   const [miedos, setMiedos] = useState("");
@@ -114,7 +114,7 @@ export default function TmaidPage() {
         router.push("/onboarding");
         return;
       }
-      const resultado = calcularResultadoTmaid(respuestas, perfil, miedos);
+      const resultado = calcularResultadoTmaid(respuestas, perfil, miedos, idioma);
       guardarResultadoTmaid(resultado);
       const gano = otorgarBadge("diagnostico-completo");
       if (gano) setBadgeGanado(BADGES["diagnostico-completo"]);
@@ -179,7 +179,7 @@ export default function TmaidPage() {
             <Icon name="radar" filled className="text-[64px] text-tertiary-fixed-dim" />
           </div>
           <h1 className="font-headline mb-6 text-3xl font-black text-white sm:text-4xl">
-            Tu Diagnóstico Docente IA
+            {t.tmaid.introTitulo}
           </h1>
           <div className="mb-6 flex flex-col items-center gap-3">
             {ORDEN_DIMENSIONES.map((dim) => {
@@ -195,20 +195,20 @@ export default function TmaidPage() {
                     <Icon name={visual.icon} filled className={`text-[18px] ${visual.iconClass}`} />
                   </span>
                   <span className="font-label text-xs font-bold uppercase tracking-wide text-white">
-                    {ETIQUETA_DIMENSION[dim]}
+                    {etiquetaDimension(dim, idioma)}
                   </span>
                 </div>
               );
             })}
           </div>
           <p className="mx-auto mb-12 max-w-md text-sm leading-relaxed text-white/60">
-            Estas 4 dimensiones son el modelo TMAID (Test de Madurez IA Docente) de Learn5: miden qué sabes, qué tanto lo usas, qué tanto lo integras a tu enseñanza y qué tan abierto estás a seguir aprendiendo.
+            {t.tmaid.introTexto}
           </p>
           <button
             onClick={siguiente}
-            className="group btn-gold-glow px-8 py-4 text-lg"
+            className="group inline-flex items-center gap-4 rounded-full bg-secondary px-8 py-4 font-headline text-lg font-bold text-on-secondary transition-all hover:bg-secondary-container"
           >
-            Comenzar Diagnóstico
+            {t.tmaid.comenzarDiagnostico}
             <Icon name="arrow_forward" className="transition-transform group-hover:translate-x-1" />
           </button>
         </section>
@@ -232,9 +232,11 @@ export default function TmaidPage() {
           </div>
         </div>
         <div className="relative z-10 text-center">
-          <h3 className="font-headline mb-4 text-xl font-bold text-white">Procesando tu perfil...</h3>
+          <h3 className="font-headline mb-4 text-xl font-bold text-white">
+            {t.tmaid.procesandoTitulo}
+          </h3>
           <p className="animate-pulse text-base text-white/60">
-            Nuestra IA está analizando tus respuestas para generar tu ruta personalizada.
+            {t.tmaid.procesandoTexto}
           </p>
         </div>
       </DarkScreen>
@@ -246,17 +248,22 @@ export default function TmaidPage() {
     return (
       <div className="min-h-screen bg-surface pb-12 pt-24">
         <BadgeUnlockToast badge={badgeGanado} onClose={() => setBadgeGanado(null)} />
-        <HeaderProgreso dimensionLabel="Integración Curricular" paso={TOTAL_PASOS} total={TOTAL_PASOS} />
+        <HeaderProgreso
+          dimensionLabel={t.tmaid.integracionCurricular}
+          dimensionTitulo={t.tmaid.dimensionLabel}
+          paso={TOTAL_PASOS}
+          total={TOTAL_PASOS}
+        />
         <div className="mx-auto flex w-full max-w-3xl flex-col px-margin-mobile">
           <h2 className="font-headline mb-8 text-2xl font-bold text-primary">
-            {PREGUNTA_ABIERTA.texto}
+            {PREGUNTA_ABIERTA.texto[idioma]}
           </h2>
           <div className="relative">
             <textarea
               value={miedos}
               onChange={(e) => setMiedos(e.target.value.slice(0, 500))}
               maxLength={500}
-              placeholder={PREGUNTA_ABIERTA.placeholder}
+              placeholder={PREGUNTA_ABIERTA.placeholder[idioma]}
               className="atmospheric-shadow h-64 w-full rounded-xl border-none bg-white/40 p-8 text-lg backdrop-blur-md transition-all placeholder:text-outline focus:bg-white/60 focus:ring-2 focus:ring-secondary/20"
             />
             <div className="font-label absolute bottom-6 right-8 text-sm font-bold text-tertiary">
@@ -265,13 +272,13 @@ export default function TmaidPage() {
           </div>
           <div className="mt-12 flex justify-between">
             <button onClick={atras} className="rounded-full px-5 py-2 text-sm font-semibold text-on-surface-variant">
-              Atrás
+              {t.comun.atras}
             </button>
             <button
               onClick={siguiente}
               className="font-label inline-flex items-center gap-4 rounded-full bg-primary px-10 py-4 text-base font-bold text-on-primary transition-all hover:bg-on-primary-fixed-variant"
             >
-              Finalizar Diagnóstico
+              {t.tmaid.finalizarDiagnostico}
               <Icon name="auto_awesome" />
             </button>
           </div>
@@ -285,18 +292,19 @@ export default function TmaidPage() {
     <div className="min-h-screen bg-surface pb-12 pt-24">
       <BadgeUnlockToast badge={badgeGanado} onClose={() => setBadgeGanado(null)} />
       <HeaderProgreso
-        dimensionLabel={pregunta ? ETIQUETA_DIMENSION[pregunta.dimension] : ""}
+        dimensionLabel={pregunta ? etiquetaDimension(pregunta.dimension, idioma) : ""}
+        dimensionTitulo={t.tmaid.dimensionLabel}
         paso={idx + 1}
         total={TOTAL_PASOS}
       />
       <div className="mx-auto flex w-full max-w-4xl flex-col items-center justify-center px-margin-mobile">
         {pregunta?.ejemplo && (
           <span className="mb-4 inline-flex items-center gap-1 rounded-full bg-tertiary-fixed px-3 py-1 text-[11px] font-black uppercase tracking-widest text-on-tertiary-fixed">
-            <Icon name="auto_stories" className="text-[14px]" /> Escenario
+            <Icon name="auto_stories" className="text-[14px]" /> {t.tmaid.escenario}
           </span>
         )}
         <h2 className="font-headline mb-16 px-4 text-center text-2xl font-bold text-primary">
-          {pregunta?.texto}
+          {pregunta?.texto[idioma]}
         </h2>
         <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-5">
           {ESCALA_LIKERT.map((opcion) => {
@@ -309,7 +317,7 @@ export default function TmaidPage() {
                   selected ? "border-secondary bg-secondary-fixed" : "border-transparent bg-white hover:bg-secondary-fixed"
                 }`}
               >
-                <span className="text-sm text-on-surface-variant">{opcion.etiqueta}</span>
+                <span className="text-sm text-on-surface-variant">{opcion.etiqueta[idioma]}</span>
                 <div
                   className={`flex h-12 w-12 items-center justify-center rounded-full border-2 ${
                     selected ? "border-secondary" : "border-outline-variant group-hover:border-secondary"
@@ -327,14 +335,14 @@ export default function TmaidPage() {
         </div>
         <div className="mt-12 flex w-full justify-between">
           <button onClick={atras} className="rounded-full px-5 py-2 text-sm font-semibold text-on-surface-variant">
-            Atrás
+            {t.comun.atras}
           </button>
           <button
             onClick={siguiente}
             disabled={!puedeContinuar}
             className="btn-primary disabled:opacity-40"
           >
-            Continuar →
+            {t.comun.continuar} →
           </button>
         </div>
       </div>
@@ -344,10 +352,12 @@ export default function TmaidPage() {
 
 function HeaderProgreso({
   dimensionLabel,
+  dimensionTitulo,
   paso,
   total,
 }: {
   dimensionLabel: string;
+  dimensionTitulo: string;
   paso: number;
   total: number;
 }) {
@@ -355,7 +365,7 @@ function HeaderProgreso({
     <header className="glass-card fixed left-0 top-0 z-50 flex w-full flex-col gap-2 px-margin-mobile py-4">
       <div className="font-label flex items-center justify-between text-xs font-bold text-on-surface-variant">
         <span>
-          DIMENSIÓN:{" "}
+          {dimensionTitulo}{" "}
           <span className="font-bold uppercase tracking-wider text-tertiary">
             {dimensionLabel}
           </span>
