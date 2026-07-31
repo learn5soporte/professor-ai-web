@@ -8,6 +8,10 @@ import { BADGES } from "@/lib/gamification/badges";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
 import { CargandoPantalla } from "@/components/CargandoPantalla";
+import { useIdioma } from "@/lib/i18n";
+import { tpl } from "@/lib/i18n/traducciones";
+import { etiquetaFase } from "@/lib/i18n/valores";
+import { localizarResultadoTmaid } from "@/lib/tmaid/scoring";
 
 /**
  * Detalle de Módulo -- base literal: code.html real de Stitch
@@ -47,6 +51,7 @@ const ICONO_POR_FASE: Record<string, string> = {
 export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null }) {
   const router = useRouter();
   const { perfil, resultadoTmaid, progresoRutas, cargando } = useSession();
+  const { idioma, t } = useIdioma();
 
   useEffect(() => {
     if (cargando) return;
@@ -58,7 +63,8 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
   if (cargando) return <CargandoPantalla />;
   if (!perfil || !perfilCompleto(perfil) || !resultadoTmaid || !nombreFase) return null;
 
-  const fases = resultadoTmaid.rutaPersonalizada;
+  const resultado = localizarResultadoTmaid(resultadoTmaid, perfil, idioma);
+  const fases = resultado.rutaPersonalizada;
   const fase = fases.find((f) => f.fase === nombreFase);
   if (!fase) return null;
 
@@ -90,13 +96,13 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
   }
 
   return (
-    <AppShell titulo="Detalle de Módulo">
+    <AppShell titulo={t.rutas.detalleModuloTitulo}>
       <div className="mx-auto max-w-5xl space-y-gap-xl">
         <Link
           href="/rutas"
           className="text-sm inline-flex items-center gap-1 font-bold text-on-primary-fixed"
         >
-          <Icon name="arrow_back" /> Volver a mi ruta
+          <Icon name="arrow_back" /> {t.rutas.volverRuta}
         </Link>
 
         <div className="grid grid-cols-1 gap-gap-xl lg:grid-cols-12 lg:items-start">
@@ -104,11 +110,11 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
             <div className="inline-flex items-center gap-2 rounded-full bg-tertiary-fixed px-3 py-1 text-on-tertiary-fixed">
               <Icon name={ICONO_POR_FASE[nombreFase]} className="text-[18px]" />
               <span className="font-label text-xs font-bold">
-                MÓDULO · {nombreFase.toUpperCase()}
+                {t.rutas.moduloChip} · {etiquetaFase(nombreFase, idioma).toUpperCase()}
               </span>
             </div>
             <h1 className="font-headline text-3xl font-black sm:text-4xl max-w-2xl text-primary">
-              Fase: {nombreFase}
+              {t.rutas.faseLabel} {etiquetaFase(nombreFase, idioma)}
             </h1>
             <p className="text-lg leading-relaxed text-on-surface-variant">
               {fase.descripcion}
@@ -118,7 +124,7 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
                 <Icon name="schedule" className="text-secondary" />
                 <div className="flex flex-col">
                   <span className="font-label text-xs font-bold text-primary">
-                    TIEMPO ESTIMADO
+                    {t.rutas.tiempoEstimado}
                   </span>
                   <span className="text-sm text-on-surface-variant">~30 min</span>
                 </div>
@@ -126,9 +132,11 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
               <div className="atmospheric-shadow flex items-center gap-2 rounded-xl bg-surface-container-lowest px-4 py-3">
                 <Icon name="military_tech" className="text-tertiary" />
                 <div className="flex flex-col">
-                  <span className="font-label text-xs font-bold text-primary">RECOMPENSA</span>
+                  <span className="font-label text-xs font-bold text-primary">
+                    {t.rutas.recompensa}
+                  </span>
                   <span className="text-sm text-on-surface-variant">
-                    {badgeInfo?.puntos ?? 0} XP disponibles
+                    {tpl(t.rutas.xpDisponiblesCorto, { xp: badgeInfo?.puntos ?? 0 })}
                   </span>
                 </div>
               </div>
@@ -137,7 +145,7 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
             {fase.recursos && fase.recursos.length > 0 && (
               <div className="space-y-2 pt-2">
                 <span className="font-label text-xs font-bold text-primary">
-                  PARA COMPLEMENTAR
+                  {t.rutas.paraComplementar}
                 </span>
                 <ul className="space-y-2">
                   {fase.recursos.map((r, i) => (
@@ -155,7 +163,7 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
             <div className="atmospheric-shadow rounded-3xl bg-surface-container-lowest p-8">
               <div className="mb-2 flex items-center justify-between">
                 <span className="font-label text-xs font-bold text-primary">
-                  PROGRESO DEL MÓDULO
+                  {t.rutas.progresoModulo}
                 </span>
                 <span className="text-sm font-bold text-secondary">
                   {porcentajeModulo}%
@@ -168,7 +176,10 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
                 />
               </div>
               <p className="text-sm mt-2 text-on-surface-variant">
-                {actividadesHechas} de {actividadesTotal} actividades completadas
+                {tpl(t.rutas.actividadesCompletadas, {
+                  hechas: actividadesHechas,
+                  total: actividadesTotal,
+                })}
               </p>
             </div>
           </div>
@@ -176,7 +187,7 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
 
         <div className="mt-8">
           <h3 className="font-headline text-xl font-bold mb-8 text-primary">
-            Tu ruta completa
+            {t.rutas.tuRutaCompleta}
           </h3>
           <div className="grid grid-cols-1 gap-gap-lg md:grid-cols-3">
             {fases.map((f, i) => {
@@ -192,11 +203,11 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
                         <Icon name="check_circle" filled />
                       </div>
                       <span className="font-label text-xs font-bold rounded-full bg-surface-container-high px-3 py-1 text-on-surface-variant">
-                        COMPLETADO
+                        {t.rutas.completadoMayus}
                       </span>
                     </div>
                     <h4 className="font-headline text-xl font-bold mb-3 text-primary">
-                      {f.fase}
+                      {etiquetaFase(f.fase, idioma)}
                     </h4>
                     <p className="text-base text-on-surface-variant">{f.descripcion}</p>
                   </div>
@@ -209,25 +220,25 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
                     className="atmospheric-shadow relative rounded-3xl border-2 border-secondary bg-surface-container-lowest p-8 ring-8 ring-secondary/5"
                   >
                     <div className="font-label text-xs font-bold absolute -top-4 left-8 rounded-full bg-secondary px-4 py-1 text-on-secondary shadow-lg">
-                      SIGUIENTE PASO
+                      {t.rutas.siguientePaso}
                     </div>
                     <div className="mb-6 flex items-start justify-between">
                       <div className="glow-node flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-on-secondary">
                         <Icon name={ICONO_POR_FASE[f.fase] ?? "psychology"} />
                       </div>
                       <span className="font-label text-xs font-bold rounded-full bg-secondary-container px-3 py-1 text-on-secondary-container">
-                        ACTIVO
+                        {t.rutas.activoMayus}
                       </span>
                     </div>
                     <h4 className="font-headline text-xl font-bold mb-3 text-primary">
-                      {f.fase}
+                      {etiquetaFase(f.fase, idioma)}
                     </h4>
                     <p className="text-base mb-8 text-on-surface-variant">{f.descripcion}</p>
                     <Link
                       href="/rutas/reto"
                       className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-base font-bold text-on-primary transition-all hover:opacity-90 active:scale-95"
                     >
-                      EMPEZAR RETO <Icon name="play_arrow" className="text-[18px]" />
+                      {t.rutas.empezarReto} <Icon name="play_arrow" className="text-[18px]" />
                     </Link>
                   </div>
                 );
@@ -242,17 +253,17 @@ export function DetalleModuloClient({ nombreFase }: { nombreFase: string | null 
                       <Icon name="lock" />
                     </div>
                     <span className="font-label text-xs font-bold rounded-full bg-surface-container-highest px-3 py-1 text-on-surface-variant">
-                      BLOQUEADO
+                      {t.rutas.bloqueadoMayus}
                     </span>
                   </div>
                   <h4 className="font-headline text-xl font-bold mb-3 text-primary">
-                    {f.fase}
+                    {etiquetaFase(f.fase, idioma)}
                   </h4>
                   <p className="text-base mb-6 text-on-surface-variant">{f.descripcion}</p>
                   <div className="flex items-center gap-2 text-outline">
                     <Icon name="info" className="text-[18px]" />
                     <span className="font-label text-xs font-bold">
-                      Requiere completar la fase anterior
+                      {t.rutas.requiereAnterior}
                     </span>
                   </div>
                 </div>
