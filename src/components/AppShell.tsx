@@ -5,22 +5,25 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Home, ClipboardList, Map, BarChart3, UserRound, Lock, LogOut, Flame, Star, Sparkles } from "lucide-react";
 import { useSession } from "@/lib/store/session";
+import { useIdioma } from "@/lib/i18n";
+import type { Traducciones } from "@/lib/i18n/traducciones";
 import { calcularNivel } from "@/lib/gamification/badges";
 import { PremiumUpgradeModal } from "@/components/PremiumUpgradeModal";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 type Tab = {
   href: string;
-  label: string;
+  labelKey: keyof Traducciones["shell"];
   icon: typeof Home;
   requiereTmaid: boolean;
 };
 
 const TABS: Tab[] = [
-  { href: "/dashboard", label: "Inicio", icon: Home, requiereTmaid: false },
-  { href: "/tmaid", label: "Diagnostico", icon: ClipboardList, requiereTmaid: false },
-  { href: "/rutas", label: "Rutas", icon: Map, requiereTmaid: true },
-  { href: "/progreso", label: "Progreso", icon: BarChart3, requiereTmaid: true },
-  { href: "/tmaid/resultado", label: "Perfil", icon: UserRound, requiereTmaid: true },
+  { href: "/dashboard", labelKey: "inicio", icon: Home, requiereTmaid: false },
+  { href: "/tmaid", labelKey: "diagnostico", icon: ClipboardList, requiereTmaid: false },
+  { href: "/rutas", labelKey: "rutas", icon: Map, requiereTmaid: true },
+  { href: "/progreso", labelKey: "progreso", icon: BarChart3, requiereTmaid: true },
+  { href: "/tmaid/resultado", labelKey: "perfil", icon: UserRound, requiereTmaid: true },
 ];
 
 export function AppShell({
@@ -41,6 +44,7 @@ export function AppShell({
     registrarActividadDiaria,
     cargando,
   } = useSession();
+  const { t } = useIdioma();
   const { nivel } = calcularNivel(puntos);
   const [mostrarPremium, setMostrarPremium] = useState(false);
 
@@ -67,9 +71,9 @@ export function AppShell({
               <button
                 onClick={() => setMostrarPremium(true)}
                 className="flex items-center gap-1 rounded-full bg-primary-container px-2.5 py-1 text-xs font-bold text-white transition-opacity hover:opacity-90"
-                title="Conoce Tutor IA Premium"
+                title={t.shell.premiumTitle}
               >
-                <Sparkles size={12} /> Premium
+                <Sparkles size={12} /> {t.shell.premium}
               </button>
               <span className="gold-chip">
                 <Star size={12} fill="currentColor" /> Nv.{nivel} · {puntos} pts
@@ -84,12 +88,13 @@ export function AppShell({
               </span>
             </div>
           )}
+          <LanguageToggle variante="claro" />
           <button
             onClick={() => {
               reiniciar();
               router.push("/login");
             }}
-            title="Reiniciar sesion de prueba"
+            title={t.shell.salir}
             className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-container-low text-on-surface-variant hover:text-primary"
           >
             <LogOut size={16} />
@@ -109,12 +114,12 @@ export function AppShell({
             return (
               <span
                 key={tab.href}
-                title="Completa el diagnostico TMAID primero"
+                title={t.shell.bloqueado}
                 className="flex flex-1 flex-col items-center gap-1 rounded-lg py-2 text-on-surface-variant opacity-40"
               >
                 <Lock size={18} />
                 <span className="font-label text-[10px] font-bold uppercase tracking-wide">
-                  {tab.label}
+                  {t.shell[tab.labelKey]}
                 </span>
               </span>
             );
@@ -132,7 +137,7 @@ export function AppShell({
             >
               <Icon size={18} strokeWidth={activo ? 2.5 : 2} />
               <span className="font-label text-[10px] font-bold uppercase tracking-wide">
-                {tab.label}
+                {t.shell[tab.labelKey]}
               </span>
             </Link>
           );
