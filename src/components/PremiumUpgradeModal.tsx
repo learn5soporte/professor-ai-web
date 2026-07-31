@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Icon } from "@/components/Icon";
+import { useIdioma } from "@/lib/i18n";
 
 /**
  * Upgrade a Tutor IA Premium -- base literal: code.html real de Stitch
@@ -22,9 +23,17 @@ export function PremiumUpgradeModal({
   open: boolean;
   onClose: () => void;
 }) {
+  const { t } = useIdioma();
   const [mostrarAviso, setMostrarAviso] = useState(false);
 
   if (!open) return null;
+
+  const beneficios = [
+    t.premium.beneficio1,
+    t.premium.beneficio2,
+    t.premium.beneficio3,
+    t.premium.beneficio4,
+  ];
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-margin-mobile">
@@ -46,9 +55,9 @@ export function PremiumUpgradeModal({
               <Icon name="auto_awesome" filled className="text-[36px] text-on-tertiary-container" />
             </div>
             <h3 className="font-headline-md text-headline-md mb-2 leading-tight">
-              La IA que evoluciona contigo.
+              {t.premium.slogan}
             </h3>
-            <p className="text-body-sm opacity-70">Exclusivo para miembros Premium.</p>
+            <p className="text-body-sm opacity-70">{t.premium.exclusivo}</p>
           </div>
         </div>
 
@@ -56,7 +65,7 @@ export function PremiumUpgradeModal({
           <div className="space-y-6">
             <div className="flex items-start justify-between">
               <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg">
-                Desbloquea tu Tutor IA Personal
+                {t.premium.titulo}
               </h2>
               <button
                 onClick={() => {
@@ -64,18 +73,13 @@ export function PremiumUpgradeModal({
                   setMostrarAviso(false);
                 }}
                 className="text-outline transition-colors hover:text-white"
-                aria-label="Cerrar"
+                aria-label={t.premium.cerrar}
               >
                 <Icon name="close" className="text-[28px]" />
               </button>
             </div>
             <ul className="space-y-4">
-              {[
-                "Feedback inmediato y personalizado 24/7.",
-                "Generación ilimitada de mapas mentales.",
-                "Acceso prioritario a nuevos modelos GPT.",
-                "Sincronización total con tu calendario.",
-              ].map((beneficio) => (
+              {beneficios.map((beneficio) => (
                 <li key={beneficio} className="flex items-start gap-4">
                   <Icon
                     name="check_circle"
@@ -91,9 +95,9 @@ export function PremiumUpgradeModal({
           <div className="mt-10 space-y-4">
             <div className="flex items-baseline gap-2">
               <span className="font-headline-lg text-white">$9.90</span>
-              <span className="text-body-md text-outline">/mes</span>
+              <span className="text-body-md text-outline">{t.premium.mes}</span>
               <div className="ml-auto rounded-full bg-tertiary-fixed px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-on-tertiary-fixed">
-                Oferta Limitada
+                {t.premium.oferta}
               </div>
             </div>
             {!mostrarAviso ? (
@@ -101,19 +105,16 @@ export function PremiumUpgradeModal({
                 onClick={() => setMostrarAviso(true)}
                 className="flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-r from-secondary-container to-secondary py-5 text-label-lg font-bold text-on-secondary-container shadow-[0_0_20px_rgba(203,168,47,0.4)] transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
-                Probar Premium 7 días gratis
+                {t.premium.probar}
                 <Icon name="arrow_forward" />
               </button>
             ) : (
               <div className="rounded-2xl bg-white/5 p-5 text-center">
-                <p className="text-body-sm text-white">
-                  Los pagos todavía no están activos en esta versión de prueba. Cuando
-                  lancemos Premium te avisaremos por correo para activarlo con un clic.
-                </p>
+                <p className="text-body-sm text-white">{t.premium.avisoPagos}</p>
               </div>
             )}
             <p className="text-center text-body-sm text-outline">
-              Cancela cuando quieras. Sin compromiso.
+              {t.premium.cancela}
             </p>
           </div>
         </div>

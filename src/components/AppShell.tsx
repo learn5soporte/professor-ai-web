@@ -76,7 +76,8 @@ export function AppShell({
                 <Sparkles size={12} /> {t.shell.premium}
               </button>
               <span className="gold-chip">
-                <Star size={12} fill="currentColor" /> Nv.{nivel} · {puntos} pts
+                <Star size={12} fill="currentColor" /> {t.comun.nivelAbrev}{nivel} · {puntos}{" "}
+                {t.comun.ptsAbrev}
               </span>
               {racha > 0 && (
                 <span className="flex items-center gap-1 rounded-full bg-surface-container-low px-2.5 py-1 text-xs font-bold text-on-surface">

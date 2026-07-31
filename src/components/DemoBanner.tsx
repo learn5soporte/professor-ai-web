@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useIdioma } from "@/lib/i18n";
 
 /**
  * Aviso temporal de demo/copyright -- pedido explicito del usuario mientras
@@ -12,6 +13,7 @@ import { useEffect, useState } from "react";
 const DISMISS_KEY = "professor-ai:aviso-demo-cerrado";
 
 export function DemoBanner() {
+  const { t } = useIdioma();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -24,16 +26,13 @@ export function DemoBanner() {
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[9999] flex items-center justify-center gap-3 bg-[#071941] px-4 py-2 text-center text-[11px] leading-tight text-white/90 shadow-[0_-4px_12px_rgba(0,0,0,0.15)]">
-      <span>
-        Versión de demostración de Professor AI (Learn5) — contenido de prueba, sujeto a cambios.
-        Prohibida su reproducción o distribución sin autorización. © 2026 Learn5.
-      </span>
+      <span>{t.comun.demoAviso}</span>
       <button
         onClick={() => {
           window.localStorage.setItem(DISMISS_KEY, "1");
           setVisible(false);
         }}
-        aria-label="Cerrar aviso"
+        aria-label={t.comun.cerrarAviso}
         className="shrink-0 rounded-full px-2 py-0.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
       >
         ✕
