@@ -4,11 +4,14 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession, perfilCompleto } from "@/lib/store/session";
-import { ETIQUETA_DIMENSION } from "@/lib/tmaid/scoring";
+import { etiquetaDimension, localizarResultadoTmaid } from "@/lib/tmaid/scoring";
 import type { Dimension } from "@/lib/tmaid/preguntas";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
 import { CargandoPantalla } from "@/components/CargandoPantalla";
+import { useIdioma } from "@/lib/i18n";
+import { tpl } from "@/lib/i18n/traducciones";
+import { etiquetaFase } from "@/lib/i18n/valores";
 
 /**
  * Análisis Detallado del Perfil IA -- base literal: code.html real de Stitch
@@ -33,6 +36,7 @@ const ICONO_DIMENSION: Record<Dimension, string> = {
 export default function AnalisisDetalladoPage() {
   const router = useRouter();
   const { perfil, resultadoTmaid, progresoRutas, cargando } = useSession();
+  const { idioma, t } = useIdioma();
 
   useEffect(() => {
     if (cargando) return;
@@ -44,11 +48,20 @@ export default function AnalisisDetalladoPage() {
   if (cargando) return <CargandoPantalla />;
   if (!perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
 
-  const { dimensiones } = resultadoTmaid;
+  const resultado = localizarResultadoTmaid(resultadoTmaid, perfil, idioma);
+
+  const nivelLabel: Record<string, string> = {
+    Iniciante: t.tmaid.nivelIniciante,
+    "En desarrollo": t.tmaid.nivelEnDesarrollo,
+    Avanzado: t.tmaid.nivelAvanzado,
+    Experto: t.tmaid.nivelExperto,
+  };
+
+  const { dimensiones } = resultado;
   const dims = Object.keys(dimensiones) as Dimension[];
   const masFuerte = dims.reduce((a, b) => (dimensiones[a] >= dimensiones[b] ? a : b));
   const masDebil = dims.reduce((a, b) => (dimensiones[a] < dimensiones[b] ? a : b));
-  const afinidadIA = Math.round((resultadoTmaid.puntajePromedio / 5) * 100);
+  const afinidadIA = Math.round((resultado.puntajePromedio / 5) * 100);
 
   const frac = {
     n: dimensiones.conocimientoIA / 5,
@@ -64,24 +77,24 @@ export default function AnalisisDetalladoPage() {
   ].join(" ");
 
   function descargarResumen() {
-    if (!resultadoTmaid) return;
     const lineas = [
-      `Análisis detallado del perfil IA -- ${perfil?.nombre ?? ""}`,
-      `Nivel: ${resultadoTmaid.nivelAsignado}`,
+      `${t.tmaid.txtTitulo} -- ${perfil?.nombre ?? ""}`,
+      `${t.tmaid.nivelLabel}: ${nivelLabel[resultado.nivelAsignado] ?? resultado.nivelAsignado}`,
       "",
-      resultadoTmaid.perfilPedagogicoIA,
+      resultado.perfilPedagogicoIA,
       "",
-      "Dimensiones:",
+      t.tmaid.dimensionesLabel,
       ...dims.map(
-        (d) => `- ${ETIQUETA_DIMENSION[d]}: ${Math.round((dimensiones[d] / 5) * 100)}%`
+        (d) =>
+          `- ${etiquetaDimension(d, idioma)}: ${Math.round((dimensiones[d] / 5) * 100)}%`
       ),
       "",
-      "Diagnóstico por dimensión:",
-      ...resultadoTmaid.mapaBrechas.map((b) => `- ${b}`),
+      `${t.tmaid.diagnosticoPorDimension}:`,
+      ...resultado.mapaBrechas.map((b) => `- ${b}`),
       "",
-      "Plan de acción:",
-      ...resultadoTmaid.rutaPersonalizada.map(
-        (f, i) => `${i + 1}. ${f.fase}: ${f.descripcion}`
+      t.tmaid.planAccionLabel,
+      ...resultado.rutaPersonalizada.map(
+        (f, i) => `${i + 1}. ${etiquetaFase(f.fase, idioma)}: ${f.descripcion}`
       ),
     ];
     const blob = new Blob([lineas.join("\n")], { type: "text/plain;charset=utf-8" });
@@ -94,34 +107,34 @@ export default function AnalisisDetalladoPage() {
   }
 
   return (
-    <AppShell titulo="Análisis Detallado">
+    <AppShell titulo={t.tmaid.analisisDetallado}>
       <div className="mx-auto max-w-5xl space-y-gap-xl">
         <Link
           href="/tmaid/resultado"
           className="text-sm inline-flex items-center gap-1 font-bold text-on-primary-fixed"
         >
-          <Icon name="arrow_back" /> Volver a mi perfil
+          <Icon name="arrow_back" /> {t.tmaid.volverPerfil}
         </Link>
 
         <section>
           <span className="gold-chip inline-block rounded-full px-4 py-1 text-xs font-bold uppercase">
-            Diagnóstico TMAID
+            {t.tmaid.diagnosticoTmaid}
           </span>
           <h1 className="font-headline mb-4 mt-4 text-3xl font-black text-primary sm:text-4xl">
-            Análisis detallado
+            {t.tmaid.analisisDetallado}
           </h1>
           <p className="text-lg max-w-2xl leading-relaxed text-on-surface-variant">
-            {resultadoTmaid.perfilPedagogicoIA}
+            {resultado.perfilPedagogicoIA}
           </p>
         </section>
 
         <div className="grid grid-cols-1 gap-gap-xl md:grid-cols-12">
           <div className="atmospheric-shadow relative overflow-hidden rounded-xl bg-surface-container-lowest p-8 md:col-span-7 lg:col-span-8">
             <h3 className="font-headline text-xl font-bold mb-1 text-primary">
-              Dimensiones IA
+              {t.tmaid.dimensionesIA}
             </h3>
             <p className="text-sm mb-8 text-on-surface-variant">
-              Análisis comparativo de tus competencias digitales
+              {t.tmaid.comparativo}
             </p>
             <div className="flex flex-col items-center gap-12 lg:flex-row">
               <div className="h-64 w-64 flex-shrink-0 md:h-80 md:w-80">
@@ -142,7 +155,7 @@ export default function AnalisisDetalladoPage() {
                       <div className="font-label flex justify-between text-sm">
                         <span className="flex items-center gap-2">
                           <Icon name={ICONO_DIMENSION[d]} className="text-outline-variant" />
-                          {ETIQUETA_DIMENSION[d]}
+                          {etiquetaDimension(d, idioma)}
                         </span>
                         <span className="font-bold text-secondary">{pct}%</span>
                       </div>
@@ -163,34 +176,34 @@ export default function AnalisisDetalladoPage() {
             <div className="atmospheric-shadow flex flex-1 flex-col justify-between rounded-xl bg-primary-container p-8 text-on-primary-container">
               <div>
                 <Icon name="star" filled className="mb-4 text-4xl" />
-                <h4 className="font-headline text-xl font-bold mb-2">Fortaleza principal</h4>
-                <p className="text-base opacity-80">{ETIQUETA_DIMENSION[masFuerte]}</p>
+                <h4 className="font-headline text-xl font-bold mb-2">{t.tmaid.fortaleza}</h4>
+                <p className="text-base opacity-80">{etiquetaDimension(masFuerte, idioma)}</p>
               </div>
               <p className="text-sm mt-6 border-t border-white/10 pt-6 italic">
-                Es tu dimensión más sólida hoy -- apóyate en ella al probar cosas nuevas.
+                {t.tmaid.fortalezaNota}
               </p>
             </div>
             <div className="atmospheric-shadow flex flex-1 flex-col justify-between rounded-xl bg-secondary-container p-8 text-on-secondary-container">
               <div>
                 <Icon name="psychology" className="mb-4 text-4xl" />
-                <h4 className="font-headline text-xl font-bold mb-2">Área de crecimiento</h4>
-                <p className="text-base opacity-80">{ETIQUETA_DIMENSION[masDebil]}</p>
+                <h4 className="font-headline text-xl font-bold mb-2">{t.tmaid.areaCrecimiento}</h4>
+                <p className="text-base opacity-80">{etiquetaDimension(masDebil, idioma)}</p>
               </div>
               <Link
                 href="/rutas"
                 className="font-label mt-6 inline-flex items-center gap-2 text-sm font-bold hover:underline"
               >
-                Ver ruta recomendada <Icon name="arrow_forward" className="text-sm" />
+                {t.tmaid.verRutaRecomendada} <Icon name="arrow_forward" className="text-sm" />
               </Link>
             </div>
           </div>
 
           <div className="md:col-span-12">
             <h3 className="font-headline text-xl font-bold mb-8 text-primary">
-              Plan de acción recomendado
+              {t.tmaid.planAccion}
             </h3>
             <div className="grid grid-cols-1 gap-gap-lg md:grid-cols-3">
-              {resultadoTmaid.rutaPersonalizada.map((f, i) => {
+              {resultado.rutaPersonalizada.map((f, i) => {
                 const estado = progresoRutas[f.fase] ?? "pendiente";
                 const completado = estado === "completado";
                 const colores = [
@@ -209,7 +222,7 @@ export default function AnalisisDetalladoPage() {
                       <Icon name={completado ? "check" : colores.icono} />
                     </div>
                     <h5 className="font-headline mb-4 text-[20px] text-primary">
-                      {f.fase}
+                      {etiquetaFase(f.fase, idioma)}
                     </h5>
                     <p className="text-base mb-6 text-on-surface-variant">
                       {f.descripcion}
@@ -218,7 +231,7 @@ export default function AnalisisDetalladoPage() {
                       href={completado ? "/rutas" : "/rutas/reto"}
                       className="font-label block w-full rounded-full bg-primary py-3 text-center text-sm font-bold text-on-primary transition-colors hover:bg-secondary"
                     >
-                      {completado ? "Completado" : "Empezar ahora"}
+                      {completado ? t.comun.completado : t.tmaid.empezarAhora}
                     </Link>
                   </div>
                 );
@@ -229,16 +242,15 @@ export default function AnalisisDetalladoPage() {
 
         <div className="atmospheric-shadow relative flex flex-col items-start gap-6 overflow-hidden rounded-2xl bg-primary-container p-12 text-on-primary-container md:flex-row md:items-center md:justify-between">
           <div className="max-w-md">
-            <h3 className="mb-4 text-[28px] font-bold">Tu afinidad actual con IA</h3>
+            <h3 className="mb-4 text-[28px] font-bold">{t.tmaid.afinidadTitulo}</h3>
             <p className="text-lg mb-6 opacity-90">
-              Hoy tu puntaje promedio equivale a un {afinidadIA}% de afinidad con el uso
-              pedagógico de IA. Sigue tu ruta formativa para seguir subiéndolo.
+              {tpl(t.tmaid.afinidadTexto, { pct: afinidadIA })}
             </p>
             <button
               onClick={descargarResumen}
               className="font-label flex items-center gap-2 rounded-full bg-secondary-container px-8 py-3 text-sm font-bold text-on-secondary-container transition-all hover:opacity-90"
             >
-              Descargar resumen (.txt) <Icon name="download" />
+              {t.tmaid.descargarResumen} <Icon name="download" />
             </button>
           </div>
         </div>
