@@ -8,6 +8,10 @@ import { generarFeedbackIA } from "@/lib/rutas/feedback";
 import { Icon } from "@/components/Icon";
 import { Confetti } from "@/components/Confetti";
 import { CargandoPantalla } from "@/components/CargandoPantalla";
+import { useIdioma } from "@/lib/i18n";
+import { tpl, type Idioma } from "@/lib/i18n/traducciones";
+import { etiquetaFase, localizarValorPerfil } from "@/lib/i18n/valores";
+import { localizarResultadoTmaid } from "@/lib/tmaid/scoring";
 
 /**
  * Espacio del Reto + Revisión/Autoevaluación + Celebración -- base literal:
@@ -31,20 +35,15 @@ import { CargandoPantalla } from "@/components/CargandoPantalla";
  * string fijo ("Excelente enfoque...") sin importar lo que se escribiera
  * -- probó con texto sin sentido ("xczvgzdfsbgzdfgdf") y la
  * retroalimentación seguía elogiándolo. Reemplazado por
- * generarFeedbackIA() (src/lib/rutas/feedback.ts), que aplica una
- * heurística simple (sin NLP real, pero honesta al respecto en sus
- * comentarios) para distinguir texto que no parece un prompt, uno muy
- * corto, uno largo sin los elementos clave de la fase, y uno que sí los
- * tiene.
+ * generarFeedbackIA() (src/lib/rutas/feedback.ts).
  */
 
 /**
  * Ampliado (jul 2026): la ruta paso de tener siempre 3 fases fijas a 4-5
  * modulos segun el nivel real del docente (ver MODULOS_POR_NIVEL en
- * scoring.ts). Estos 2 mapas ahora cubren los 7 modulos posibles, no solo
- * los 3 originales -- si un modulo nuevo llegara sin entrada aqui, el
- * fallback a TEORIA_POR_FASE.Explorar de mas abajo evitaria un crash, pero
- * mostraria contenido equivocado, asi que se completaron todos.
+ * scoring.ts). Estos mapas cubren los 7 modulos posibles. Fase i18n: la
+ * teoría/reflexión/ejemplos existen en ES y EN, indexados por el idioma
+ * activo; las claves de fase siguen en español (canónicas).
  */
 const BADGE_POR_FASE: Record<string, string> = {
   Fundamentos: "fase-fundamentos",
@@ -56,124 +55,226 @@ const BADGE_POR_FASE: Record<string, string> = {
   Innovar: "fase-innovar",
 };
 
-const TEORIA_POR_FASE: Record<string, { titulo: string; parrafo: string; tips: string[] }> = {
-  Fundamentos: {
-    titulo: "Teoría esencial: Antes de tu primer prompt",
-    parrafo:
-      "Un modelo de lenguaje no \"sabe\" nada con certeza -- predice la palabra más probable dada tu instrucción. Por eso puede sonar muy segura y aun así estar equivocada (una \"alucinación\").",
-    tips: [
-      "Pídele siempre que sea concreta: mientras más vago tu pedido, más genérica (o inventada) la respuesta.",
-      "Verifica cualquier dato, cifra o cita antes de usarla con tus estudiantes.",
-    ],
+const TEORIA_POR_FASE: Record<
+  Idioma,
+  Record<string, { titulo: string; parrafo: string; tips: string[] }>
+> = {
+  es: {
+    Fundamentos: {
+      titulo: "Teoría esencial: Antes de tu primer prompt",
+      parrafo:
+        "Un modelo de lenguaje no \"sabe\" nada con certeza -- predice la palabra más probable dada tu instrucción. Por eso puede sonar muy segura y aun así estar equivocada (una \"alucinación\").",
+      tips: [
+        "Pídele siempre que sea concreta: mientras más vago tu pedido, más genérica (o inventada) la respuesta.",
+        "Verifica cualquier dato, cifra o cita antes de usarla con tus estudiantes.",
+      ],
+    },
+    Explorar: {
+      titulo: "Teoría esencial: Primeros prompts",
+      parrafo:
+        "Un buen prompt exploratorio define claramente el rol de la IA, el contexto de tu aula y el resultado que esperas.",
+      tips: [
+        'Define el rol: "Actúa como un especialista en didáctica..."',
+        "Da contexto: nivel, materia, tamaño del grupo.",
+      ],
+    },
+    Aplicar: {
+      titulo: "Teoría esencial: Prompts de personalización",
+      parrafo:
+        "La personalización efectiva requiere tres elementos: contexto del estudiante, objetivo de aprendizaje y restricciones de formato.",
+      tips: [
+        'Define el rol: "Actúa como un psicopedagogo..."',
+        'Sube o baja la dificultad: "Adapta este texto para un nivel..."',
+      ],
+    },
+    Integrar: {
+      titulo: "Teoría esencial: Prompts para tu rutina semanal",
+      parrafo:
+        "Integrar de verdad significa reutilizar: en vez de escribir un prompt distinto cada vez, guarda y ajusta los que ya te funcionaron para planeación, retroalimentación o comunicación con estudiantes.",
+      tips: [
+        "Guarda tus prompts que sí funcionaron -- reutilizarlos ahorra más tiempo que escribir uno nuevo cada vez.",
+        "Fíjate una tarea semanal fija donde siempre uses IA (por ejemplo, el borrador de tu planeación).",
+      ],
+    },
+    Evaluar: {
+      titulo: "Teoría esencial: Prompts de evaluación",
+      parrafo:
+        "Para evaluar con IA, encadena instrucciones: primero pide criterios, luego pide retroalimentación específica por estudiante.",
+      tips: [
+        "Pide una rúbrica antes de pedir la evaluación en sí.",
+        "Solicita siempre retroalimentación accionable, no solo una nota.",
+      ],
+    },
+    Liderar: {
+      titulo: "Teoría esencial: Prompts para explicarle a otros",
+      parrafo:
+        "Enseñar a un/a colega es distinto a usar algo tú mismo/a: necesitas poder explicar el prompt paso a paso, no solo el resultado final.",
+      tips: [
+        'Pide a la IA que te ayude a explicar un prompt "como si se lo enseñaras a alguien que nunca usó esto".',
+        "Documenta el prompt exacto que funcionó, no solo la idea general -- así otros pueden reutilizarlo tal cual.",
+      ],
+    },
+    Innovar: {
+      titulo: "Teoría esencial: Prompts para casos poco comunes",
+      parrafo:
+        "Los usos más innovadores de IA (simulaciones, generación dinámica de casos, asistencia de investigación) requieren prompts más largos y con más restricciones explícitas que los prompts básicos.",
+      tips: [
+        "Divide una tarea compleja en varios prompts encadenados en vez de uno solo gigante.",
+        "Pide siempre una justificación de la respuesta, no solo el resultado -- te ayuda a detectar errores sutiles.",
+      ],
+    },
   },
-  Explorar: {
-    titulo: "Teoría esencial: Primeros prompts",
-    parrafo:
-      "Un buen prompt exploratorio define claramente el rol de la IA, el contexto de tu aula y el resultado que esperas.",
-    tips: [
-      'Define el rol: "Actúa como un especialista en didáctica..."',
-      "Da contexto: nivel, materia, tamaño del grupo.",
-    ],
-  },
-  Aplicar: {
-    titulo: "Teoría esencial: Prompts de personalización",
-    parrafo:
-      "La personalización efectiva requiere tres elementos: contexto del estudiante, objetivo de aprendizaje y restricciones de formato.",
-    tips: [
-      'Define el rol: "Actúa como un psicopedagogo..."',
-      'Sube o baja la dificultad: "Adapta este texto para un nivel..."',
-    ],
-  },
-  Integrar: {
-    titulo: "Teoría esencial: Prompts para tu rutina semanal",
-    parrafo:
-      "Integrar de verdad significa reutilizar: en vez de escribir un prompt distinto cada vez, guarda y ajusta los que ya te funcionaron para planeación, retroalimentación o comunicación con estudiantes.",
-    tips: [
-      "Guarda tus prompts que sí funcionaron -- reutilizarlos ahorra más tiempo que escribir uno nuevo cada vez.",
-      "Fíjate una tarea semanal fija donde siempre uses IA (por ejemplo, el borrador de tu planeación).",
-    ],
-  },
-  Evaluar: {
-    titulo: "Teoría esencial: Prompts de evaluación",
-    parrafo:
-      "Para evaluar con IA, encadena instrucciones: primero pide criterios, luego pide retroalimentación específica por estudiante.",
-    tips: [
-      "Pide una rúbrica antes de pedir la evaluación en sí.",
-      "Solicita siempre retroalimentación accionable, no solo una nota.",
-    ],
-  },
-  Liderar: {
-    titulo: "Teoría esencial: Prompts para explicarle a otros",
-    parrafo:
-      "Enseñar a un/a colega es distinto a usar algo tú mismo/a: necesitas poder explicar el prompt paso a paso, no solo el resultado final.",
-    tips: [
-      'Pide a la IA que te ayude a explicar un prompt "como si se lo enseñaras a alguien que nunca usó esto".',
-      "Documenta el prompt exacto que funcionó, no solo la idea general -- así otros pueden reutilizarlo tal cual.",
-    ],
-  },
-  Innovar: {
-    titulo: "Teoría esencial: Prompts para casos poco comunes",
-    parrafo:
-      "Los usos más innovadores de IA (simulaciones, generación dinámica de casos, asistencia de investigación) requieren prompts más largos y con más restricciones explícitas que los prompts básicos.",
-    tips: [
-      "Divide una tarea compleja en varios prompts encadenados en vez de uno solo gigante.",
-      "Pide siempre una justificación de la respuesta, no solo el resultado -- te ayuda a detectar errores sutiles.",
-    ],
+  en: {
+    Fundamentos: {
+      titulo: "Essential theory: Before your first prompt",
+      parrafo:
+        "A language model doesn't \"know\" anything with certainty -- it predicts the most likely word given your instruction. That's why it can sound very confident and still be wrong (a \"hallucination\").",
+      tips: [
+        "Always ask it to be specific: the vaguer your request, the more generic (or made-up) the answer.",
+        "Verify any fact, figure or quote before using it with your students.",
+      ],
+    },
+    Explorar: {
+      titulo: "Essential theory: First prompts",
+      parrafo:
+        "A good exploratory prompt clearly defines the AI's role, your classroom context and the result you expect.",
+      tips: [
+        'Define the role: "Act as a didactics specialist..."',
+        "Give context: level, subject, group size.",
+      ],
+    },
+    Aplicar: {
+      titulo: "Essential theory: Personalization prompts",
+      parrafo:
+        "Effective personalization requires three elements: student context, learning objective and format constraints.",
+      tips: [
+        'Define the role: "Act as an educational psychologist..."',
+        'Raise or lower the difficulty: "Adapt this text for a level..."',
+      ],
+    },
+    Integrar: {
+      titulo: "Essential theory: Prompts for your weekly routine",
+      parrafo:
+        "Truly integrating means reusing: instead of writing a different prompt each time, save and adjust the ones that already worked for planning, feedback or student communication.",
+      tips: [
+        "Save the prompts that worked -- reusing them saves more time than writing a new one each time.",
+        "Set a fixed weekly task where you always use AI (for example, the draft of your lesson plan).",
+      ],
+    },
+    Evaluar: {
+      titulo: "Essential theory: Assessment prompts",
+      parrafo:
+        "To assess with AI, chain your instructions: first ask for criteria, then ask for specific feedback per student.",
+      tips: [
+        "Ask for a rubric before asking for the assessment itself.",
+        "Always request actionable feedback, not just a grade.",
+      ],
+    },
+    Liderar: {
+      titulo: "Essential theory: Prompts for explaining to others",
+      parrafo:
+        "Teaching a colleague is different from using something yourself: you need to be able to explain the prompt step by step, not just the final result.",
+      tips: [
+        'Ask the AI to help you explain a prompt "as if you were teaching it to someone who has never used this".',
+        "Document the exact prompt that worked, not just the general idea -- that way others can reuse it as is.",
+      ],
+    },
+    Innovar: {
+      titulo: "Essential theory: Prompts for uncommon cases",
+      parrafo:
+        "The most innovative AI uses (simulations, dynamic case generation, research assistance) require longer prompts with more explicit constraints than basic prompts.",
+      tips: [
+        "Split a complex task into several chained prompts instead of one giant prompt.",
+        "Always ask for a justification of the answer, not just the result -- it helps you catch subtle errors.",
+      ],
+    },
   },
 };
 
 /**
- * Pregunta de reflexión corta por módulo -- actividad nueva (jul 2026,
- * pedido explícito del usuario: "necesitamos mas consistencia... mas
- * carne para el docente"). A diferencia del reto (que evalúa un prompt
- * escrito con una heurística), la reflexión no se "corrige": es un
- * espacio real para que el docente piense por escrito, se guarda tal
- * cual la escribió (ver REFLEXION_KEY más abajo) y se marca completa
- * cuando el docente decide que ya terminó de escribirla.
+ * Pregunta de reflexión corta por módulo -- actividad nueva (jul 2026).
+ * A diferencia del reto, la reflexión no se "corrige": se guarda tal
+ * cual el docente la escribió y se marca completa cuando decide que
+ * terminó.
  */
-const REFLEXION_POR_FASE: Record<string, string> = {
-  Fundamentos:
-    "¿Qué fue lo que más te sorprendió sobre cómo funciona la IA? Escríbelo en 2-3 líneas.",
-  Explorar:
-    "Después de probar una herramienta de IA, ¿qué tarea concreta de tu semana te ahorraría más tiempo si la usaras ahí?",
-  Aplicar:
-    "¿Qué parte de tu prompt tuviste que ajustar más de una vez? ¿Qué aprendiste de eso?",
-  Integrar:
-    "De las tareas donde probaste IA esta semana, ¿cuál vas a seguir usando y cuál no? ¿Por qué?",
-  Evaluar:
-    "¿Hubo algo en la retroalimentación o rúbrica generada con IA con lo que no estuviste de acuerdo? ¿Qué cambiarías?",
-  Liderar:
-    "¿A qué colega le mostrarías primero lo que aprendiste, y por qué a esa persona en particular?",
-  Innovar:
-    "¿Qué uso de IA en tu materia todavía te parece arriesgado o poco probado? ¿Qué necesitarías ver para confiar en él?",
+const REFLEXION_POR_FASE: Record<Idioma, Record<string, string>> = {
+  es: {
+    Fundamentos:
+      "¿Qué fue lo que más te sorprendió sobre cómo funciona la IA? Escríbelo en 2-3 líneas.",
+    Explorar:
+      "Después de probar una herramienta de IA, ¿qué tarea concreta de tu semana te ahorraría más tiempo si la usaras ahí?",
+    Aplicar:
+      "¿Qué parte de tu prompt tuviste que ajustar más de una vez? ¿Qué aprendiste de eso?",
+    Integrar:
+      "De las tareas donde probaste IA esta semana, ¿cuál vas a seguir usando y cuál no? ¿Por qué?",
+    Evaluar:
+      "¿Hubo algo en la retroalimentación o rúbrica generada con IA con lo que no estuviste de acuerdo? ¿Qué cambiarías?",
+    Liderar:
+      "¿A qué colega le mostrarías primero lo que aprendiste, y por qué a esa persona en particular?",
+    Innovar:
+      "¿Qué uso de IA en tu materia todavía te parece arriesgado o poco probado? ¿Qué necesitarías ver para confiar en él?",
+  },
+  en: {
+    Fundamentos:
+      "What surprised you the most about how AI works? Write it down in 2-3 lines.",
+    Explorar:
+      "After trying an AI tool, which specific task of your week would save you the most time if you used it there?",
+    Aplicar:
+      "Which part of your prompt did you have to adjust more than once? What did you learn from that?",
+    Integrar:
+      "Of the tasks where you tried AI this week, which one will you keep using and which not? Why?",
+    Evaluar:
+      "Was there anything in the AI-generated feedback or rubric you disagreed with? What would you change?",
+    Liderar:
+      "Which colleague would you show what you learned first, and why that person in particular?",
+    Innovar:
+      "Which AI use in your subject still feels risky or unproven to you? What would you need to see to trust it?",
+  },
 };
 
 /**
  * Ejemplo de prompt concreto y listo para adaptar, por fase -- pedido
- * explícito del usuario (2026-07-28): "crea un prompt y no sé" -- sin un
- * punto de partida concreto, el área de trabajo era una caja en blanco
- * con el mismo placeholder genérico ("Escribe tu prompt aquí...") en
- * cualquier fase, lo que hacía que la actividad se sintiera igual módulo
- * tras módulo aunque la teoría/reflexión/recursos sí variaran. Cada
- * ejemplo usa la materia real del docente y es específico del objetivo
- * de esa fase (no intercambiable con otra), y se puede insertar con un
- * click ("Usar este ejemplo") en vez de forzar a escribir desde cero.
+ * explícito del usuario (2026-07-28). Cada ejemplo usa la materia real del
+ * docente y es específico del objetivo de esa fase, y se puede insertar
+ * con un click ("Usar este ejemplo") en vez de forzar a escribir desde
+ * cero.
  */
-const EJEMPLO_PROMPT_POR_FASE: Record<string, (materia: string) => string> = {
-  Fundamentos: (materia) =>
-    `Actúa como un asistente educativo. Explícame en lenguaje simple qué es un modelo de lenguaje como tú, y dame un ejemplo de un error ("alucinación") que podrías cometer si te pregunto algo sobre ${materia}.`,
-  Explorar: (materia) =>
-    `Actúa como un especialista en ${materia}. Dame 3 ideas breves para explicar el tema de mi próxima clase a mis estudiantes, en un tono cercano y con un ejemplo cotidiano en cada una.`,
-  Aplicar: (materia) =>
-    `Actúa como un psicopedagogo especializado en ${materia}. Adapta el siguiente texto para un estudiante con [describe la necesidad -- ej. dificultad de lectura]: "[pega aquí tu texto]". Usa lenguaje simple y formato de lista corta.`,
-  Integrar: (materia) =>
-    `Actúa como mi asistente de planeación semanal para ${materia}. Con estos 3 temas de la semana: [tema 1, tema 2, tema 3], dame un borrador corto de actividad para cada uno.`,
-  Evaluar: (materia) =>
-    `Actúa como un especialista en evaluación educativa. Dame primero una rúbrica de 4 criterios para calificar un trabajo de ${materia} sobre [tema], y en un segundo momento úsala para dar retroalimentación a este trabajo: "[pega aquí el trabajo]".`,
-  Liderar: (materia) =>
-    `Ayúdame a explicarle a un/a colega de ${materia} que nunca usó IA cómo escribir su primer prompt, paso a paso y con un ejemplo simple, sin jerga técnica.`,
-  Innovar: (materia) =>
-    `Actúa como diseñador de evaluaciones para ${materia}. Genera un caso o escenario poco común (no un examen tradicional) donde un estudiante tenga que aplicar lo aprendido, con 2 variantes del mismo caso.`,
+const EJEMPLO_PROMPT_POR_FASE: Record<
+  Idioma,
+  Record<string, (materia: string) => string>
+> = {
+  es: {
+    Fundamentos: (materia) =>
+      `Actúa como un asistente educativo. Explícame en lenguaje simple qué es un modelo de lenguaje como tú, y dame un ejemplo de un error ("alucinación") que podrías cometer si te pregunto algo sobre ${materia}.`,
+    Explorar: (materia) =>
+      `Actúa como un especialista en ${materia}. Dame 3 ideas breves para explicar el tema de mi próxima clase a mis estudiantes, en un tono cercano y con un ejemplo cotidiano en cada una.`,
+    Aplicar: (materia) =>
+      `Actúa como un psicopedagogo especializado en ${materia}. Adapta el siguiente texto para un estudiante con [describe la necesidad -- ej. dificultad de lectura]: "[pega aquí tu texto]". Usa lenguaje simple y formato de lista corta.`,
+    Integrar: (materia) =>
+      `Actúa como mi asistente de planeación semanal para ${materia}. Con estos 3 temas de la semana: [tema 1, tema 2, tema 3], dame un borrador corto de actividad para cada uno.`,
+    Evaluar: (materia) =>
+      `Actúa como un especialista en evaluación educativa. Dame primero una rúbrica de 4 criterios para calificar un trabajo de ${materia} sobre [tema], y en un segundo momento úsala para dar retroalimentación a este trabajo: "[pega aquí el trabajo]".`,
+    Liderar: (materia) =>
+      `Ayúdame a explicarle a un/a colega de ${materia} que nunca usó IA cómo escribir su primer prompt, paso a paso y con un ejemplo simple, sin jerga técnica.`,
+    Innovar: (materia) =>
+      `Actúa como diseñador de evaluaciones para ${materia}. Genera un caso o escenario poco común (no un examen tradicional) donde un estudiante tenga que aplicar lo aprendido, con 2 variantes del mismo caso.`,
+  },
+  en: {
+    Fundamentos: (materia) =>
+      `Act as an educational assistant. Explain to me in simple language what a language model like you is, and give me an example of a mistake ("hallucination") you could make if I asked you something about ${materia}.`,
+    Explorar: (materia) =>
+      `Act as a ${materia} specialist. Give me 3 brief ideas to explain my next lesson's topic to my students, in a friendly tone and with an everyday example in each one.`,
+    Aplicar: (materia) =>
+      `Act as an educational psychologist specialized in ${materia}. Adapt the following text for a student with [describe the need -- e.g. reading difficulty]: "[paste your text here]". Use simple language and a short list format.`,
+    Integrar: (materia) =>
+      `Act as my weekly planning assistant for ${materia}. With these 3 topics for the week: [topic 1, topic 2, topic 3], give me a short activity draft for each one.`,
+    Evaluar: (materia) =>
+      `Act as an educational assessment specialist. First give me a 4-criteria rubric to grade a ${materia} assignment on [topic], and then use it to give feedback on this work: "[paste the work here]".`,
+    Liderar: (materia) =>
+      `Help me explain to a ${materia} colleague who has never used AI how to write their first prompt, step by step and with a simple example, without technical jargon.`,
+    Innovar: (materia) =>
+      `Act as an assessment designer for ${materia}. Generate an uncommon case or scenario (not a traditional exam) where a student has to apply what they learned, with 2 variants of the same case.`,
+  },
 };
 
 /** XP que se otorga (una sola vez por actividad) al completar la reflexión o marcar un recurso como hecho. */
@@ -181,19 +282,12 @@ const XP_ACTIVIDAD_CHICA = 5;
 
 const REFLEXION_STORAGE_PREFIX = "professor-ai:reflexion:";
 
-/** Icono + etiqueta por tipo de recurso sugerido (ver RecursoSugerido en session.tsx). */
+/** Icono por tipo de recurso sugerido (ver RecursoSugerido en session.tsx). */
 const ICONO_POR_TIPO_RECURSO: Record<string, string> = {
   video: "play_circle",
   lectura: "article",
   libro: "menu_book",
   consulta: "forum",
-};
-
-const ETIQUETA_TIPO_RECURSO: Record<string, string> = {
-  video: "Video",
-  lectura: "Lectura",
-  libro: "Libro",
-  consulta: "Consulta",
 };
 
 export default function RetoPage() {
@@ -207,11 +301,12 @@ export default function RetoPage() {
     sumarPuntos,
     cargando,
   } = useSession();
+  const { idioma, t } = useIdioma();
   const [prompt, setPrompt] = useState("");
   const [estado, setEstado] = useState<"editando" | "procesando" | "revision">("editando");
   const [calificacion, setCalificacion] = useState(0);
   const [marcadoCompleto, setMarcadoCompleto] = useState(false);
-  const [errorValidacion, setErrorValidacion] = useState<string | null>(null);
+  const [errorValidacion, setErrorValidacion] = useState<null | "calificacion" | "marcar">(null);
   const [celebracion, setCelebracion] = useState(false);
   const [puntosGanados, setPuntosGanados] = useState(0);
   // Reflexion (actividad nueva, jul 2026): texto libre por modulo,
@@ -242,20 +337,29 @@ export default function RetoPage() {
   if (cargando) return <CargandoPantalla />;
   if (!perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
 
-  const fases = resultadoTmaid.rutaPersonalizada;
+  const resultado = localizarResultadoTmaid(resultadoTmaid, perfil, idioma);
+  const fases = resultado.rutaPersonalizada;
   const indiceActivo = fases.findIndex((f) => progresoRutas[f.fase] !== "completado");
   const faseActual = fases[indiceActivo] ?? fases[fases.length - 1];
-  const teoria = TEORIA_POR_FASE[faseActual.fase] ?? TEORIA_POR_FASE.Explorar;
+  const teoria = TEORIA_POR_FASE[idioma][faseActual.fase] ?? TEORIA_POR_FASE[idioma].Explorar;
   const hayMasFases = indiceActivo >= 0 && indiceActivo < fases.length - 1;
   const badgeId = BADGE_POR_FASE[faseActual.fase];
   const badge = badgeId ? BADGES[badgeId] : null;
   const xpDisponible = badge?.puntos ?? 10;
-  const feedbackIA = generarFeedbackIA(prompt, faseActual.fase, teoria.tips);
+  const feedbackIA = generarFeedbackIA(prompt, faseActual.fase, teoria.tips, idioma);
+  const materiaVisible = localizarValorPerfil(perfil.materia, idioma);
   const promptEjemplo = (
-    EJEMPLO_PROMPT_POR_FASE[faseActual.fase] ?? EJEMPLO_PROMPT_POR_FASE.Explorar
-  )(perfil.materia);
+    EJEMPLO_PROMPT_POR_FASE[idioma][faseActual.fase] ?? EJEMPLO_PROMPT_POR_FASE[idioma].Explorar
+  )(materiaVisible);
 
-  const preguntaReflexion = REFLEXION_POR_FASE[faseActual.fase];
+  const etiquetaTipoRecurso: Record<string, string> = {
+    video: t.rutas.tipoVideo,
+    lectura: t.rutas.tipoLectura,
+    libro: t.rutas.tipoLibro,
+    consulta: t.rutas.tipoConsulta,
+  };
+
+  const preguntaReflexion = REFLEXION_POR_FASE[idioma][faseActual.fase];
   const claveReflexion = `${faseActual.fase}::reflexion`;
   const reflexionCompleta = progresoRutas[claveReflexion] === "completado";
   const recursos = faseActual.recursos ?? [];
@@ -290,11 +394,8 @@ export default function RetoPage() {
     // mostrar una barra al 65% cuando una fase esta "en_progreso" (vs 25%
     // si no) -- pero ningun lugar del codigo llamaba nunca
     // actualizarProgresoFase(fase, "en_progreso"), asi que esa rama nunca
-    // se activaba y la barra de la fase activa mostraba siempre el mismo
-    // 25%, sin importar cuanto hubiera avanzado el docente. Marcar
-    // "en_progreso" aqui (cuando el docente ya envio una propuesta real,
-    // no solo abrio la pantalla) hace que ese indicador refleje avance de
-    // verdad.
+    // se activaba. Marcar "en_progreso" aqui (cuando el docente ya envio
+    // una propuesta real) hace que ese indicador refleje avance de verdad.
     actualizarProgresoFase(faseActual.fase, "en_progreso");
     setTimeout(() => {
       setEstado("revision");
@@ -303,11 +404,11 @@ export default function RetoPage() {
 
   function confirmar() {
     if (calificacion === 0) {
-      setErrorValidacion("Selecciona una calificación antes de continuar.");
+      setErrorValidacion("calificacion");
       return;
     }
     if (!marcadoCompleto) {
-      setErrorValidacion("Marca el reto como completado para ganar los puntos XP.");
+      setErrorValidacion("marcar");
       return;
     }
     setErrorValidacion(null);
@@ -329,22 +430,22 @@ export default function RetoPage() {
             className="relative z-10 text-[160px] text-tertiary-fixed-dim"
           />
         </div>
-        <h2 className="font-headline text-4xl font-black mb-2 text-white">¡EXCELENTE TRABAJO!</h2>
+        <h2 className="font-headline text-4xl font-black mb-2 text-white">{t.rutas.excelente}</h2>
         <p className="font-headline text-xl font-bold mb-8 text-tertiary-fixed-dim">
-          +{puntosGanados} XP GANADOS
+          {tpl(t.rutas.xpGanados, { xp: puntosGanados })}
         </p>
         <div className="w-full max-w-xs space-y-4">
           <button
             onClick={() => router.push(hayMasFases ? "/rutas" : "/dashboard")}
             className="w-full rounded-full bg-tertiary-container py-4 text-base font-bold text-on-tertiary-fixed transition-transform hover:scale-105"
           >
-            {hayMasFases ? "PRÓXIMO RETO" : "IR AL INICIO"}
+            {hayMasFases ? t.rutas.proximoReto : t.rutas.irInicio}
           </button>
           <button
             onClick={() => router.push("/dashboard")}
             className="w-full font-bold text-white/60 transition-colors hover:text-white"
           >
-            Volver al Inicio
+            {t.rutas.volverInicio}
           </button>
         </div>
       </div>
@@ -358,18 +459,17 @@ export default function RetoPage() {
           <div>
             <div className="mb-4 flex items-center gap-md">
               <span className="text-[12px] font-bold uppercase text-on-tertiary-fixed rounded-full bg-tertiary-fixed px-3 py-1">
-                Reto {indiceActivo + 1} de {fases.length}
+                {tpl(t.rutas.retoDe, { n: indiceActivo + 1, total: fases.length })}
               </span>
               <span className="text-sm text-on-surface-variant">
-                Fase: {faseActual.fase}
+                {t.rutas.faseLabel} {etiquetaFase(faseActual.fase, idioma)}
               </span>
             </div>
             <h2 className="font-headline text-3xl font-black sm:text-4xl mb-2 text-primary">
-              Revisión del Reto
+              {t.rutas.revisionTitulo}
             </h2>
             <p className="text-lg max-w-2xl text-on-surface-variant">
-              Compara tu propuesta con la retroalimentación de la IA y evalúa tu experiencia
-              para avanzar.
+              {t.rutas.revisionTexto}
             </p>
           </div>
 
@@ -379,7 +479,7 @@ export default function RetoPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-surface-container text-primary">
                   <Icon name="edit_note" />
                 </div>
-                <h3 className="font-headline text-xl font-bold">Tu Propuesta</h3>
+                <h3 className="font-headline text-xl font-bold">{t.rutas.tuPropuesta}</h3>
               </div>
               <p className="text-base whitespace-pre-wrap leading-relaxed text-on-surface-variant">
                 {prompt}
@@ -392,7 +492,7 @@ export default function RetoPage() {
                   <Icon name="auto_awesome" filled />
                 </div>
                 <h3 className="font-headline text-xl font-bold text-white">
-                  Retroalimentación IA
+                  {t.rutas.retroIA}
                 </h3>
               </div>
               <p className="text-base leading-relaxed text-blue-100">{feedbackIA}</p>
@@ -401,12 +501,11 @@ export default function RetoPage() {
 
           <div className="grid grid-cols-1 gap-gap-xl lg:grid-cols-3">
             <div className="lg:col-span-2 rounded-xl bg-surface-container-high p-8">
-              <h4 className="font-headline text-xl font-bold mb-6">Autoevaluación</h4>
+              <h4 className="font-headline text-xl font-bold mb-6">{t.rutas.autoevaluacion}</h4>
               <div className="flex flex-col justify-between gap-lg md:flex-row md:items-center">
                 <div className="space-y-2">
                   <p className="text-sm text-on-surface-variant">
-                    ¿Qué tan útil te ha parecido la retroalimentación de la IA para tu
-                    práctica docente?
+                    {t.rutas.utilPregunta}
                   </p>
                   <div className="flex gap-2 py-2">
                     {[1, 2, 3, 4, 5].map((n) => (
@@ -417,7 +516,7 @@ export default function RetoPage() {
                           setErrorValidacion(null);
                         }}
                         className="transition-transform hover:scale-110"
-                        aria-label={`Calificar con ${n} estrella(s)`}
+                        aria-label={tpl(t.rutas.calificarAria, { n })}
                       >
                         <Icon
                           name="star"
@@ -441,7 +540,7 @@ export default function RetoPage() {
                     className="h-6 w-6 cursor-pointer rounded border-outline-variant text-secondary focus:ring-secondary"
                   />
                   <span className="font-label text-xs font-bold cursor-pointer">
-                    Marcar como completado
+                    {t.rutas.marcarCompletado}
                   </span>
                 </label>
               </div>
@@ -453,7 +552,7 @@ export default function RetoPage() {
                 className="font-headline text-lg font-bold group relative overflow-hidden rounded-full bg-primary px-10 py-6 text-on-primary transition-all hover:-translate-y-1 hover:shadow-xl active:scale-95"
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
-                  Confirmar y ganar XP
+                  {t.rutas.confirmarXP}
                   <Icon
                     name="rocket_launch"
                     className="transition-transform group-hover:translate-x-2"
@@ -461,11 +560,13 @@ export default function RetoPage() {
                 </span>
               </button>
               <p className="text-center text-[12px] font-bold uppercase tracking-widest text-on-surface-variant">
-                +{xpDisponible} XP disponibles
+                {tpl(t.rutas.xpDisponibles, { xp: xpDisponible })}
               </p>
               {errorValidacion && (
                 <p className="text-center text-sm font-semibold text-error">
-                  {errorValidacion}
+                  {errorValidacion === "calificacion"
+                    ? t.rutas.errorCalificacion
+                    : t.rutas.errorMarcar}
                 </p>
               )}
             </div>
@@ -483,10 +584,10 @@ export default function RetoPage() {
             onClick={() => router.push("/rutas")}
             className="flex items-center gap-2 font-bold text-on-primary-fixed"
           >
-            <Icon name="arrow_back" /> Atrás
+            <Icon name="arrow_back" /> {t.comun.atras}
           </button>
           <span className="font-bold uppercase tracking-widest text-tertiary-container">
-            Módulo {indiceActivo + 1} de {fases.length}
+            {tpl(t.rutas.moduloDe, { n: indiceActivo + 1, total: fases.length })}
           </span>
           <div className="w-10" />
         </div>
@@ -506,7 +607,10 @@ export default function RetoPage() {
             />
           </div>
           <span className="text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
-            {actividadesHechas}/{actividadesTotal} actividades de este módulo
+            {tpl(t.rutas.actividadesModulo, {
+              hechas: actividadesHechas,
+              total: actividadesTotal,
+            })}
           </span>
         </div>
 
@@ -526,19 +630,19 @@ export default function RetoPage() {
         </details>
 
         <div className="atmospheric-shadow rounded-xl bg-tertiary-fixed p-6 text-on-tertiary-fixed">
-          <h3 className="font-headline text-xl font-bold mb-2">TU DESAFÍO</h3>
+          <h3 className="font-headline text-xl font-bold mb-2">{t.rutas.tuDesafio}</h3>
           <p className="text-lg">{faseActual.descripcion}</p>
         </div>
 
         <div className="grid h-auto grid-cols-1 gap-lg lg:h-[500px] lg:grid-cols-2">
           <div className="atmospheric-shadow flex flex-col gap-md rounded-xl bg-white p-6">
             <div className="flex items-center justify-between">
-              <span className="font-bold text-secondary">Actividad 1 · Área de Trabajo</span>
+              <span className="font-bold text-secondary">{t.rutas.areaTrabajo}</span>
             </div>
             {estado === "editando" && !prompt.trim() && (
               <div className="rounded-xl bg-tertiary-fixed/40 p-4">
                 <p className="text-xs mb-2 font-bold uppercase tracking-widest text-on-tertiary-fixed">
-                  💡 ¿No sabes por dónde empezar? Un ejemplo para esta fase:
+                  {t.rutas.ejemploFase}
                 </p>
                 <p className="text-sm mb-3 italic text-on-tertiary-fixed">{promptEjemplo}</p>
                 <button
@@ -546,7 +650,7 @@ export default function RetoPage() {
                   onClick={() => setPrompt(promptEjemplo)}
                   className="text-xs font-bold uppercase tracking-widest text-secondary underline"
                 >
-                  Usar este ejemplo
+                  {t.rutas.usarEjemplo}
                 </button>
               </div>
             )}
@@ -554,7 +658,7 @@ export default function RetoPage() {
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               disabled={estado !== "editando"}
-              placeholder="Escribe tu prompt aquí..."
+              placeholder={t.rutas.escribePrompt}
               className="text-sm flex-grow rounded-xl border-none bg-surface-container-lowest p-4 font-mono focus:ring-2 focus:ring-secondary/20"
             />
             <button
@@ -564,11 +668,11 @@ export default function RetoPage() {
             >
               {estado === "procesando" ? (
                 <>
-                  <Icon name="autorenew" className="animate-spin" /> PROCESANDO...
+                  <Icon name="autorenew" className="animate-spin" /> {t.rutas.procesandoMayus}
                 </>
               ) : (
                 <>
-                  ENVIAR Y COMPLETAR RETO <Icon name="send" />
+                  {t.rutas.enviarReto} <Icon name="send" />
                 </>
               )}
             </button>
@@ -576,12 +680,12 @@ export default function RetoPage() {
 
           <div className="flex flex-col gap-md overflow-hidden rounded-xl border-2 border-dashed border-outline-variant bg-on-secondary-fixed/5 p-6">
             <span className="flex items-center gap-2 font-bold text-on-surface-variant">
-              <Icon name="preview" /> Preview de Output IA
+              <Icon name="preview" /> {t.rutas.previewOutput}
             </span>
             <div className="flex-grow space-y-4 overflow-y-auto">
               {estado === "editando" && (
                 <div className="flex h-full items-center justify-center italic text-on-surface-variant opacity-30">
-                  Esperando tu prompt para generar el resultado...
+                  {t.rutas.esperandoPrompt}
                 </div>
               )}
               {estado === "procesando" && (
@@ -604,11 +708,11 @@ export default function RetoPage() {
           <div className="atmospheric-shadow rounded-xl bg-white p-6">
             <div className="mb-3 flex items-center justify-between">
               <h4 className="flex items-center gap-2 font-bold text-primary">
-                <Icon name="self_improvement" className="text-[18px]" /> Actividad 2 · Reflexión
+                <Icon name="self_improvement" className="text-[18px]" /> {t.rutas.reflexionTitulo}
               </h4>
               {reflexionCompleta && (
                 <span className="flex items-center gap-1 text-[11px] font-black uppercase text-secondary">
-                  <Icon name="check_circle" filled className="text-[16px]" /> Hecha
+                  <Icon name="check_circle" filled className="text-[16px]" /> {t.rutas.hecha}
                 </span>
               )}
             </div>
@@ -617,7 +721,7 @@ export default function RetoPage() {
               value={reflexionTexto}
               onChange={(e) => setReflexionTexto(e.target.value)}
               disabled={!reflexionHidratada}
-              placeholder="Escribe tu reflexión aquí..."
+              placeholder={t.rutas.escribeReflexion}
               rows={3}
               className="text-sm mb-3 w-full rounded-xl border-none bg-surface-container-lowest p-4 focus:ring-2 focus:ring-secondary/20"
             />
@@ -627,7 +731,7 @@ export default function RetoPage() {
                 disabled={!reflexionTexto.trim() || !reflexionHidratada}
                 className="rounded-full bg-secondary px-6 py-2 text-sm font-bold text-on-secondary transition-opacity hover:opacity-90 disabled:opacity-40"
               >
-                {reflexionCompleta ? "Actualizar reflexión" : "Guardar reflexión"}
+                {reflexionCompleta ? t.rutas.actualizarReflexion : t.rutas.guardarReflexion}
               </button>
               {!reflexionCompleta && (
                 <span className="text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
@@ -645,12 +749,11 @@ export default function RetoPage() {
         {recursos.length > 0 && (
           <div className="atmospheric-shadow rounded-xl bg-white p-6">
             <h4 className="mb-1 flex items-center gap-2 font-bold text-primary">
-              <Icon name="explore" className="text-[18px]" /> Actividades 3-{2 + recursos.length}{" "}
-              · Para complementar este módulo
+              <Icon name="explore" className="text-[18px]" />{" "}
+              {tpl(t.rutas.actividadesComplementar, { n: 2 + recursos.length })}
             </h4>
             <p className="text-sm mb-4 text-on-surface-variant">
-              Sugerencias de tema, no un link específico -- tú eliges qué video, artículo o
-              persona concreta te sirve más. Márcalo cuando lo hagas.
+              {t.rutas.sugerenciasNota}
             </p>
             <div className="grid grid-cols-1 gap-md sm:grid-cols-2">
               {recursos.map((r, i) => {
@@ -670,12 +773,12 @@ export default function RetoPage() {
                     />
                     <div>
                       <span className="text-[11px] font-black uppercase tracking-widest text-secondary">
-                        {ETIQUETA_TIPO_RECURSO[r.tipo] ?? r.tipo}
+                        {etiquetaTipoRecurso[r.tipo] ?? r.tipo}
                         {!hecho && ` · +${XP_ACTIVIDAD_CHICA} XP`}
                       </span>
                       <p className="text-sm mt-1 text-on-surface-variant">{r.sugerencia}</p>
                       <span className="mt-1 block text-[11px] font-bold text-secondary">
-                        {hecho ? "Marcado como hecho" : "Marcar como hecho"}
+                        {hecho ? t.rutas.marcadoHecho : t.rutas.marcarHecho}
                       </span>
                     </div>
                   </button>
