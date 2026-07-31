@@ -4,21 +4,29 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession, perfilCompleto } from "@/lib/store/session";
-import { BADGES, calcularNivel } from "@/lib/gamification/badges";
+import { BADGES, calcularNivel, textoBadge } from "@/lib/gamification/badges";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
 import { CargandoPantalla } from "@/components/CargandoPantalla";
+import { useIdioma } from "@/lib/i18n";
+import { localizarValorPerfil } from "@/lib/i18n/valores";
+import type { Traducciones } from "@/lib/i18n/traducciones";
 
-const HERRAMIENTAS = [
-  { nombre: "Generador de Planeaciones", href: "/herramientas/planeacion", disponible: true },
-  { nombre: "Creador de Rubricas", href: "/herramientas/rubricas", disponible: true },
-  { nombre: "Banco de Prompts Pedagogicos", href: "/herramientas/prompts", disponible: true },
+const HERRAMIENTAS: {
+  nombreKey: keyof Traducciones["dashboard"];
+  href: string;
+  disponible: boolean;
+}[] = [
+  { nombreKey: "genPlaneaciones", href: "/herramientas/planeacion", disponible: true },
+  { nombreKey: "creadorRubricas", href: "/herramientas/rubricas", disponible: true },
+  { nombreKey: "bancoPrompts", href: "/herramientas/prompts", disponible: true },
 ];
 
 export default function DashboardPage() {
   const router = useRouter();
   const { perfil, resultadoTmaid, progresoRutas, badges, puntos, cargando } =
     useSession();
+  const { idioma, t } = useIdioma();
 
   useEffect(() => {
     if (cargando) return;
@@ -34,13 +42,20 @@ export default function DashboardPage() {
     return null;
   }
 
+  const nivelTmaidLabel: Record<string, string> = {
+    Iniciante: t.tmaid.nivelIniciante,
+    "En desarrollo": t.tmaid.nivelEnDesarrollo,
+    Avanzado: t.tmaid.nivelAvanzado,
+    Experto: t.tmaid.nivelExperto,
+  };
+
   // Estado inicial -- base literal: code.html real de Stitch
   // (estado_inicial_tu_primer_paso). Antes, un docente sin diagnóstico era
   // redirigido instantáneamente a /tmaid sin ninguna explicación; ahora ve
   // esta pantalla de bienvenida real con su propio CTA hacia el diagnóstico.
   if (!resultadoTmaid) {
     return (
-      <AppShell titulo="Inicio">
+      <AppShell titulo={t.shell.inicio}>
         <div className="mx-auto flex max-w-4xl flex-col items-center px-margin-mobile text-center">
           <div className="relative mb-gap-xl flex h-64 w-64 items-center justify-center md:h-80 md:w-80">
             <div className="flex h-full w-full items-center justify-center rounded-full bg-surface-container-highest shadow-inner">
@@ -59,12 +74,10 @@ export default function DashboardPage() {
           </div>
 
           <h1 className="font-headline mb-4 max-w-2xl text-3xl font-black tracking-tight text-primary sm:text-4xl md:text-5xl">
-            Todo empieza aquí
+            {t.dashboard.todoEmpieza}
           </h1>
           <p className="mb-gap-xl max-w-lg text-base text-on-surface-variant sm:text-lg">
-            Para comenzar tu viaje de transformación académica con IA, necesitamos
-            entender tu punto de partida. Realiza tu primer diagnóstico y
-            desbloquea tu ruta personalizada.
+            {t.dashboard.introTexto}
           </p>
 
           <div className="flex flex-col items-center gap-4">
@@ -72,10 +85,10 @@ export default function DashboardPage() {
               href="/tmaid"
               className="font-label flex items-center gap-3 rounded-full bg-primary-container px-10 py-5 text-base font-bold text-on-primary transition-all hover:opacity-90 active:scale-95"
             >
-              Hacer mi diagnóstico <Icon name="rocket_launch" />
+              {t.dashboard.hacerDiagnostico} <Icon name="rocket_launch" />
             </Link>
             <span className="flex items-center gap-2 text-sm text-outline">
-              <Icon name="timer" className="text-[18px]" /> Toma unos 5 minutos
+              <Icon name="timer" className="text-[18px]" /> {t.dashboard.toma5min}
             </span>
           </div>
 
@@ -85,9 +98,11 @@ export default function DashboardPage() {
                 <Icon name="psychology" className="text-secondary" />
               </div>
               <div>
-                <h3 className="font-label text-base font-bold text-primary">Análisis IA</h3>
+                <h3 className="font-label text-base font-bold text-primary">
+                  {t.dashboard.analisisIA}
+                </h3>
                 <p className="text-sm text-on-surface-variant">
-                  Evaluamos tus competencias actuales.
+                  {t.dashboard.analisisIADesc}
                 </p>
               </div>
             </div>
@@ -96,9 +111,11 @@ export default function DashboardPage() {
                 <Icon name="route" className="text-secondary" />
               </div>
               <div>
-                <h3 className="font-label text-base font-bold text-primary">Ruta Única</h3>
+                <h3 className="font-label text-base font-bold text-primary">
+                  {t.dashboard.rutaUnica}
+                </h3>
                 <p className="text-sm text-on-surface-variant">
-                  Contenido adaptado a tu especialidad.
+                  {t.dashboard.rutaUnicaDesc}
                 </p>
               </div>
             </div>
@@ -107,9 +124,11 @@ export default function DashboardPage() {
                 <Icon name="verified" className="text-secondary" />
               </div>
               <div>
-                <h3 className="font-label text-base font-bold text-primary">Certificación</h3>
+                <h3 className="font-label text-base font-bold text-primary">
+                  {t.dashboard.certificacion}
+                </h3>
                 <p className="text-sm text-on-surface-variant">
-                  Valida tus avances ante la facultad.
+                  {t.dashboard.certificacionDesc}
                 </p>
               </div>
             </div>
@@ -126,36 +145,46 @@ export default function DashboardPage() {
   ).length;
 
   return (
-    <AppShell titulo="Inicio">
+    <AppShell titulo={t.shell.inicio}>
       <div className="mx-auto max-w-3xl">
         <p className="font-label text-xs font-bold uppercase tracking-widest text-secondary">
-          Hola, {perfil.nombre}
+          {t.dashboard.hola} {perfil.nombre}
         </p>
         <h1 className="mt-2 text-3xl font-black text-on-surface">
-          {perfil.materia} · {perfil.nivelEducativo}
+          {localizarValorPerfil(perfil.materia, idioma)} ·{" "}
+          {localizarValorPerfil(perfil.nivelEducativo, idioma)}
         </h1>
 
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <MiniStat etiqueta="Nivel IA" valor={resultadoTmaid.nivelAsignado} />
-          <MiniStat etiqueta="Nivel de juego" valor={`Nv. ${nivel}`} />
-          <MiniStat etiqueta="Puntos" valor={`${puntos} pts`} />
-          <MiniStat etiqueta="Badges" valor={`${badges.length}/${Object.keys(BADGES).length}`} />
+          <MiniStat
+            etiqueta={t.dashboard.nivelIA}
+            valor={nivelTmaidLabel[resultadoTmaid.nivelAsignado] ?? resultadoTmaid.nivelAsignado}
+          />
+          <MiniStat
+            etiqueta={t.dashboard.nivelJuego}
+            valor={`${t.comun.nivelAbrev} ${nivel}`}
+          />
+          <MiniStat etiqueta={t.dashboard.puntos} valor={`${puntos} ${t.comun.ptsAbrev}`} />
+          <MiniStat
+            etiqueta={t.dashboard.badges}
+            valor={`${badges.length}/${Object.keys(BADGES).length}`}
+          />
         </div>
 
         <div className="dark-hero mt-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold uppercase tracking-wide text-white/60">
-              Tu ruta de hoy
+              {t.dashboard.tuRutaHoy}
             </h2>
             <Link
               href="/rutas"
               className="text-sm font-semibold text-tertiary-fixed hover:underline"
             >
-              Ver completa →
+              {t.dashboard.verCompleta}
             </Link>
           </div>
           <p className="mt-1 text-2xl font-black text-white">
-            {completadas} / {totalFases} fases
+            {completadas} / {totalFases} {t.dashboard.fases}
           </p>
           <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/10">
             <div
@@ -168,37 +197,38 @@ export default function DashboardPage() {
         <div className="card mt-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold uppercase tracking-wide text-on-surface-variant">
-              Tus badges
+              {t.dashboard.tusBadges}
             </h2>
             <div className="flex items-center gap-3">
               <Link
                 href="/insignias"
                 className="text-sm font-semibold text-secondary hover:underline"
               >
-                Ver todas →
+                {t.comun.verTodas}
               </Link>
               <Link
                 href="/tmaid/resultado"
                 className="text-sm font-semibold text-secondary hover:underline"
               >
-                Ver mi perfil →
+                {t.dashboard.verMiPerfil}
               </Link>
             </div>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {Object.values(BADGES).map((badge) => {
               const desbloqueado = badges.includes(badge.id);
+              const textos = textoBadge(badge, idioma);
               return (
                 <span
                   key={badge.id}
-                  title={`${badge.nombre}: ${badge.descripcion}`}
+                  title={`${textos.nombre}: ${textos.descripcion}`}
                   className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold ${
                     desbloqueado
                       ? "bg-tertiary-container text-on-tertiary-container"
                       : "bg-surface-container-low text-on-surface-variant opacity-40"
                   }`}
                 >
-                  {badge.emoji} {badge.nombre}
+                  {badge.emoji} {textos.nombre}
                 </span>
               );
             })}
@@ -208,20 +238,20 @@ export default function DashboardPage() {
         <div className="card mt-4">
           <div className="flex items-center justify-between">
             <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-on-surface-variant">
-              Herramientas rapidas
+              {t.dashboard.herramientasRapidas}
             </h2>
             <div className="mb-4 flex items-center gap-3">
               <Link
                 href="/herramientas"
                 className="text-sm font-semibold text-secondary hover:underline"
               >
-                Ver todas →
+                {t.comun.verTodas}
               </Link>
               <Link
                 href="/progreso"
                 className="text-sm font-semibold text-secondary hover:underline"
               >
-                Mi progreso →
+                {t.dashboard.miProgreso}
               </Link>
             </div>
           </div>
@@ -229,21 +259,21 @@ export default function DashboardPage() {
             {HERRAMIENTAS.map((h) =>
               h.disponible ? (
                 <Link
-                  key={h.nombre}
+                  key={h.nombreKey}
                   href={h.href}
                   className="flex items-center justify-between rounded-lg bg-surface-container-low px-4 py-3 text-sm font-semibold text-on-surface hover:bg-surface-container"
                 >
-                  {h.nombre}
+                  {t.dashboard[h.nombreKey]}
                   <span className="text-primary">→</span>
                 </Link>
               ) : (
                 <div
-                  key={h.nombre}
+                  key={h.nombreKey}
                   className="flex items-center justify-between rounded-lg bg-surface-container-low px-4 py-3 text-sm font-semibold text-on-surface-variant opacity-60"
                 >
-                  {h.nombre}
+                  {t.dashboard[h.nombreKey]}
                   <span className="font-label text-xs uppercase">
-                    Proximamente
+                    {t.comun.proximamente}
                   </span>
                 </div>
               )
