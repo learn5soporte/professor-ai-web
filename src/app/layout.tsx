@@ -43,8 +43,8 @@ export default function RootLayout({
       <body>
         <IdiomaProvider>
           <SessionProvider>{children}</SessionProvider>
+          <DemoBanner />
         </IdiomaProvider>
-        <DemoBanner />
       </body>
     </html>
   );
