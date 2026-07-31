@@ -4,8 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "@/lib/store/session";
+import { useIdioma } from "@/lib/i18n";
 import { DarkScreen } from "@/components/DarkScreen";
 import { Icon } from "@/components/Icon";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 /**
  * SCREEN 2: LOGIN -- base literal: code.html real de Stitch
@@ -16,13 +18,10 @@ import { Icon } from "@/components/Icon";
  * verdad). Si no (como en todo deploy hasta ahora), sigue funcionando
  * exactamente igual que en Fase 0: cualquier email/password te deja entrar
  * -- comportamiento sin cambios para no romper la demo actual.
- *
- * v2 (2026-07-30): el CTA principal pasa de .btn-accent a .btn-gold-glow,
- * mismo tratamiento dorado aprobado en Claude Design que ya se aplico en
- * el Splash (tarea de rediseno visual, screens compartidas via DarkScreen).
  */
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useIdioma();
   const { usarSupabase, iniciarSesion, reenviarConfirmacion } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -52,7 +51,7 @@ export default function LoginPage() {
     setReenvioMensaje(null);
     const { error: errorReenvio } = await reenviarConfirmacion(email);
     setReenviando(false);
-    setReenvioMensaje(errorReenvio ?? "Correo reenviado -- revisa tu bandeja de entrada (o spam).");
+    setReenvioMensaje(errorReenvio ?? t.login.reenvioOk);
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -62,25 +61,26 @@ export default function LoginPage() {
 
   return (
     <DarkScreen>
+      <div className="fixed right-4 top-4 z-50">
+        <LanguageToggle variante="oscuro" />
+      </div>
       <section className="flex w-full max-w-md flex-col px-margin-mobile">
         <div className="mb-12 flex flex-col items-center">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container">
             <span className="font-headline text-lg font-bold text-white">P</span>
           </div>
           <h2 className="font-headline text-2xl font-bold text-white">
-            Iniciar Sesión
+            {t.login.titulo}
           </h2>
           <p className="mt-2 text-center text-sm text-white/40">
-            {usarSupabase
-              ? "Ingresa con el email y contraseña de tu cuenta."
-              : "Prototipo Fase 0 -- sin cuenta real todavía. Cualquier email / contraseña te lleva al flujo completo."}
+            {usarSupabase ? t.login.subtituloReal : t.login.subtituloDemo}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="glass-card space-y-6 rounded-xl p-8">
           <div className="space-y-2">
             <label className="font-label text-sm font-semibold text-white/60">
-              Email
+              {t.login.email}
             </label>
             <input
               type="email"
@@ -93,7 +93,7 @@ export default function LoginPage() {
           </div>
           <div className="space-y-2">
             <label className="font-label text-sm font-semibold text-white/60">
-              Contraseña
+              {t.login.password}
             </label>
             <input
               type="password"
@@ -106,7 +106,7 @@ export default function LoginPage() {
             {usarSupabase && (
               <p className="text-right text-sm">
                 <Link href="/recuperar" className="text-white/40 underline hover:text-white/70">
-                  ¿Olvidaste tu contraseña?
+                  {t.login.olvidaste}
                 </Link>
               </p>
             )}
@@ -121,7 +121,7 @@ export default function LoginPage() {
                   disabled={reenviando || !email}
                   className="text-sm font-bold text-tertiary-fixed-dim underline disabled:opacity-60"
                 >
-                  {reenviando ? "Reenviando..." : "Reenviar correo de confirmación"}
+                  {reenviando ? t.login.reenviando : t.login.reenviar}
                 </button>
               )}
             </div>
@@ -134,29 +134,29 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={cargando}
-            className="btn-gold-glow w-full disabled:opacity-60"
+            className="btn-accent flex w-full items-center justify-center gap-2 disabled:opacity-60"
           >
-            {cargando ? "Entrando..." : "Entrar"} <Icon name="arrow_forward" className="text-[18px]" />
+            {cargando ? t.login.entrando : t.login.entrar} <Icon name="arrow_forward" className="text-[18px]" />
           </button>
           {!usarSupabase && (
             <>
               <div className="flex items-center gap-4 py-2">
                 <div className="h-px flex-1 bg-tertiary-fixed-dim/20" />
                 <span className="text-sm font-bold uppercase tracking-widest text-tertiary-fixed-dim">
-                  o
+                  {t.login.o}
                 </span>
                 <div className="h-px flex-1 bg-tertiary-fixed-dim/20" />
               </div>
               <button type="button" onClick={entrar} className="btn-outline-dark flex w-full items-center justify-center gap-2">
                 <Icon name="account_circle" />
-                Continuar con Google
+                {t.login.continuarGoogle}
               </button>
             </>
           )}
           <p className="text-center text-sm text-white/40">
-            ¿No tienes cuenta?{" "}
+            {t.login.noTienesCuenta}{" "}
             <Link href="/registro" className="font-bold text-tertiary-fixed-dim">
-              Registrarse
+              {t.login.registrarse}
             </Link>
           </p>
         </form>
