@@ -4,8 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "@/lib/store/session";
+import { useIdioma } from "@/lib/i18n";
 import { DarkScreen } from "@/components/DarkScreen";
 import { Icon } from "@/components/Icon";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 /**
  * SCREEN 3: REGISTRO -- base literal: code.html real de Stitch
@@ -15,14 +17,10 @@ import { Icon } from "@/components/Icon";
  * este formulario crea una cuenta real (Supabase Auth). Si no (como en
  * todo deploy hasta ahora), sigue funcionando exactamente igual que en
  * Fase 0: crea la sesión mock directamente, sin cambios de comportamiento.
- *
- * v2 (2026-07-30): ambos CTA (pantalla de confirmacion pendiente y el
- * boton principal del formulario) pasan de .btn-accent a .btn-gold-glow,
- * mismo tratamiento dorado aprobado en Claude Design ya aplicado en
- * Splash y Login.
  */
 export default function RegistroPage() {
   const router = useRouter();
+  const { t } = useIdioma();
   const { usarSupabase, registrar } = useSession();
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
@@ -42,7 +40,7 @@ export default function RegistroPage() {
     const { error: errorAuth, yaExiste: cuentaExistente, requiereConfirmacion } = await registrar(
       email,
       password,
-      nombre.trim() || email.split("@")[0] || "Docente"
+      nombre.trim() || email.split("@")[0] || t.registro.docenteFallback
     );
     setCargando(false);
     if (errorAuth) {
@@ -63,22 +61,25 @@ export default function RegistroPage() {
   if (confirmacionPendiente) {
     return (
       <DarkScreen>
+        <div className="fixed right-4 top-4 z-50">
+          <LanguageToggle variante="oscuro" />
+        </div>
         <section className="flex w-full max-w-md flex-col px-margin-mobile">
           <div className="mb-8 flex flex-col items-center text-center">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container">
               <Icon name="mail" className="text-[28px] text-white" />
             </div>
             <h2 className="font-headline text-2xl font-bold text-white">
-              Confirma tu correo
+              {t.registro.confirmaTitulo}
             </h2>
             <p className="mt-3 text-base text-white/60">
-              Creamos tu cuenta. Revisa tu bandeja de entrada (o la carpeta de spam) en{" "}
-              <span className="font-bold text-white">{email}</span> y haz clic en el enlace de
-              confirmación antes de iniciar sesión.
+              {t.registro.confirmaTexto1}{" "}
+              <span className="font-bold text-white">{email}</span>{" "}
+              {t.registro.confirmaTexto2}
             </p>
           </div>
-          <Link href="/login" className="btn-gold-glow w-full">
-            Ir a iniciar sesión
+          <Link href="/login" className="btn-accent flex w-full items-center justify-center gap-2">
+            {t.registro.irLogin}
           </Link>
         </section>
       </DarkScreen>
@@ -87,17 +88,20 @@ export default function RegistroPage() {
 
   return (
     <DarkScreen>
+      <div className="fixed right-4 top-4 z-50">
+        <LanguageToggle variante="oscuro" />
+      </div>
       <section className="flex w-full max-w-md flex-col px-margin-mobile">
         <div className="mb-8 flex flex-col items-center">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container">
             <span className="font-headline text-lg font-bold text-white">P</span>
           </div>
           <h2 className="font-headline text-2xl font-bold text-white">
-            Crea tu cuenta
+            {t.registro.titulo}
           </h2>
           {usarSupabase && (
             <p className="mt-2 text-center text-sm text-white/40">
-              Usa un email y contraseña reales -- vas a necesitarlos para volver a entrar.
+              {t.registro.subtituloReal}
             </p>
           )}
         </div>
@@ -105,20 +109,20 @@ export default function RegistroPage() {
         <form onSubmit={handleSubmit} className="glass-card space-y-5 rounded-xl p-8">
           <div className="space-y-2">
             <label className="font-label text-sm font-semibold text-white/60">
-              Nombre completo
+              {t.registro.nombre}
             </label>
             <input
               type="text"
               required
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
-              placeholder="Dr. Julian Casablancas"
+              placeholder={t.registro.nombrePlaceholder}
               className="w-full rounded-xl border-none bg-white/5 px-4 py-4 text-white focus:ring-2 focus:ring-secondary-container"
             />
           </div>
           <div className="space-y-2">
             <label className="font-label text-sm font-semibold text-white/60">
-              Email
+              {t.registro.email}
             </label>
             <input
               type="email"
@@ -131,7 +135,7 @@ export default function RegistroPage() {
           </div>
           <div className="space-y-2">
             <label className="font-label text-sm font-semibold text-white/60">
-              Contraseña
+              {t.registro.password}
             </label>
             <input
               type="password"
@@ -152,7 +156,7 @@ export default function RegistroPage() {
               className="h-5 w-5 rounded border-white/20 bg-transparent text-tertiary focus:ring-0"
             />
             <span className="text-sm text-white/60 transition-colors group-hover:text-white">
-              Acepto los términos y condiciones
+              {t.registro.terminos}
             </span>
           </label>
           {error && (
@@ -160,7 +164,7 @@ export default function RegistroPage() {
               <p className="text-sm text-red-300">{error}</p>
               {yaExiste && (
                 <Link href="/login" className="text-sm font-bold text-tertiary-fixed-dim underline">
-                  Ir a iniciar sesión
+                  {t.registro.irLogin}
                 </Link>
               )}
             </div>
@@ -168,14 +172,14 @@ export default function RegistroPage() {
           <button
             type="submit"
             disabled={cargando}
-            className="btn-gold-glow w-full disabled:opacity-60"
+            className="btn-accent flex w-full items-center justify-center gap-2 disabled:opacity-60"
           >
-            {cargando ? "Creando..." : "Crear mi cuenta"} <Icon name="arrow_forward" className="text-[18px]" />
+            {cargando ? t.registro.creando : t.registro.crear} <Icon name="arrow_forward" className="text-[18px]" />
           </button>
           <p className="text-center text-sm text-white/40">
-            ¿Ya tienes cuenta?{" "}
+            {t.registro.yaTienes}{" "}
             <Link href="/login" className="font-bold text-tertiary-fixed-dim">
-              Inicia sesión
+              {t.registro.iniciaSesion}
             </Link>
           </p>
         </form>
