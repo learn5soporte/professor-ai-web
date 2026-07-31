@@ -3,28 +3,25 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, perfilCompleto } from "@/lib/store/session";
-import { ETIQUETA_DIMENSION } from "@/lib/tmaid/scoring";
+import { etiquetaDimension, localizarResultadoTmaid } from "@/lib/tmaid/scoring";
 import type { Dimension } from "@/lib/tmaid/preguntas";
-import { BADGES, calcularNivel } from "@/lib/gamification/badges";
+import { BADGES, calcularNivel, textoBadge } from "@/lib/gamification/badges";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
 import { CargandoPantalla } from "@/components/CargandoPantalla";
+import { useIdioma } from "@/lib/i18n";
+import { tpl, type Traducciones } from "@/lib/i18n/traducciones";
+import { etiquetaFase, localizarValorPerfil } from "@/lib/i18n/valores";
 
 /**
  * Mi Informe -- pantalla nueva (jul 2026), pedida por el usuario: "un
  * pequeño generador de informes... reportes privados" antes de sacar la
  * app a la luz. Alcance confirmado via AskUserQuestion: SOLO el informe
- * privado del propio docente (no un panel admin -- eso requeriría un rol
- * nuevo + políticas RLS adicionales, fuera de alcance por ahora), con
- * pantalla + descarga PDF.
+ * privado del propio docente, con pantalla + descarga PDF.
  *
  * La "descarga PDF" usa window.print() + clases print: de Tailwind (core,
- * sin tocar tailwind.config.ts) en vez de una librería nueva como jsPDF --
- * evita sumar una dependencia npm nueva que nunca se probó contra el build
- * real de GitHub Actions, y le da al docente el flujo nativo del navegador
- * ("Guardar como PDF") que ya conoce. AppShell.tsx gana `print:hidden` en
- * el header/nav fijos para que al imprimir solo se vea el contenido del
- * informe, no la barra de navegación de la app.
+ * sin tocar tailwind.config.ts) en vez de una librería nueva como jsPDF.
+ * AppShell.tsx tiene `print:hidden` en el header/nav fijos.
  *
  * Todo el contenido sale de datos reales de la sesión (resultadoTmaid,
  * baselineTmaid, progresoRutas, badges, puntos, racha) -- mismo principio
@@ -38,6 +35,16 @@ const ICONO_DIMENSION: Record<Dimension, string> = {
   actitudCambio: "rocket_launch",
 };
 
+function nivelTmaidLabel(t: Traducciones, nivel: string): string {
+  const mapa: Record<string, string> = {
+    Iniciante: t.tmaid.nivelIniciante,
+    "En desarrollo": t.tmaid.nivelEnDesarrollo,
+    Avanzado: t.tmaid.nivelAvanzado,
+    Experto: t.tmaid.nivelExperto,
+  };
+  return mapa[nivel] ?? nivel;
+}
+
 export default function InformesPage() {
   const router = useRouter();
   const {
@@ -50,6 +57,7 @@ export default function InformesPage() {
     racha,
     cargando,
   } = useSession();
+  const { idioma, t } = useIdioma();
 
   useEffect(() => {
     if (cargando) return;
@@ -61,17 +69,21 @@ export default function InformesPage() {
   if (cargando) return <CargandoPantalla />;
   if (!perfil || !perfilCompleto(perfil) || !resultadoTmaid) return null;
 
-  const { dimensiones } = resultadoTmaid;
+  const resultado = localizarResultadoTmaid(resultadoTmaid, perfil, idioma);
+  const { dimensiones } = resultado;
   const dims = Object.keys(dimensiones) as Dimension[];
   const { nivel: nivelGamificacion } = calcularNivel(puntos);
 
-  const fechaGeneracion = new Date().toLocaleDateString("es-MX", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const fechaGeneracion = new Date().toLocaleDateString(
+    idioma === "es" ? "es-MX" : "en-US",
+    {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }
+  );
 
-  const fases = resultadoTmaid.rutaPersonalizada;
+  const fases = resultado.rutaPersonalizada;
   const indiceActivo = fases.findIndex((f) => progresoRutas[f.fase] !== "completado");
   const modulos = fases.map((f, i) => {
     const retoHecho = progresoRutas[f.fase] === "completado";
@@ -82,12 +94,22 @@ export default function InformesPage() {
     ).length;
     const total = 1 + 1 + recursos.length;
     const hechas = (retoHecho ? 1 : 0) + (reflexionHecha ? 1 : 0) + recursosHechos;
-    const estado = retoHecho ? "Completado" : i === indiceActivo ? "En curso" : "Pendiente";
+    const estado: "completado" | "en_curso" | "pendiente" = retoHecho
+      ? "completado"
+      : i === indiceActivo
+      ? "en_curso"
+      : "pendiente";
     return { fase: f.fase, estado, hechas, total };
   });
-  const modulosCompletados = modulos.filter((m) => m.estado === "Completado").length;
+  const modulosCompletados = modulos.filter((m) => m.estado === "completado").length;
   const actividadesTotal = modulos.reduce((a, m) => a + m.total, 0);
   const actividadesHechas = modulos.reduce((a, m) => a + m.hechas, 0);
+
+  const estadoLabel: Record<"completado" | "en_curso" | "pendiente", string> = {
+    completado: t.comun.completado,
+    en_curso: t.informes.enCurso,
+    pendiente: t.informes.pendiente,
+  };
 
   const badgesObtenidos = badges
     .map((id) => BADGES[id])
@@ -98,63 +120,78 @@ export default function InformesPage() {
   }
 
   return (
-    <AppShell titulo="Mi Informe">
+    <AppShell titulo={t.informes.miInforme}>
       <div className="mx-auto max-w-4xl space-y-gap-xl print:max-w-none print:space-y-6">
         <div className="hidden print:mb-4 print:block">
           <p className="text-xl font-black text-primary">Professor AI · Learn5</p>
-          <p className="text-sm text-on-surface-variant">Informe generado el {fechaGeneracion}</p>
+          <p className="text-sm text-on-surface-variant">
+            {tpl(t.informes.informeGeneradoEl, { fecha: fechaGeneracion })}
+          </p>
         </div>
 
         <div className="flex flex-wrap items-start justify-between gap-4 print:hidden">
           <div>
             <span className="font-label text-xs font-bold uppercase tracking-widest text-secondary">
-              Reportes
+              {t.informes.reportes}
             </span>
             <h1 className="font-headline text-3xl font-black text-on-primary-fixed sm:text-4xl">
-              Mi Informe
+              {t.informes.miInforme}
             </h1>
             <p className="text-sm mt-1 text-on-surface-variant">
-              Generado el {fechaGeneracion} · datos reales de tu cuenta
+              {tpl(t.informes.generadoEl, { fecha: fechaGeneracion })}
             </p>
           </div>
           <button
             onClick={imprimir}
             className="flex items-center gap-2 whitespace-nowrap rounded-2xl bg-primary-container px-6 py-3 font-bold text-white transition-transform hover:scale-105"
           >
-            <Icon name="picture_as_pdf" className="text-[18px]" /> Descargar PDF
+            <Icon name="picture_as_pdf" className="text-[18px]" /> {t.informes.descargarPdf}
           </button>
         </div>
 
         <section className="atmospheric-shadow space-y-3 rounded-[2rem] bg-white p-6 print:rounded-none print:border print:border-outline-variant print:shadow-none">
           <h3 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-            Docente
+            {t.informes.docente}
           </h3>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <Dato etiqueta="Nombre" valor={perfil.nombre || "—"} />
-            <Dato etiqueta="Materia" valor={perfil.materia || "—"} />
-            <Dato etiqueta="Nivel educativo" valor={perfil.nivelEducativo || "—"} />
-            <Dato etiqueta="País" valor={perfil.pais || "—"} />
+            <Dato etiqueta={t.informes.nombre} valor={perfil.nombre || "—"} />
+            <Dato
+              etiqueta={t.informes.materia}
+              valor={perfil.materia ? localizarValorPerfil(perfil.materia, idioma) : "—"}
+            />
+            <Dato
+              etiqueta={t.informes.nivelEducativo}
+              valor={
+                perfil.nivelEducativo
+                  ? localizarValorPerfil(perfil.nivelEducativo, idioma)
+                  : "—"
+              }
+            />
+            <Dato etiqueta={t.informes.pais} valor={perfil.pais || "—"} />
           </div>
         </section>
 
         <section className="atmospheric-shadow space-y-4 rounded-[2rem] bg-white p-6 print:rounded-none print:border print:border-outline-variant print:shadow-none">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-              Diagnóstico TMAID
+              {t.tmaid.diagnosticoTmaid}
             </h3>
             <span className="rounded-full bg-tertiary-fixed px-3 py-1 text-xs font-black uppercase text-on-tertiary-fixed">
-              Nivel {resultadoTmaid.nivelAsignado}
+              {tpl(t.informes.nivelChip, {
+                nivel: nivelTmaidLabel(t, resultado.nivelAsignado),
+              })}
             </span>
           </div>
           <p className="text-sm text-on-surface-variant">
-            Puntaje promedio: <strong>{resultadoTmaid.puntajePromedio.toFixed(1)}/5</strong>
+            {t.informes.puntajePromedio}{" "}
+            <strong>{resultado.puntajePromedio.toFixed(1)}/5</strong>
           </p>
           <div className="space-y-2">
             {dims.map((d) => (
               <div key={d} className="flex items-center gap-3">
                 <Icon name={ICONO_DIMENSION[d]} className="w-6 text-[18px] text-secondary" />
                 <span className="w-40 shrink-0 text-sm text-on-surface-variant">
-                  {ETIQUETA_DIMENSION[d]}
+                  {etiquetaDimension(d, idioma)}
                 </span>
                 <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-container-highest print:border print:border-outline-variant">
                   <div
@@ -170,10 +207,10 @@ export default function InformesPage() {
           </div>
           <div className="space-y-1 pt-2">
             <h4 className="text-xs font-bold uppercase tracking-wide text-outline">
-              Diagnóstico por dimensión
+              {t.informes.diagnosticoPorDimension}
             </h4>
             <ul className="space-y-1">
-              {resultadoTmaid.mapaBrechas.map((b, i) => (
+              {resultado.mapaBrechas.map((b, i) => (
                 <li key={i} className="text-sm flex items-start gap-2 text-on-surface-variant">
                   <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" />
                   <span>{b}</span>
@@ -183,42 +220,48 @@ export default function InformesPage() {
           </div>
         </section>
 
-        <EvolucionResumen resultadoTmaid={resultadoTmaid} baselineTmaid={baselineTmaid} />
+        <EvolucionResumen resultadoTmaid={resultado} baselineTmaid={baselineTmaid} />
 
         <section className="atmospheric-shadow space-y-4 rounded-[2rem] bg-white p-6 print:break-inside-avoid print:rounded-none print:border print:border-outline-variant print:shadow-none">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-              Ruta formativa
+              {t.informes.rutaFormativa}
             </h3>
             <span className="text-sm text-on-surface-variant">
-              {modulosCompletados}/{fases.length} módulos · {actividadesHechas}/{actividadesTotal}{" "}
-              actividades
+              {tpl(t.informes.modulosActividades, {
+                mc: modulosCompletados,
+                mt: fases.length,
+                ah: actividadesHechas,
+                at: actividadesTotal,
+              })}
             </span>
           </div>
           <div className="overflow-hidden rounded-xl border border-outline-variant/40">
             <table className="w-full text-left text-sm">
               <thead className="bg-surface-container-low text-xs uppercase tracking-wide text-on-surface-variant">
                 <tr>
-                  <th className="px-4 py-2">Módulo</th>
-                  <th className="px-4 py-2">Estado</th>
-                  <th className="px-4 py-2">Actividades</th>
+                  <th className="px-4 py-2">{t.informes.modulo}</th>
+                  <th className="px-4 py-2">{t.informes.estado}</th>
+                  <th className="px-4 py-2">{t.informes.actividades}</th>
                 </tr>
               </thead>
               <tbody>
                 {modulos.map((m) => (
                   <tr key={m.fase} className="border-t border-outline-variant/30">
-                    <td className="px-4 py-2 font-semibold text-on-surface">{m.fase}</td>
+                    <td className="px-4 py-2 font-semibold text-on-surface">
+                      {etiquetaFase(m.fase, idioma)}
+                    </td>
                     <td className="px-4 py-2">
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs font-bold ${
-                          m.estado === "Completado"
+                          m.estado === "completado"
                             ? "bg-tertiary-fixed text-on-tertiary-fixed"
-                            : m.estado === "En curso"
+                            : m.estado === "en_curso"
                             ? "bg-secondary-container text-on-secondary-container"
                             : "bg-surface-container-low text-on-surface-variant"
                         }`}
                       >
-                        {m.estado}
+                        {estadoLabel[m.estado]}
                       </span>
                     </td>
                     <td className="px-4 py-2 text-on-surface-variant">
@@ -233,20 +276,23 @@ export default function InformesPage() {
 
         <section className="atmospheric-shadow space-y-4 rounded-[2rem] bg-white p-6 print:break-inside-avoid print:rounded-none print:border print:border-outline-variant print:shadow-none">
           <h3 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-            Gamificación
+            {t.informes.gamificacion}
           </h3>
           <div className="grid grid-cols-3 gap-4">
-            <Dato etiqueta="Nivel" valor={`Nv.${nivelGamificacion}`} />
-            <Dato etiqueta="Puntos (XP)" valor={String(puntos)} />
-            <Dato etiqueta="Racha" valor={`${racha} día${racha === 1 ? "" : "s"}`} />
+            <Dato etiqueta={t.informes.nivelG} valor={`${t.comun.nivelAbrev}${nivelGamificacion}`} />
+            <Dato etiqueta={t.informes.puntosXp} valor={String(puntos)} />
+            <Dato
+              etiqueta={t.progreso.racha}
+              valor={`${racha} ${racha === 1 ? t.informes.rachaDia : t.informes.rachaDias}`}
+            />
           </div>
           <div className="space-y-1 pt-2">
             <h4 className="text-xs font-bold uppercase tracking-wide text-outline">
-              Insignias obtenidas ({badgesObtenidos.length})
+              {tpl(t.informes.insigniasObtenidas, { n: badgesObtenidos.length })}
             </h4>
             {badgesObtenidos.length === 0 ? (
               <p className="text-sm text-on-surface-variant">
-                Todavía no has desbloqueado ninguna insignia.
+                {t.informes.sinInsignias}
               </p>
             ) : (
               <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -256,7 +302,7 @@ export default function InformesPage() {
                     className="flex items-center gap-2 rounded-lg bg-surface-container-low px-3 py-2 text-sm"
                   >
                     <span aria-hidden>{b.emoji}</span>
-                    <span className="text-on-surface">{b.nombre}</span>
+                    <span className="text-on-surface">{textoBadge(b, idioma).nombre}</span>
                     <span className="ml-auto text-xs font-bold text-secondary">+{b.puntos}</span>
                   </li>
                 ))}
@@ -265,10 +311,7 @@ export default function InformesPage() {
           </div>
         </section>
 
-        <p className="text-xs text-outline print:mt-6">
-          Este informe se genera automáticamente a partir de tu actividad real registrada en
-          Professor AI (Learn5). No incluye evaluaciones de terceros ni datos de otros docentes.
-        </p>
+        <p className="text-xs text-outline print:mt-6">{t.informes.pieInforme}</p>
       </div>
     </AppShell>
   );
@@ -295,18 +338,16 @@ function EvolucionResumen({
   resultadoTmaid: NonNullable<ReturnType<typeof useSession>["resultadoTmaid"]>;
   baselineTmaid: ReturnType<typeof useSession>["baselineTmaid"];
 }) {
+  const { idioma, t } = useIdioma();
   const dims = Object.keys(resultadoTmaid.dimensiones) as Dimension[];
 
   if (!baselineTmaid) {
     return (
       <section className="atmospheric-shadow space-y-2 rounded-[2rem] bg-white p-6 print:rounded-none print:border print:border-outline-variant print:shadow-none">
         <h3 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-          Evolución
+          {t.informes.evolucion}
         </h3>
-        <p className="text-sm text-on-surface-variant">
-          Todavía no hay suficientes datos para comparar. Esto se activa automáticamente después
-          del primer diagnóstico TMAID registrado.
-        </p>
+        <p className="text-sm text-on-surface-variant">{t.informes.sinDatosInforme}</p>
       </section>
     );
   }
@@ -319,12 +360,13 @@ function EvolucionResumen({
     return (
       <section className="atmospheric-shadow space-y-2 rounded-[2rem] bg-white p-6 print:rounded-none print:border print:border-outline-variant print:shadow-none">
         <h3 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-          Evolución
+          {t.informes.evolucion}
         </h3>
         <p className="text-sm text-on-surface-variant">
-          Único diagnóstico hasta ahora ({resultadoTmaid.nivelAsignado},{" "}
-          {resultadoTmaid.puntajePromedio.toFixed(1)}/5). Repite el TMAID desde /progreso para
-          poder comparar más adelante.
+          {tpl(t.informes.unicoInforme, {
+            nivel: nivelTmaidLabel(t, resultadoTmaid.nivelAsignado),
+            puntaje: resultadoTmaid.puntajePromedio.toFixed(1),
+          })}
         </p>
       </section>
     );
@@ -338,7 +380,7 @@ function EvolucionResumen({
     <section className="atmospheric-shadow space-y-3 rounded-[2rem] bg-white p-6 print:break-inside-avoid print:rounded-none print:border print:border-outline-variant print:shadow-none">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-          Evolución
+          {t.informes.evolucion}
         </h3>
         <span
           className={`rounded-full px-3 py-1 text-xs font-bold ${
@@ -347,7 +389,8 @@ function EvolucionResumen({
               : "bg-surface-container-low text-on-surface-variant"
           }`}
         >
-          {baselineTmaid.nivelAsignado} → {resultadoTmaid.nivelAsignado} ({deltaPromedio >= 0 ? "+" : ""}
+          {nivelTmaidLabel(t, baselineTmaid.nivelAsignado)} →{" "}
+          {nivelTmaidLabel(t, resultadoTmaid.nivelAsignado)} ({deltaPromedio >= 0 ? "+" : ""}
           {deltaPromedio})
         </span>
       </div>
@@ -361,7 +404,7 @@ function EvolucionResumen({
               key={d}
               className="flex items-center justify-between rounded-lg bg-surface-container-low px-3 py-2 text-xs"
             >
-              <span className="text-on-surface-variant">{ETIQUETA_DIMENSION[d]}</span>
+              <span className="text-on-surface-variant">{etiquetaDimension(d, idioma)}</span>
               <span
                 className={
                   delta > 0
