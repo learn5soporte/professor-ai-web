@@ -108,6 +108,16 @@ export type ResultadoTmaid = {
     descripcion: string;
     recursos?: RecursoSugerido[];
   }[];
+  /**
+   * Metadatos i18n (fase ES/EN, jul 2026) -- opcionales para no romper
+   * registros ya guardados. `idioma` es el idioma en el que se generaron
+   * los textos de este resultado; `miedos` conserva la respuesta abierta
+   * cruda para poder re-generar la cita al cambiar de idioma (ver
+   * localizarResultadoTmaid en scoring.ts). Registros viejos sin estos
+   * campos se tratan como generados en español y sin cita recuperable.
+   */
+  idioma?: "es" | "en";
+  miedos?: string;
 };
 
 /**
