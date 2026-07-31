@@ -4,11 +4,12 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession, perfilCompleto } from "@/lib/store/session";
-import { ETIQUETA_DIMENSION } from "@/lib/tmaid/scoring";
-import { BADGES, calcularNivel } from "@/lib/gamification/badges";
+import { localizarResultadoTmaid } from "@/lib/tmaid/scoring";
+import { BADGES, calcularNivel, textoBadge } from "@/lib/gamification/badges";
 import { AppShell } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
 import { CargandoPantalla } from "@/components/CargandoPantalla";
+import { useIdioma } from "@/lib/i18n";
 
 /**
  * SCREEN 13: RESULTADO -- base literal: code.html real de Stitch
@@ -27,13 +28,6 @@ import { CargandoPantalla } from "@/components/CargandoPantalla";
  * por Dimension" porque ya no todas son "brechas" en sentido estricto.
  */
 
-const PERSONA_POR_NIVEL: Record<string, string> = {
-  Iniciante: "Docente Explorador",
-  "En desarrollo": "Docente Curioso",
-  Avanzado: "Docente Aplicador",
-  Experto: "Docente Referente",
-};
-
 const METRICA_ICONO: Record<string, string> = {
   conocimientoIA: "psychology",
   usoHerramientas: "handyman",
@@ -41,16 +35,10 @@ const METRICA_ICONO: Record<string, string> = {
   actitudCambio: "rocket_launch",
 };
 
-const METRICA_LABEL: Record<string, string> = {
-  conocimientoIA: "Teoría",
-  usoHerramientas: "Uso",
-  integracionAula: "Aulas",
-  actitudCambio: "Mentalidad",
-};
-
 export default function ResultadoTmaidPage() {
   const router = useRouter();
   const { perfil, resultadoTmaid, badges, puntos, cargando } = useSession();
+  const { idioma, t } = useIdioma();
 
   useEffect(() => {
     if (cargando) return;
@@ -68,7 +56,23 @@ export default function ResultadoTmaidPage() {
     return null;
   }
 
-  const { dimensiones } = resultadoTmaid;
+  const resultado = localizarResultadoTmaid(resultadoTmaid, perfil, idioma);
+
+  const personaPorNivel: Record<string, string> = {
+    Iniciante: t.tmaid.personaIniciante,
+    "En desarrollo": t.tmaid.personaEnDesarrollo,
+    Avanzado: t.tmaid.personaAvanzado,
+    Experto: t.tmaid.personaExperto,
+  };
+
+  const metricaLabel: Record<string, string> = {
+    conocimientoIA: t.tmaid.metricaTeoria,
+    usoHerramientas: t.tmaid.metricaUso,
+    integracionAula: t.tmaid.metricaAulas,
+    actitudCambio: t.tmaid.metricaMentalidad,
+  };
+
+  const { dimensiones } = resultado;
   const { nivel } = calcularNivel(puntos);
 
   // Radar: N=conocimiento, E=herramientas, S=integracion, W=actitud.
@@ -87,27 +91,29 @@ export default function ResultadoTmaidPage() {
   ].join(" ");
 
   return (
-    <AppShell titulo="Perfil">
+    <AppShell titulo={t.shell.perfil}>
       <div className="relative -mx-6 -mt-20 mb-8 overflow-hidden bg-white px-6 pb-8 pt-24 text-center md:px-margin-page">
         <div className="pointer-events-none absolute inset-0 opacity-10">
           <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-secondary-container blur-[80px]" />
         </div>
         <div className="relative z-10">
           <span className="font-label mb-4 inline-block rounded-full bg-secondary-fixed px-4 py-1 text-xs font-bold uppercase tracking-widest text-secondary">
-            TU PERFIL IA
+            {t.tmaid.tuPerfilIa}
           </span>
           <h1 className="font-headline text-4xl font-black tracking-tight text-primary sm:text-5xl md:text-6xl">
-            {PERSONA_POR_NIVEL[resultadoTmaid.nivelAsignado] ?? resultadoTmaid.nivelAsignado}
+            {personaPorNivel[resultado.nivelAsignado] ?? resultado.nivelAsignado}
           </h1>
           <p className="mx-auto mt-2 max-w-xl text-base text-on-surface-variant sm:text-lg">
-            {resultadoTmaid.perfilPedagogicoIA}
+            {resultado.perfilPedagogicoIA}
           </p>
         </div>
       </div>
 
       <div className="mx-auto grid max-w-5xl grid-cols-1 items-start gap-xl lg:grid-cols-2">
         <div className="atmospheric-shadow flex flex-col items-center rounded-3xl bg-white p-8">
-          <h3 className="font-headline mb-8 self-start text-xl font-bold">Mapa de Competencias</h3>
+          <h3 className="font-headline mb-8 self-start text-xl font-bold">
+            {t.tmaid.mapaCompetencias}
+          </h3>
           <div className="w-full max-w-[400px]">
             <svg className="h-auto w-full drop-shadow-xl" viewBox="-40 -10 280 220">
               <polygon fill="none" points="100,20 180,100 100,180 20,100" stroke="#e1e3e4" strokeWidth="1" />
@@ -117,16 +123,16 @@ export default function ResultadoTmaidPage() {
               <line x1="20" y1="100" x2="180" y2="100" stroke="#e1e3e4" strokeWidth="1" />
               <polygon fill="rgba(37, 82, 202, 0.4)" points={puntosRadar} stroke="#cba82f" strokeWidth="3" />
               <text className="fill-on-surface-variant font-label font-bold" style={{ fontSize: "8px" }} textAnchor="middle" x="100" y="15">
-                CONOCIMIENTO
+                {t.tmaid.radarConocimiento}
               </text>
               <text className="fill-on-surface-variant font-label font-bold" style={{ fontSize: "8px" }} textAnchor="start" x="185" y="103">
-                HERRAMIENTAS
+                {t.tmaid.radarHerramientas}
               </text>
               <text className="fill-on-surface-variant font-label font-bold" style={{ fontSize: "8px" }} textAnchor="middle" x="100" y="193">
-                INTEGRACIÓN
+                {t.tmaid.radarIntegracion}
               </text>
               <text className="fill-on-surface-variant font-label font-bold" style={{ fontSize: "8px" }} textAnchor="end" x="15" y="103">
-                ACTITUD
+                {t.tmaid.radarActitud}
               </text>
             </svg>
           </div>
@@ -141,7 +147,7 @@ export default function ResultadoTmaidPage() {
                   <span className="font-label text-lg font-bold text-tertiary-container">{pct}%</span>
                   <Icon name={METRICA_ICONO[dim]} className="text-outline-variant" />
                 </div>
-                <p className="font-headline mb-2 text-base font-bold">{METRICA_LABEL[dim]}</p>
+                <p className="font-headline mb-2 text-base font-bold">{metricaLabel[dim]}</p>
                 <div className="h-1 w-full rounded-full bg-surface-container-highest">
                   <div className="h-full rounded-full bg-secondary-container" style={{ width: `${pct}%` }} />
                 </div>
@@ -151,9 +157,11 @@ export default function ResultadoTmaidPage() {
 
           <div className="col-span-2 mt-4">
             <div className="atmospheric-shadow rounded-3xl bg-white/50 p-8">
-              <h4 className="font-headline mb-6 text-xl font-bold">Diagnóstico por Dimensión</h4>
+              <h4 className="font-headline mb-6 text-xl font-bold">
+                {t.tmaid.diagnosticoPorDimension}
+              </h4>
               <ul className="space-y-4">
-                {resultadoTmaid.mapaBrechas.map((brecha) => (
+                {resultado.mapaBrechas.map((brecha) => (
                   <li key={brecha} className="flex items-center gap-4 text-on-surface-variant">
                     <Icon name="warning" filled className="text-tertiary-container" />
                     {brecha}
@@ -161,9 +169,11 @@ export default function ResultadoTmaidPage() {
                 ))}
               </ul>
 
-              <h4 className="font-headline mb-6 mt-12 text-xl font-bold">Acciones Prioritarias</h4>
+              <h4 className="font-headline mb-6 mt-12 text-xl font-bold">
+                {t.tmaid.accionesPrioritarias}
+              </h4>
               <div className="space-y-4">
-                {resultadoTmaid.rutaPersonalizada.map((fase, i) => (
+                {resultado.rutaPersonalizada.map((fase, i) => (
                   <div key={fase.fase} className="group flex items-start gap-4">
                     <span className="font-headline text-2xl font-black text-tertiary-container/30 transition-colors group-hover:text-tertiary-container">
                       {String(i + 1).padStart(2, "0")}
@@ -180,25 +190,26 @@ export default function ResultadoTmaidPage() {
           <div className="col-span-2">
             <div className="atmospheric-shadow rounded-3xl bg-white p-8">
               <div className="mb-4 flex items-center justify-between">
-                <h4 className="font-headline text-xl font-bold">Tus badges</h4>
+                <h4 className="font-headline text-xl font-bold">{t.tmaid.tusBadges}</h4>
                 <span className="text-sm text-on-surface-variant">
-                  Nv.{nivel} · {puntos} pts
+                  {t.comun.nivelAbrev}{nivel} · {puntos} {t.comun.ptsAbrev}
                 </span>
               </div>
               <div className="flex flex-wrap gap-2">
                 {Object.values(BADGES).map((badge) => {
                   const desbloqueado = badges.includes(badge.id);
+                  const textos = textoBadge(badge, idioma);
                   return (
                     <span
                       key={badge.id}
-                      title={`${badge.nombre}: ${badge.descripcion}`}
+                      title={`${textos.nombre}: ${textos.descripcion}`}
                       className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold ${
                         desbloqueado
                           ? "bg-tertiary-container text-on-tertiary-container"
                           : "bg-surface-container-low text-on-surface-variant opacity-40"
                       }`}
                     >
-                      {badge.emoji} {badge.nombre}
+                      {badge.emoji} {textos.nombre}
                     </span>
                   );
                 })}
@@ -213,14 +224,14 @@ export default function ResultadoTmaidPage() {
           href="/rutas"
           className="font-headline group flex w-full items-center justify-between rounded-full bg-on-secondary-fixed px-10 py-5 text-lg font-bold text-on-secondary shadow-xl transition-all hover:bg-secondary active:scale-95"
         >
-          Ver Mi Plan de Ruta Personalizado
+          {t.tmaid.verPlanRuta}
           <Icon name="trending_flat" className="transition-transform group-hover:translate-x-2" />
         </Link>
         <Link
           href="/tmaid/resultado/detallado"
           className="flex w-full items-center justify-between rounded-full border border-outline-variant px-10 py-4 text-on-surface transition-all hover:bg-surface-container-low active:scale-95"
         >
-          Ver análisis detallado de mi perfil IA
+          {t.tmaid.verAnalisis}
           <Icon name="arrow_forward" />
         </Link>
       </div>
