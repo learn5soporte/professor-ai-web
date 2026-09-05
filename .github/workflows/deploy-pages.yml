@@ -15,7 +15,10 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  # Puerta de calidad: si el typecheck o los tests fallan, NO se publica.
+  # Antes los tests vivian en un workflow aparte que no bloqueaba el deploy,
+  # asi que una regresion podia llegar a produccion con el semaforo en rojo.
+  verificar:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,7 +30,28 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run test
+
+  build:
+    needs: verificar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
 
       - name: Build (Next.js static export)
         run: npm run build
