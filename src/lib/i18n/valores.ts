@@ -31,8 +31,17 @@ const VALOR_PERFIL_EN: Record<string, string> = {
   // Relación con la IA (onboarding paso 3)
   Explorador: "Explorer",
   Curioso: "Curious",
-  Aplicador: "Applier",
-  // Desafíos (onboarding paso 3)
+  Aplicador: "Hands-on",
+  // Desafíos (onboarding paso 3). Se guardan en minúscula y como sintagma
+  // nominal porque scoring.ts los interpola dentro de una frase
+  // ("...pensando en resolver {desafio}"); la traducción EN respeta esa
+  // misma forma (se usa con .toLowerCase() en la versión inglesa).
+  "la falta de tiempo": "the lack of time",
+  "la desconexión de tus estudiantes": "your students' disengagement",
+  "el tiempo que te toma evaluar": "the time grading takes you",
+  // Valores heredados: perfiles guardados antes de sep 2026 todavía los
+  // tienen. Se conservan solo para que su etiqueta visible siga
+  // traduciéndose; ya no se ofrecen en el onboarding.
   "Falta de tiempo": "Lack of time",
   "Engagement alumnos": "Student engagement",
   "Evaluación rápida": "Fast assessment",

@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import {
+  IDIOMA_STORAGE_KEY,
   TRADUCCIONES,
   type Idioma,
   type Traducciones,
@@ -22,7 +23,7 @@ import {
  * hidratar.
  */
 
-const STORAGE_KEY = "professor-ai:idioma";
+const STORAGE_KEY = IDIOMA_STORAGE_KEY;
 
 type IdiomaContextValue = {
   idioma: Idioma;

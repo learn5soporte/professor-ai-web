@@ -46,7 +46,7 @@ const es = {
     subtituloReal:
       "Usa un email y contraseña reales -- vas a necesitarlos para volver a entrar.",
     nombre: "Nombre completo",
-    nombrePlaceholder: "Dr. Julian Casablancas",
+    nombrePlaceholder: "Ej.: María González",
     email: "Email",
     password: "Contraseña",
     terminos: "Acepto los términos y condiciones",
@@ -69,7 +69,7 @@ const es = {
     progreso: "Progreso",
     perfil: "Perfil",
     premium: "Premium",
-    premiumTitle: "Conoce Tutor IA Premium",
+    premiumTitle: "Ver planes y lo que viene",
     bloqueado: "Completa el diagnóstico TMAID primero",
     salir: "Cerrar sesión",
   },
@@ -81,22 +81,22 @@ const es = {
     verTodas: "Ver todas →",
     herramientas: "Herramientas",
     completado: "Completado",
-    badgeDesbloqueado: "Badge desbloqueado!",
+    badgeDesbloqueado: "¡Insignia desbloqueada!",
     ptsAbrev: "pts",
     nivelAbrev: "Nv.",
     demoAviso:
-      "Versión de demostración de Professor AI (Learn5) — contenido de prueba, sujeto a cambios. Prohibida su reproducción o distribución sin autorización. © 2026 Learn5.",
+      "Professor AI (Learn5) — versión piloto. Prohibida su reproducción o distribución sin autorización. © 2026 Learn5.",
     cerrarAviso: "Cerrar aviso",
     descargarTxt: "Descargar como .txt",
     copiarPortapapeles: "Copiar al portapapeles",
   },
   onboarding: {
-    analisis1: "Analizando tu perfil...",
-    analisis2: "Construyendo tu ruta...",
-    analisis3: "Identificando desafíos...",
-    analisis4: "Sincronizando modelos de IA...",
+    analisis1: "Guardando tu perfil docente...",
+    analisis2: "Registrando tu materia y tu nivel...",
+    analisis3: "Anotando el desafío que nos contaste...",
+    analisis4: "Preparando tu diagnóstico TMAID...",
     analisis5: "¡Casi listo!",
-    motorActivo: "Motor de Inteligencia Educativa Activo",
+    motorActivo: "Modelo TMAID de Learn5",
     pasoNivel: "¿En qué nivel enseñas?",
     pasoMateria: "¿Qué enseñas?",
     pasoMateriaSub: "Escribe tu materia o selecciona de las sugerencias.",
@@ -107,7 +107,7 @@ const es = {
     relacionAplicadorDesc: "Ya la uso para crear mis contenidos.",
     pasoDesafio: "¿Cuál es tu mayor desafío?",
     pasoObjetivo: "¿Qué quieres lograr?",
-    finalizar: "Finalizar Configuración",
+    finalizar: "Finalizar configuración",
   },
   dashboard: {
     todoEmpieza: "Todo empieza aquí",
@@ -115,53 +115,56 @@ const es = {
       "Para comenzar tu viaje de transformación académica con IA, necesitamos entender tu punto de partida. Realiza tu primer diagnóstico y desbloquea tu ruta personalizada.",
     hacerDiagnostico: "Hacer mi diagnóstico",
     toma5min: "Toma unos 5 minutos",
-    analisisIA: "Análisis IA",
-    analisisIADesc: "Evaluamos tus competencias actuales.",
-    rutaUnica: "Ruta Única",
-    rutaUnicaDesc: "Contenido adaptado a tu especialidad.",
-    certificacion: "Certificación",
-    certificacionDesc: "Valida tus avances ante la facultad.",
+    analisisIA: "Diagnóstico TMAID",
+    analisisIADesc: "Medimos tus competencias en 4 dimensiones.",
+    rutaUnica: "Ruta personalizada",
+    rutaUnicaDesc: "Retos ajustados a tu materia y a tu punto de partida.",
+    informeAvance: "Informe de avance",
+    informeAvanceDesc: "Descarga tu progreso y compártelo con tu equipo.",
     hola: "Hola,",
     nivelIA: "Nivel IA",
     nivelJuego: "Nivel de juego",
     puntos: "Puntos",
-    badges: "Badges",
+    badges: "Insignias",
     tuRutaHoy: "Tu ruta de hoy",
     verCompleta: "Ver completa →",
     fases: "fases",
-    tusBadges: "Tus badges",
+    tusBadges: "Tus insignias",
     verMiPerfil: "Ver mi perfil →",
-    herramientasRapidas: "Herramientas rapidas",
+    herramientasRapidas: "Herramientas rápidas",
     miProgreso: "Mi progreso →",
     genPlaneaciones: "Generador de Planeaciones",
-    creadorRubricas: "Creador de Rubricas",
-    bancoPrompts: "Banco de Prompts Pedagogicos",
+    creadorRubricas: "Creador de Rúbricas",
+    bancoPrompts: "Banco de Prompts Pedagógicos",
   },
   tmaid: {
     introTitulo: "Tu Diagnóstico Docente IA",
     introTexto:
       "Estas 4 dimensiones son el modelo TMAID (Test de Madurez IA Docente) de Learn5: miden qué sabes, qué tanto lo usas, qué tanto lo integras a tu enseñanza y qué tan abierto estás a seguir aprendiendo.",
-    comenzarDiagnostico: "Comenzar Diagnóstico",
-    procesandoTitulo: "Procesando tu perfil...",
+    comenzarDiagnostico: "Comenzar diagnóstico",
+    procesandoTitulo: "Calculando tu perfil...",
     procesandoTexto:
-      "Nuestra IA está analizando tus respuestas para generar tu ruta personalizada.",
+      "Comparamos tus respuestas con el modelo TMAID de Learn5, guardamos tu perfil y preparamos tu ruta formativa.",
     dimensionLabel: "DIMENSIÓN:",
     integracionCurricular: "Integración Curricular",
     escenario: "Escenario",
-    finalizarDiagnostico: "Finalizar Diagnóstico",
+    finalizarDiagnostico: "Finalizar diagnóstico",
     // Resultado
     tuPerfilIa: "TU PERFIL IA",
-    mapaCompetencias: "Mapa de Competencias",
-    diagnosticoPorDimension: "Diagnóstico por Dimensión",
-    accionesPrioritarias: "Acciones Prioritarias",
-    tusBadges: "Tus badges",
-    verPlanRuta: "Ver Mi Plan de Ruta Personalizado",
+    mapaCompetencias: "Mapa de competencias",
+    diagnosticoPorDimension: "Diagnóstico por dimensión",
+    accionesPrioritarias: "Acciones prioritarias",
+    tusBadges: "Tus insignias",
+    verPlanRuta: "Ver mi plan de ruta personalizado",
     verAnalisis: "Ver análisis detallado de mi perfil IA",
     personaIniciante: "Docente Explorador",
     personaEnDesarrollo: "Docente Curioso",
     personaAvanzado: "Docente Aplicador",
     personaExperto: "Docente Referente",
-    nivelIniciante: "Iniciante",
+    // OJO: "Iniciante" sigue siendo la CLAVE canónica de nivelAsignado
+    // (persistida en Supabase/localStorage). Aquí solo cambia la etiqueta
+    // visible a "Principiante", que es el término correcto en español.
+    nivelIniciante: "Principiante",
     nivelEnDesarrollo: "En desarrollo",
     nivelAvanzado: "Avanzado",
     nivelExperto: "Experto",
@@ -207,12 +210,12 @@ const es = {
     retoDe: "Reto {n} de {total}",
     revisionTitulo: "Revisión del Reto",
     revisionTexto:
-      "Compara tu propuesta con la retroalimentación de la IA y evalúa tu experiencia para avanzar.",
+      "Compara tu propuesta con la revisión que hace Professor AI de tu prompt y evalúa tu experiencia para avanzar.",
     tuPropuesta: "Tu Propuesta",
-    retroIA: "Retroalimentación IA",
+    retroIA: "Revisión de tu prompt",
     autoevaluacion: "Autoevaluación",
     utilPregunta:
-      "¿Qué tan útil te ha parecido la retroalimentación de la IA para tu práctica docente?",
+      "¿Qué tan útil te ha parecido esta revisión para tu práctica docente?",
     calificarAria: "Calificar con {n} estrella(s)",
     marcarCompletado: "Marcar como completado",
     confirmarXP: "Confirmar y ganar XP",
@@ -233,8 +236,12 @@ const es = {
     escribePrompt: "Escribe tu prompt aquí...",
     procesandoMayus: "PROCESANDO...",
     enviarReto: "ENVIAR Y COMPLETAR RETO",
-    previewOutput: "Preview de Output IA",
-    esperandoPrompt: "Esperando tu prompt para generar el resultado...",
+    previewOutput: "Qué pasa al enviar",
+    previewSinIA:
+      "Professor AI todavía no escribe la respuesta por ti: esta versión no tiene un modelo de IA generativa conectado. Al enviar, revisamos tu prompt contra los criterios de esta fase y te devolvemos retroalimentación concreta sobre cómo mejorarlo.",
+    previewCopia:
+      "Mientras tanto, copia tu prompt en la herramienta de IA que uses (ChatGPT, Gemini, Claude) para ver el resultado real.",
+    previewRevisando: "Revisando tu prompt...",
     reflexionTitulo: "Actividad 2 · Reflexión",
     hecha: "Hecha",
     escribeReflexion: "Escribe tu reflexión aquí...",
@@ -282,7 +289,7 @@ const es = {
     // Planeación Pro
     generadorClases: "Generador de Clases",
     personalizaSecuencia:
-      "Personaliza tu secuencia didáctica con el poder de la IA.",
+      "Arma tu secuencia didáctica en minutos a partir de plantillas pedagógicas de Learn5.",
     temaClase: "Tema de la clase",
     temaPlaceholder: "Ej. Fotosíntesis",
     nivel: "Nivel",
@@ -338,7 +345,7 @@ const es = {
     numNivelesDesc: "Define cuántas columnas tendrá tu rúbrica.",
     tonoRetro: "Tono de Retroalimentación",
     idiomaSalida: "Idioma de Salida",
-    iaSugiere: "IA Sugiere",
+    iaSugiere: "Sugerencia de Learn5",
     iaSugerencia:
       'Para {tipo} en nivel de {nivel}, te recomendamos incluir criterios como "{c1}" y "{c2}".',
     vistaPreviaDesc: "{n} niveles de desempeño · {tono} · {idioma}",
@@ -452,9 +459,9 @@ const es = {
   insignias: {
     reconocimiento: "Reconocimiento",
     tusInsignias: "Tus Insignias",
-    rarezaComun: "Comun",
+    rarezaComun: "Común",
     rarezaRara: "Rara",
-    rarezaEpica: "Epica",
+    rarezaEpica: "Épica",
     rarezaLegendaria: "Legendaria",
     insigniaDestacada: "Insignia Destacada",
     coleccion: "COLECCIÓN",
@@ -493,21 +500,93 @@ const es = {
     guardarPass: "Guardar contraseña",
     irLogin: "Ir a iniciar sesión",
   },
+  /**
+   * Planes (antes "Premium"). Reescrito tras la auditoría de producto
+   * (sep 2026): la versión anterior vendía cuatro funciones que no existen
+   * en el código (feedback 24/7, mapas mentales, modelos GPT prioritarios,
+   * sincronización con calendario). Ahora la pantalla separa de forma
+   * explícita lo que YA existe (Plan Docente, gratis), lo que se cobrará
+   * cuando abramos pagos (Plan Pro, precio previsto) y lo que todavía no
+   * existe ("En camino"). Nada aquí puede prometer algo que la app no
+   * hace hoy.
+   */
   premium: {
-    slogan: "La IA que evoluciona contigo.",
-    exclusivo: "Exclusivo para miembros Premium.",
-    titulo: "Desbloquea tu Tutor IA Personal",
-    beneficio1: "Feedback inmediato y personalizado 24/7.",
-    beneficio2: "Generación ilimitada de mapas mentales.",
-    beneficio3: "Acceso prioritario a nuevos modelos GPT.",
-    beneficio4: "Sincronización total con tu calendario.",
-    mes: "/mes",
-    oferta: "Oferta Limitada",
-    probar: "Probar Premium 7 días gratis",
+    etiqueta: "Planes",
+    titulo: "Tu plan y lo que viene",
+    subtitulo:
+      "Durante el piloto, Professor AI es gratuito. Aquí está lo que ya tienes, lo que traerá el Plan Pro y lo que todavía estamos construyendo.",
+    // Plan Docente -- solo funciones que existen hoy en la app.
+    docenteEtiqueta: "Incluido",
+    docenteTitulo: "Plan Docente",
+    docenteSubtitulo: "Ya está activo en tu cuenta, sin costo.",
+    docente1: "Diagnóstico TMAID completo y tu perfil docente.",
+    docente2: "Ruta de aprendizaje personalizada con retos prácticos.",
+    docente3:
+      "Herramientas de aula: planeación, rúbricas, adaptador de contenido y banco de prompts.",
+    docente4: "Progreso, insignias e informe de avance.",
+    // Plan Pro -- NO contratable hoy. El precio es previsto, no un cobro.
+    proEtiqueta: "Cuando abramos los pagos",
+    proTitulo: "Plan Pro",
+    proPrecio: "$9.90",
+    proPrecioNota: "/mes previsto — hoy no se cobra nada",
+    pro1: "Todo lo del Plan Docente.",
+    pro2: "Descarga de informes y rúbricas para compartir con tu equipo.",
+    pro3: "Historial de diagnósticos para medir tu avance a lo largo del año.",
+    pro4: "Biblioteca ampliada de prompts y plantillas.",
+    pro5: "Acceso a las herramientas nuevas apenas se publiquen.",
+    pro6: "Soporte prioritario de Learn5.",
+    // En camino -- nada de esto está disponible todavía.
+    caminoEtiqueta: "No disponible todavía",
+    caminoTitulo: "En camino",
+    caminoNota:
+      "Nada de esta lista está disponible todavía. La mostramos para que sepas hacia dónde va el producto, no como parte de lo que recibes hoy ni de lo que contratarías.",
+    camino1: "Generación con IA real dentro de las herramientas.",
+    camino2: "Videos y podcasts descargables.",
+    camino3:
+      "Constancia de horas de formación: sería una constancia de participación emitida por Learn5, no una certificación académica, y solo existirá si logramos acreditarla con una institución aliada.",
+    camino4: "Panel para instituciones.",
+    cta: "Quiero saber cuándo esté disponible",
+    ctaConfirmado:
+      "Anotado. Te escribiremos al correo de tu cuenta cuando el Plan Pro esté disponible.",
     avisoPagos:
-      "Los pagos todavía no están activos en esta versión de prueba. Cuando lancemos Premium te avisaremos por correo para activarlo con un clic.",
-    cancela: "Cancela cuando quieras. Sin compromiso.",
+      "Los pagos no están activos: hoy no te pedimos tarjeta ni te cobramos nada. Cuando el Plan Pro exista te avisaremos por correo y tú decides si lo quieres.",
     cerrar: "Cerrar",
+  },
+  /**
+   * Estado de guardado (SyncIndicator) y pantalla ErrorSesion. Textos
+   * deliberadamente honestos: si algo no se guardo, se dice -- el docente
+   * necesita poder confiar en que su avance esta a salvo antes de cerrar la
+   * app en medio de una clase.
+   */
+  sync: {
+    guardando: "Guardando…",
+    sinConexion: "Sin conexión — tu avance se guardará al reconectar",
+    error: "No pudimos guardar tu avance.",
+    reintentar: "Reintentar",
+    reintentando: "Reintentando…",
+    cerrarSesion: "Cerrar sesión",
+    cerrandoSesion: "Cerrando sesión…",
+    errorSesionTitulo: "No pudimos abrir tu sesión",
+    errorSesionTexto:
+      "Tu cuenta existe, pero hubo un problema al leer tus datos. Tu avance no se perdió. Vuelve a intentarlo; si sigue igual, cierra sesión y entra de nuevo.",
+    errorSesionRedTitulo: "Sin conexión",
+    errorSesionRedTexto:
+      "No pudimos conectarnos para cargar tus datos. Revisa tu conexión e intenta de nuevo — tu cuenta y tu avance siguen intactos.",
+  },
+  /**
+   * Pantalla de error global (src/app/error.tsx). Se lee desde un error
+   * boundary, así que error.tsx NO depende del IdiomaProvider para
+   * renderizarla: resuelve el idioma leyendo directamente localStorage.
+   */
+  error: {
+    titulo: "Algo falló de nuestro lado",
+    texto:
+      "No pudimos mostrar esta pantalla. Tu cuenta y tu avance están a salvo: casi siempre basta con reintentar.",
+    reintentar: "Reintentar",
+    irInicio: "Ir al inicio",
+    detalleLabel: "Detalle técnico (útil si nos escribes):",
+    contacto:
+      "Si vuelve a pasar, escríbenos a contacto@learn5.tech contándonos qué estabas haciendo.",
   },
 } as const;
 
@@ -519,11 +598,11 @@ const en: Traducciones = {
   splash: {
     badge: "Built for educators",
     descripcion:
-      "Your AI assistant for the classroom. Diagnose your level, build your pathway and create materials in minutes, not hours.",
+      "Your AI assistant for the classroom. Check where you stand, build your pathway and create materials in minutes, not hours.",
     comenzar: "Start for free",
     yaTengoCuenta: "I already have an account →",
     ejemplo: "E.g.: a rubric that takes 30 min by hand takes 5 here.",
-    valor1: "AI Diagnosis",
+    valor1: "AI Readiness Check",
     valor2: "Personalized pathways",
     valor3: "Classroom tools",
     perfilIa: "Your AI Profile",
@@ -554,7 +633,7 @@ const en: Traducciones = {
     subtituloReal:
       "Use a real email and password -- you'll need them to sign back in.",
     nombre: "Full name",
-    nombrePlaceholder: "Dr. Julian Casablancas",
+    nombrePlaceholder: "E.g.: Maria Gonzalez",
     email: "Email",
     password: "Password",
     terminos: "I accept the terms and conditions",
@@ -571,13 +650,13 @@ const en: Traducciones = {
   },
   shell: {
     inicio: "Home",
-    diagnostico: "Diagnosis",
+    diagnostico: "Assessment",
     rutas: "Pathways",
     progreso: "Progress",
     perfil: "Profile",
     premium: "Premium",
-    premiumTitle: "Meet AI Tutor Premium",
-    bloqueado: "Complete the TMAID diagnosis first",
+    premiumTitle: "Explore Premium",
+    bloqueado: "Complete the TMAID assessment first",
     salir: "Sign out",
   },
   comun: {
@@ -592,18 +671,18 @@ const en: Traducciones = {
     ptsAbrev: "pts",
     nivelAbrev: "Lv.",
     demoAviso:
-      "Demo version of Professor AI (Learn5) — sample content, subject to change. Reproduction or distribution without authorization is prohibited. © 2026 Learn5.",
+      "Professor AI (Learn5) — pilot version. Reproduction or distribution without authorization is prohibited. © 2026 Learn5.",
     cerrarAviso: "Dismiss notice",
     descargarTxt: "Download as .txt",
     copiarPortapapeles: "Copy to clipboard",
   },
   onboarding: {
-    analisis1: "Analyzing your profile...",
-    analisis2: "Building your pathway...",
-    analisis3: "Identifying challenges...",
-    analisis4: "Syncing AI models...",
+    analisis1: "Saving your educator profile...",
+    analisis2: "Recording your subject and level...",
+    analisis3: "Noting the challenge you told us about...",
+    analisis4: "Getting your TMAID assessment ready...",
     analisis5: "Almost ready!",
-    motorActivo: "Educational Intelligence Engine Active",
+    motorActivo: "Learn5 TMAID model",
     pasoNivel: "What level do you teach?",
     pasoMateria: "What do you teach?",
     pasoMateriaSub: "Type your subject or pick one of the suggestions.",
@@ -619,15 +698,15 @@ const en: Traducciones = {
   dashboard: {
     todoEmpieza: "Everything starts here",
     introTexto:
-      "To begin your academic transformation journey with AI, we need to understand your starting point. Take your first diagnosis and unlock your personalized pathway.",
-    hacerDiagnostico: "Take my diagnosis",
+      "To begin your academic transformation journey with AI, we need to understand your starting point. Take your first AI Readiness Check and unlock your personalized pathway.",
+    hacerDiagnostico: "Take my AI Readiness Check",
     toma5min: "Takes about 5 minutes",
-    analisisIA: "AI Analysis",
-    analisisIADesc: "We assess your current competencies.",
-    rutaUnica: "Unique Pathway",
-    rutaUnicaDesc: "Content tailored to your specialty.",
-    certificacion: "Certification",
-    certificacionDesc: "Validate your progress with your institution.",
+    analisisIA: "TMAID assessment",
+    analisisIADesc: "We measure your competencies across 4 dimensions.",
+    rutaUnica: "Personalized pathway",
+    rutaUnicaDesc: "Challenges tailored to your subject and starting point.",
+    informeAvance: "Progress report",
+    informeAvanceDesc: "Download your progress and share it with your team.",
     hola: "Hi,",
     nivelIA: "AI Level",
     nivelJuego: "Game level",
@@ -645,27 +724,27 @@ const en: Traducciones = {
     bancoPrompts: "Pedagogical Prompt Bank",
   },
   tmaid: {
-    introTitulo: "Your AI Teaching Diagnosis",
+    introTitulo: "Your AI Readiness Check",
     introTexto:
       "These 4 dimensions make up Learn5's TMAID model (AI Teaching Maturity Test): they measure what you know, how much you use it, how deeply you integrate it into your teaching, and how open you are to keep learning.",
-    comenzarDiagnostico: "Start Diagnosis",
-    procesandoTitulo: "Processing your profile...",
+    comenzarDiagnostico: "Start the assessment",
+    procesandoTitulo: "Calculating your profile...",
     procesandoTexto:
-      "Our AI is analyzing your answers to generate your personalized pathway.",
+      "We compare your answers against Learn5's TMAID model, save your profile and prepare your learning pathway.",
     dimensionLabel: "DIMENSION:",
     integracionCurricular: "Curricular Integration",
     escenario: "Scenario",
-    finalizarDiagnostico: "Finish Diagnosis",
+    finalizarDiagnostico: "Finish the assessment",
     tuPerfilIa: "YOUR AI PROFILE",
     mapaCompetencias: "Competency Map",
-    diagnosticoPorDimension: "Diagnosis by Dimension",
+    diagnosticoPorDimension: "Results by Dimension",
     accionesPrioritarias: "Priority Actions",
     tusBadges: "Your badges",
     verPlanRuta: "View My Personalized Pathway Plan",
     verAnalisis: "View the detailed analysis of my AI profile",
     personaIniciante: "Explorer Educator",
     personaEnDesarrollo: "Curious Educator",
-    personaAvanzado: "Applier Educator",
+    personaAvanzado: "Hands-On Educator",
     personaExperto: "Leading Educator",
     nivelIniciante: "Beginner",
     nivelEnDesarrollo: "Developing",
@@ -680,7 +759,7 @@ const en: Traducciones = {
     radarIntegracion: "INTEGRATION",
     radarActitud: "ATTITUDE",
     volverPerfil: "Back to my profile",
-    diagnosticoTmaid: "TMAID Diagnosis",
+    diagnosticoTmaid: "TMAID Assessment",
     analisisDetallado: "Detailed analysis",
     dimensionesIA: "AI Dimensions",
     comparativo: "Comparative analysis of your digital competencies",
@@ -711,12 +790,12 @@ const en: Traducciones = {
     retoDe: "Challenge {n} of {total}",
     revisionTitulo: "Challenge Review",
     revisionTexto:
-      "Compare your proposal with the AI feedback and rate your experience to move forward.",
+      "Compare your proposal with Professor AI's review of your prompt and rate your experience to move forward.",
     tuPropuesta: "Your Proposal",
-    retroIA: "AI Feedback",
+    retroIA: "Prompt review",
     autoevaluacion: "Self-Assessment",
     utilPregunta:
-      "How useful was the AI feedback for your teaching practice?",
+      "How useful was this review for your teaching practice?",
     calificarAria: "Rate with {n} star(s)",
     marcarCompletado: "Mark as completed",
     confirmarXP: "Confirm and earn XP",
@@ -737,8 +816,12 @@ const en: Traducciones = {
     escribePrompt: "Write your prompt here...",
     procesandoMayus: "PROCESSING...",
     enviarReto: "SUBMIT AND COMPLETE CHALLENGE",
-    previewOutput: "AI Output Preview",
-    esperandoPrompt: "Waiting for your prompt to generate the result...",
+    previewOutput: "What happens when you submit",
+    previewSinIA:
+      "Professor AI doesn't write the answer for you yet: this version has no generative AI model connected. When you submit, we review your prompt against the criteria of this phase and give you concrete feedback on how to improve it.",
+    previewCopia:
+      "In the meantime, copy your prompt into the AI tool you use (ChatGPT, Gemini, Claude) to see the real output.",
+    previewRevisando: "Reviewing your prompt...",
     reflexionTitulo: "Activity 2 · Reflection",
     hecha: "Done",
     escribeReflexion: "Write your reflection here...",
@@ -753,7 +836,7 @@ const en: Traducciones = {
     tipoVideo: "Video",
     tipoLectura: "Reading",
     tipoLibro: "Book",
-    tipoConsulta: "Consult",
+    tipoConsulta: "Ask a colleague",
     detalleModuloTitulo: "Module Detail",
     volverRuta: "Back to my pathway",
     moduloChip: "MODULE",
@@ -784,7 +867,7 @@ const en: Traducciones = {
       "A real guide to adapt your material to SEN, reading level or language level.",
     generadorClases: "Lesson Generator",
     personalizaSecuencia:
-      "Personalize your teaching sequence with the power of AI.",
+      "Build your teaching sequence in minutes from Learn5's pedagogical templates.",
     temaClase: "Lesson topic",
     temaPlaceholder: "E.g. Photosynthesis",
     nivel: "Level",
@@ -838,7 +921,7 @@ const en: Traducciones = {
     numNivelesDesc: "Defines how many columns your rubric will have.",
     tonoRetro: "Feedback Tone",
     idiomaSalida: "Output Language",
-    iaSugiere: "AI Suggests",
+    iaSugiere: "Learn5 suggests",
     iaSugerencia:
       'For {tipo} at {nivel} level, we recommend including criteria such as "{c1}" and "{c2}".',
     vistaPreviaDesc: "{n} performance levels · {tono} · {idioma}",
@@ -901,13 +984,13 @@ const en: Traducciones = {
       "Illustrative activity — soon it will reflect your real usage of the platform.",
     listoSiguiente: "Ready for the next level?",
     repetirTexto:
-      "You can retake your TMAID diagnosis anytime to update your AI profile.",
-    repetirDiagnostico: "Retake diagnosis",
+      "You can retake your TMAID assessment anytime to update your AI profile.",
+    repetirDiagnostico: "Retake the assessment",
     tuEvolucion: "Your evolution",
     sinDatos:
-      "There isn't enough data to compare yet. This activates automatically after your first recorded TMAID diagnosis.",
+      "There isn't enough data to compare yet. This activates automatically after your first recorded TMAID assessment.",
     unicoDiagnostico:
-      "This is your only diagnosis so far ({nivel}, {puntaje}/5). Retake the TMAID later from this screen to see how you progress.",
+      "This is your only assessment so far ({nivel}, {puntaje}/5). Retake the TMAID later from this screen to see how you progress.",
     puntoPartida: "Starting point",
     ahora: "Now",
   },
@@ -924,12 +1007,12 @@ const en: Traducciones = {
     pais: "Country",
     nivelChip: "Level {nivel}",
     puntajePromedio: "Average score:",
-    diagnosticoPorDimension: "Diagnosis by dimension",
+    diagnosticoPorDimension: "Results by dimension",
     evolucion: "Evolution",
     sinDatosInforme:
-      "There isn't enough data to compare yet. This activates automatically after the first recorded TMAID diagnosis.",
+      "There isn't enough data to compare yet. This activates automatically after the first recorded TMAID assessment.",
     unicoInforme:
-      "Only diagnosis so far ({nivel}, {puntaje}/5). Retake the TMAID from /progreso to be able to compare later.",
+      "Only assessment so far ({nivel}, {puntaje}/5). Retake the TMAID from /progreso to be able to compare later.",
     rutaFormativa: "Learning pathway",
     modulosActividades: "{mc}/{mt} modules · {ah}/{at} activities",
     modulo: "Module",
@@ -993,24 +1076,80 @@ const en: Traducciones = {
     irLogin: "Go to sign in",
   },
   premium: {
-    slogan: "The AI that evolves with you.",
-    exclusivo: "Exclusive to Premium members.",
-    titulo: "Unlock your Personal AI Tutor",
-    beneficio1: "Immediate, personalized feedback 24/7.",
-    beneficio2: "Unlimited mind map generation.",
-    beneficio3: "Priority access to new GPT models.",
-    beneficio4: "Full sync with your calendar.",
-    mes: "/mo",
-    oferta: "Limited Offer",
-    probar: "Try Premium free for 7 days",
+    etiqueta: "Plans",
+    titulo: "Your plan and what's coming",
+    subtitulo:
+      "Professor AI is free during the pilot. Here is what you already have, what the Pro plan will add, and what we are still building.",
+    docenteEtiqueta: "Included",
+    docenteTitulo: "Educator Plan",
+    docenteSubtitulo: "Already active in your account, at no cost.",
+    docente1: "Full TMAID assessment and your educator profile.",
+    docente2: "A personalized learning pathway with practical challenges.",
+    docente3:
+      "Classroom tools: lesson planning, rubrics, content adapter and prompt bank.",
+    docente4: "Progress, badges and a progress report.",
+    proEtiqueta: "When we open payments",
+    proTitulo: "Pro Plan",
+    proPrecio: "$9.90",
+    proPrecioNota: "/mo expected — nothing is charged today",
+    pro1: "Everything in the Educator Plan.",
+    pro2: "Downloadable reports and rubrics to share with your team.",
+    pro3: "Assessment history to measure your progress across the year.",
+    pro4: "An expanded library of prompts and templates.",
+    pro5: "Access to new tools as soon as they ship.",
+    pro6: "Priority support from Learn5.",
+    caminoEtiqueta: "Not available yet",
+    caminoTitulo: "On the way",
+    caminoNota:
+      "None of this is available yet. We list it so you know where the product is heading, not as part of what you get today or of what you would be paying for.",
+    camino1: "Real AI generation inside the tools.",
+    camino2: "Downloadable videos and podcasts.",
+    camino3:
+      "Record of training hours: this would be a certificate of participation issued by Learn5, not an academic certification, and it will only exist if we manage to have it accredited with a partner institution.",
+    camino4: "An institution dashboard.",
+    cta: "Tell me when it's available",
+    ctaConfirmado:
+      "Noted. We'll email the address on your account when the Pro plan is available.",
     avisoPagos:
-      "Payments are not active yet in this trial version. When we launch Premium we'll email you so you can activate it with one click.",
-    cancela: "Cancel anytime. No commitment.",
+      "Payments are not active: we are not asking for a card and nothing is charged today. When the Pro plan exists we'll email you and you decide whether you want it.",
     cerrar: "Close",
+  },
+  sync: {
+    guardando: "Saving…",
+    sinConexion: "You're offline — your progress will be saved when you reconnect",
+    error: "We couldn't save your progress.",
+    reintentar: "Retry",
+    reintentando: "Retrying…",
+    cerrarSesion: "Sign out",
+    cerrandoSesion: "Signing out…",
+    errorSesionTitulo: "We couldn't open your session",
+    errorSesionTexto:
+      "Your account exists, but something went wrong reading your data. Your progress is not lost. Try again; if it keeps failing, sign out and sign back in.",
+    errorSesionRedTitulo: "No connection",
+    errorSesionRedTexto:
+      "We couldn't connect to load your data. Check your connection and try again — your account and your progress are intact.",
+  },
+  error: {
+    titulo: "Something broke on our side",
+    texto:
+      "We couldn't show this screen. Your account and your progress are safe — retrying is usually enough.",
+    reintentar: "Try again",
+    irInicio: "Go to home",
+    detalleLabel: "Technical detail (useful if you write to us):",
+    contacto:
+      "If it happens again, email us at contacto@learn5.tech and tell us what you were doing.",
   },
 };
 
 export type Idioma = "es" | "en";
+
+/**
+ * Clave de localStorage donde se guarda el idioma elegido. Vive aquí (y no
+ * en i18n/index.tsx) para que un error boundary como src/app/error.tsx
+ * pueda resolver el idioma sin depender del IdiomaProvider -- que puede ser
+ * justo lo que falló.
+ */
+export const IDIOMA_STORAGE_KEY = "professor-ai:idioma";
 
 export const TRADUCCIONES: Record<Idioma, Traducciones> = { es, en };
 
